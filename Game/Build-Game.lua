@@ -17,7 +17,8 @@ project "Game"
 
     includedirs
     {
-        "src"
+        "src",
+        "%{wks.location}/vendor/OpenGL/include"
     }
 
     libdirs
@@ -26,6 +27,7 @@ project "Game"
 
     links
     {
+        "OpenGL32.lib"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")

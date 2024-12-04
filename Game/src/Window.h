@@ -23,6 +23,7 @@ namespace Game {
 
 	private:
 		AutoRelease<::HWND, nullptr> m_Window;
+		AutoRelease<::HDC> m_DeviceCtx;
 		::WNDCLASSA m_WndClass;
 	};
 

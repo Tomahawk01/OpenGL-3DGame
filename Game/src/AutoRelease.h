@@ -10,7 +10,7 @@ namespace Game {
 	{
 	public:
 		AutoRelease()
-			: AutoRelease({}, nullptr)
+			: AutoRelease(Invalid, nullptr)
 		{}
 
 		AutoRelease(T obj, std::function<void(T)> deleter)
@@ -48,6 +48,7 @@ namespace Game {
 
 		T Get() const { return m_Object; }
 		operator T() const { return m_Object; }
+		explicit operator bool() const { return m_Object != Invalid; }
 
 	private:
 		T m_Object;
