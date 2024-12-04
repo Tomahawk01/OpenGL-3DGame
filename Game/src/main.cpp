@@ -4,34 +4,26 @@
 #include <iostream>
 #include <print>
 
-void bar()
-{
-	throw Game::Exception("err");
-}
-
-void foo()
-{
-	bar();
-}
-
 int main()
 {
 	std::println("hello world");
 
 	try
 	{
-		foo();
+		Game::Window window{ 800u, 600u };
+
+		while (window.IsRunning())
+		{
+
+		}
 	}
-	catch (Game::Exception& err)
+	catch (const Game::Exception& err)
 	{
-		std::println(std::cerr, "exception {} {}", err.what(), err.Stacktrace());
+		std::println(std::cerr, "Exception {}", err);
 	}
-
-	Game::Window window{ 800u, 600u };
-
-	while (window.IsRunning())
+	catch (...)
 	{
-
+		std::println(std::cerr, "Unknown exception");
 	}
 
 	return 0;

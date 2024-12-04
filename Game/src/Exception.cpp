@@ -3,7 +3,7 @@
 namespace Game {
 
 	Exception::Exception(const std::string& what)
-		: std::runtime_error(what), m_Trace(std::stacktrace::current())
+		: std::runtime_error(what), m_Trace(std::stacktrace::current(1))
 	{}
 
 	std::string Exception::Stacktrace() const
