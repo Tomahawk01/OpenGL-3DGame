@@ -21,6 +21,8 @@ namespace Game {
 
 		bool IsRunning() const;
 
+		void Swap() const;
+
 	private:
 		AutoRelease<::HWND, nullptr> m_Window;
 		AutoRelease<::HDC> m_DeviceCtx;

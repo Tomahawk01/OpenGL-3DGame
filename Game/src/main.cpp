@@ -1,5 +1,6 @@
-#include "Window.h"
 #include "Exception.h"
+#include "OpenGL.h"
+#include "Window.h"
 
 #include <iostream>
 #include <print>
@@ -12,9 +13,20 @@ int main()
 	{
 		Game::Window window{ 800u, 600u };
 
+		::glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+		// TODO: Create shaders and program
+		// TODO: Link shaders and program
+		// TODO: Create VBO and VAO
+		// TODO: Setup all that
+
 		while (window.IsRunning())
 		{
+			::glClear(GL_COLOR_BUFFER_BIT);
 
+			// TODO: Draw
+
+			window.Swap();
 		}
 	}
 	catch (const Game::Exception& err)

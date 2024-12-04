@@ -1,9 +1,8 @@
 #include "Window.h"
 
 #include "Error.h"
-
-#include <gl/GL.h>
-#include "opengl/wglext.h"
+#define NO_EXTERN
+#include "OpenGL.h"
 
 #include <print>
 
@@ -31,7 +30,7 @@ namespace {
 	}
 
 	template<class T>
-	void ResolveWGLFunction(T& function, const std::string& name)
+	void ResolveGLFunction(T& function, const std::string& name)
 	{
 		const PROC address = ::wglGetProcAddress(name.c_str());
 		Game::Ensure(address != nullptr, "Could not resolve {}", name);
@@ -100,8 +99,8 @@ namespace {
 
 		// ========== Resolve GL functions here ==========
 
-		ResolveWGLFunction(wglCreateContextAttribsARB, "wglCreateContextAttribsARB");
-		ResolveWGLFunction(wglChoosePixelFormatARB, "wglChoosePixelFormatARB");
+		ResolveGLFunction(wglCreateContextAttribsARB, "wglCreateContextAttribsARB");
+		ResolveGLFunction(wglChoosePixelFormatARB, "wglChoosePixelFormatARB");
 
 		Game::Ensure(::wglMakeCurrent(dc, 0) == TRUE, "Could not unbind context");
 	}
@@ -141,6 +140,13 @@ namespace {
 		Game::Ensure(context != nullptr, "Failed to create gl context");
 
 		Game::Ensure(::wglMakeCurrent(dc, context) == TRUE, "Failed to make current context");
+	}
+
+	void ResolveGlobalGLFunctions()
+	{
+#define RESOLVE(TYPE, NAME) ResolveGLFunction(NAME, #NAME);
+
+		FOR_OPENGL_FUNCTIONS(RESOLVE)
 	}
 
 }
@@ -191,6 +197,7 @@ namespace Game {
 
 		ResolveWGLFunctions(m_WndClass.hInstance);
 		InitOpenGL(m_DeviceCtx);
+		ResolveGlobalGLFunctions();
 	}
 
 	bool Window::IsRunning() const
@@ -202,19 +209,12 @@ namespace Game {
 			::DispatchMessageA(&message);
 		}
 
-		static float b = 1.0f;
-		static float inc = -0.01f;
-
-		b += inc;
-		if (b <= 0.0f || b >= 1.0f)
-			inc *= -1.0f;
-
-		::glClearColor(0.1f, 0.1f, b, 1.0f);
-
-		::glClear(GL_COLOR_BUFFER_BIT);
-		::SwapBuffers(m_DeviceCtx);
-
 		return g_Running;
+	}
+
+	void Window::Swap() const
+	{
+		::SwapBuffers(m_DeviceCtx);
 	}
 
 }
