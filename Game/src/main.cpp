@@ -19,7 +19,7 @@ int main()
 	}
 	catch (const Game::Exception& err)
 	{
-		std::println(std::cerr, "Exception {}", err);
+		std::println(std::cerr, "{}", err);
 	}
 	catch (...)
 	{

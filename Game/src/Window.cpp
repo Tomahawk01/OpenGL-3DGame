@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "Error.h"
+
 #include <stdexcept>
 #include <print>
 
@@ -36,9 +38,7 @@ namespace Game {
 			.hInstance = ::GetModuleHandleA(nullptr),
 			.lpszClassName = "window class"
 		};
-
-		if (::RegisterClassA(&m_WndClass) == 0)
-			throw std::runtime_error("Failed to register class");
+		Ensure(::RegisterClassA(&m_WndClass) != 0, "Failed to register class");
 
 		::RECT rect{
 			.left = {},
@@ -46,9 +46,7 @@ namespace Game {
 			.right = static_cast<int>(width),
 			.bottom = static_cast<int>(height)
 		};
-
-		if (::AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false) == 0)
-			throw std::runtime_error("Could not resize window");
+		Ensure(::AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false) != 0, "Could not resize window");
 
 		m_Window = { ::CreateWindowExA(
 			0,
