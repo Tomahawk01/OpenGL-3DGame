@@ -10,6 +10,11 @@ project "Game"
         "**.cpp"
     }
 
+    defines
+    {
+        "NOMINMAX"
+    }
+
     includedirs
     {
         "src"
