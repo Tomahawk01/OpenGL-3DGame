@@ -1,6 +1,6 @@
 #include "Window.h"
 
-#include "Error.h"
+#include "Utilities/Error.h"
 #include "OpenGL.h"
 
 #include <print>

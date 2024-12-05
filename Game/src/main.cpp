@@ -1,5 +1,5 @@
-#include "Error.h"
-#include "Exception.h"
+#include "Utilities/Error.h"
+#include "Utilities/Exception.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "OpenGL.h"

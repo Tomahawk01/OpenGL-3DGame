@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AutoRelease.h"
-#include "Error.h"
-#include "Exception.h"
+#include "Utilities/AutoRelease.h"
+#include "Utilities/Error.h"
+#include "Utilities/Exception.h"
 #include "OpenGL.h"
 
 #include <format>
