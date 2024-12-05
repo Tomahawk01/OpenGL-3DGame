@@ -3,6 +3,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "OpenGL.h"
+#include "Renderer.h"
 #include "Shader.h"
 #include "Window.h"
 
@@ -47,22 +48,14 @@ int main()
 	{
 		Game::Window window{ 800u, 600u };
 
-		Game::Shader vertexShader{ vertex_shader_src, Game::ShaderType::VERTEX };
-		Game::Shader fragmentShader{ fragment_shader_src, Game::ShaderType::FRAGMENT };
+		const Game::Shader vertexShader{ vertex_shader_src, Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ fragment_shader_src, Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
-		Game::Mesh mesh{};
-
-		::glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		const Game::Renderer renderer{ std::move(material) };
 
 		while (window.IsRunning())
 		{
-			::glClear(GL_COLOR_BUFFER_BIT);
-
-			::glUseProgram(material.NativeHandle());
-			mesh.Bind();
-			::glDrawArrays(GL_TRIANGLES, 0, 3);
-			mesh.UnBind();
-
+			renderer.Render();
 			window.Swap();
 		}
 	}
