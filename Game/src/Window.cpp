@@ -12,6 +12,18 @@ namespace {
 
 	static bool g_Running = true;
 
+	void APIENTRY OpenGLDebugCallback(
+		::GLenum src,
+		::GLenum type,
+		::GLuint id,
+		::GLenum severity,
+		::GLsizei,
+		const ::GLchar* message,
+		const void*)
+	{
+		std::println("{} {} {} {} {}", src, type, id, severity, message);
+	}
+
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (Msg)
@@ -148,12 +160,20 @@ namespace {
 		FOR_OPENGL_FUNCTIONS(RESOLVE)
 	}
 
+	void SetupDebug()
+	{
+		::glEnable(GL_DEBUG_OUTPUT);
+		::glDebugMessageCallback(OpenGLDebugCallback, nullptr);
+	}
+
 }
 
 namespace Game {
 
 	Window::Window(std::uint32_t width, std::uint32_t height)
-		: m_Window({}), m_DeviceCtx({}), m_WndClass({})
+		: m_Window({})
+		, m_DeviceCtx({})
+		, m_WndClass({})
 	{
 		m_WndClass = {
 			.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
@@ -197,6 +217,7 @@ namespace Game {
 		ResolveWGLFunctions(m_WndClass.hInstance);
 		InitOpenGL(m_DeviceCtx);
 		ResolveGlobalGLFunctions();
+		SetupDebug();
 	}
 
 	bool Window::IsRunning() const
