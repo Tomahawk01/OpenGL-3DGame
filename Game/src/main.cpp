@@ -1,8 +1,6 @@
-#include "Utilities/Error.h"
 #include "Utilities/Exception.h"
+#include "Logger.h"
 #include "Material.h"
-#include "Mesh.h"
-#include "OpenGL.h"
 #include "Renderer.h"
 #include "Shader.h"
 #include "Window.h"
@@ -42,7 +40,7 @@ void main()
 
 int main()
 {
-	std::println("hello world");
+	Game::Logger::Info("Hello world");
 
 	try
 	{
