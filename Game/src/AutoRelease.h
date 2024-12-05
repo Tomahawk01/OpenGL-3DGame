@@ -49,6 +49,7 @@ namespace Game {
 		T Get() const { return m_Object; }
 		operator T() const { return m_Object; }
 		explicit operator bool() const { return m_Object != Invalid; }
+		T* operator&() noexcept { return std::addressof(m_Object); }
 
 	private:
 		T m_Object;
