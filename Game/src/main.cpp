@@ -1,6 +1,7 @@
 #include "Error.h"
 #include "Exception.h"
 #include "Material.h"
+#include "Mesh.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "Window.h"
@@ -42,46 +43,25 @@ int main()
 {
 	std::println("hello world");
 
-	static constexpr float vertex_data[] = {
-		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-	};
-
 	try
 	{
 		Game::Window window{ 800u, 600u };
 
-		Game::Shader vertexShader = Game::Shader{ vertex_shader_src, Game::ShaderType::VERTEX };
-		Game::Shader fragmentShader = Game::Shader{ fragment_shader_src, Game::ShaderType::FRAGMENT };
-		Game::Material material = Game::Material{ vertexShader, fragmentShader };
+		Game::Shader vertexShader{ vertex_shader_src, Game::ShaderType::VERTEX };
+		Game::Shader fragmentShader{ fragment_shader_src, Game::ShaderType::FRAGMENT };
+		Game::Material material{ vertexShader, fragmentShader };
+		Game::Mesh mesh{};
 
 		::glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-		::GLuint vao{};
-		::glGenVertexArrays(1, &vao);
-		::GLuint vbo{};
-		::glGenBuffers(1, &vbo);
-
-		::glBindVertexArray(vao);
-
-		::glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		::glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
-
-		::glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(0));
-		::glEnableVertexAttribArray(0);
-		::glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-		::glEnableVertexAttribArray(1);
-
-		::glBindVertexArray(0);
 
 		while (window.IsRunning())
 		{
 			::glClear(GL_COLOR_BUFFER_BIT);
 
 			::glUseProgram(material.NativeHandle());
-			::glBindVertexArray(vao);
+			mesh.Bind();
 			::glDrawArrays(GL_TRIANGLES, 0, 3);
+			mesh.UnBind();
 
 			window.Swap();
 		}
