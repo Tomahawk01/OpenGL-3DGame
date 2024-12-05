@@ -1,5 +1,6 @@
 #include "Error.h"
 #include "Exception.h"
+#include "Material.h"
 #include "OpenGL.h"
 #include "Shader.h"
 #include "Window.h"
@@ -53,16 +54,7 @@ int main()
 
 		Game::Shader vertexShader = Game::Shader{ vertex_shader_src, Game::ShaderType::VERTEX };
 		Game::Shader fragmentShader = Game::Shader{ fragment_shader_src, Game::ShaderType::FRAGMENT };
-
-		auto program = Game::AutoRelease<::GLuint>{
-			::glCreateProgram(),
-			::glDeleteProgram
-		};
-		Game::Ensure(program, "Failed to create OpenGL program");
-
-		::glAttachShader(program, vertexShader.NativeHandle());
-		::glAttachShader(program, fragmentShader.NativeHandle());
-		::glLinkProgram(program);
+		Game::Material material = Game::Material{ vertexShader, fragmentShader };
 
 		::glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
@@ -72,6 +64,7 @@ int main()
 		::glGenBuffers(1, &vbo);
 
 		::glBindVertexArray(vao);
+
 		::glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		::glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
 
@@ -86,7 +79,7 @@ int main()
 		{
 			::glClear(GL_COLOR_BUFFER_BIT);
 
-			::glUseProgram(program);
+			::glUseProgram(material.NativeHandle());
 			::glBindVertexArray(vao);
 			::glDrawArrays(GL_TRIANGLES, 0, 3);
 
