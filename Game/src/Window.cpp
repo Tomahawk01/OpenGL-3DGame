@@ -1,7 +1,6 @@
 #include "Window.h"
 
 #include "Error.h"
-#define NO_EXTERN
 #include "OpenGL.h"
 
 #include <print>
