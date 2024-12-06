@@ -5,9 +5,11 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Window.h"
+#include "Camera.h"
 
 #include <iostream>
 #include <print>
+#include <numbers>
 
 namespace {
 
@@ -62,9 +64,18 @@ int main()
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Renderer renderer{ std::move(material) };
 
+		const Game::Camera camera{
+			{3.0f, 0.0f, 5.0f},
+			{0.0f, 0.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f},
+			std::numbers::pi_v<float> / 4.0f,
+			800.0f, 600.0f,
+			0.1f, 100.0f
+		};
+
 		while (window.IsRunning())
 		{
-			renderer.Render();
+			renderer.Render(camera);
 			window.Swap();
 		}
 	}
