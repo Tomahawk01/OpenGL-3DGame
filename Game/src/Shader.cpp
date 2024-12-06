@@ -36,12 +36,12 @@ namespace Game {
 		Game::Ensure(result, "Failed to compile shader {}", m_Type);
 	}
 
-	ShaderType Shader::Type() const
+	ShaderType Shader::GetType() const
 	{
 		return m_Type;
 	}
 
-	::GLuint Shader::NativeHandle() const
+	::GLuint Shader::GetNativeHandle() const
 	{
 		return m_Handle;
 	}

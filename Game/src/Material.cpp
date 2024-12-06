@@ -5,8 +5,8 @@ namespace Game {
 	Material::Material(const Shader& vertexShader, const Shader& fragmentShader)
 		: m_Handle{}
 	{
-		Ensure(vertexShader.Type() == ShaderType::VERTEX, "Shader is not a vertex shader");
-		Ensure(fragmentShader.Type() == ShaderType::FRAGMENT, "Shader is not a fragment shader");
+		Ensure(vertexShader.GetType() == ShaderType::VERTEX, "Shader is not a vertex shader");
+		Ensure(fragmentShader.GetType() == ShaderType::FRAGMENT, "Shader is not a fragment shader");
 
 		m_Handle = AutoRelease<::GLuint>{
 			::glCreateProgram(),
@@ -14,12 +14,12 @@ namespace Game {
 		};
 		Ensure(m_Handle, "Failed to create OpenGL program");
 
-		::glAttachShader(m_Handle, vertexShader.NativeHandle());
-		::glAttachShader(m_Handle, fragmentShader.NativeHandle());
+		::glAttachShader(m_Handle, vertexShader.GetNativeHandle());
+		::glAttachShader(m_Handle, fragmentShader.GetNativeHandle());
 		::glLinkProgram(m_Handle);
 	}
 
-	::GLuint Material::NativeHandle() const
+	::GLuint Material::GetNativeHandle() const
 	{
 		return m_Handle;
 	}

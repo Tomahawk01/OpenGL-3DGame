@@ -21,8 +21,8 @@ namespace Game {
 	public:
 		Shader(std::string_view src, ShaderType type);
 
-		ShaderType Type() const;
-		::GLuint NativeHandle() const;
+		ShaderType GetType() const;
+		::GLuint GetNativeHandle() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;

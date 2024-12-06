@@ -20,7 +20,7 @@ namespace Game {
 	{
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		::glUseProgram(m_Material.NativeHandle());
+		::glUseProgram(m_Material.GetNativeHandle());
 
 		static float x = 2.0f;
 		static float z = 0.0f;
@@ -32,19 +32,19 @@ namespace Game {
 		t += 0.01f;
 
 		static constexpr mat4 model{ vec3{0.0f, 0.0f, 0.0f} };
-		const GLint modelUniform = ::glGetUniformLocation(m_Material.NativeHandle(), "model");
+		const GLint modelUniform = ::glGetUniformLocation(m_Material.GetNativeHandle(), "model");
 		::glUniformMatrix4fv(modelUniform, 1, GL_FALSE, model.data().data());
 
 		const mat4 view{ mat4::LookAt({x, 0.0f, z}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f})};
-		const GLint viewUniform = ::glGetUniformLocation(m_Material.NativeHandle(), "view");
+		const GLint viewUniform = ::glGetUniformLocation(m_Material.GetNativeHandle(), "view");
 		::glUniformMatrix4fv(viewUniform, 1, GL_FALSE, view.data().data());
 
 		static const mat4 projection{ mat4::Perspective(std::numbers::pi_v<float> / 4.0f, 800.0f, 600.0f, 0.1f, 100.0f) };
-		const GLint projectionUniform = ::glGetUniformLocation(m_Material.NativeHandle(), "projection");
+		const GLint projectionUniform = ::glGetUniformLocation(m_Material.GetNativeHandle(), "projection");
 		::glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, projection.data().data());
 
 		m_Mesh.Bind();
-		::glDrawArrays(GL_TRIANGLES, 0, 26);
+		::glDrawArrays(GL_TRIANGLES, 0, 36);
 		m_Mesh.UnBind();
 	}
 

@@ -11,7 +11,7 @@ namespace Game {
 	public:
 		Material(const Shader& vertexShader, const Shader& fragmentShader);
 
-		::GLuint NativeHandle() const;
+		::GLuint GetNativeHandle() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;
