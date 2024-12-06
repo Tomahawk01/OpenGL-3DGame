@@ -21,6 +21,8 @@ namespace Game {
 			return { i, -j, k };
 		}
 
+		constexpr bool operator==(const vec3&) const = default;
+
 		float x;
 		float y;
 		float z;

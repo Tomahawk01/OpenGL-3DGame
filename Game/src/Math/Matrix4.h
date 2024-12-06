@@ -40,6 +40,8 @@ namespace Game {
 
 		friend constexpr mat4& operator*=(mat4& m1, const mat4& m2);
 
+		constexpr bool operator==(const mat4&) const = default;
+
 	private:
 		std::array<float, 16u> m_Elements;
 	};
