@@ -163,6 +163,7 @@ namespace {
 	void SetupDebug()
 	{
 		::glEnable(GL_DEBUG_OUTPUT);
+		::glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		::glDebugMessageCallback(OpenGLDebugCallback, nullptr);
 	}
 
