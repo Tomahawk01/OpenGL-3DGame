@@ -5,9 +5,47 @@
 namespace {
 
 	static constexpr Game::VertexData vertex_data[] = {
-		{.position = { 0.0f, 0.5f, 0.0f}, .color = {1.0f, 0.0f, 0.0f}},
-		{.position = { -0.5f, -0.5f, 0.0f}, .color = {0.0f, 1.0f, 0.0f}},
-		{.position = { 0.5f, -0.5f, 0.0f}, .color = {0.0f, 0.0f, 1.0f}}
+		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+
+		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+
+		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
+		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
+		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
+		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
+		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
+		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
+
+		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
+		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
+		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
+		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
+		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
+		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
+
+		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
+		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
+		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
+		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
+		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
+		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
+
+		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
+		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
+		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
+		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
+		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
+		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.94f, 0.91f, 0.17f }}
 	};
 
 }

@@ -219,6 +219,8 @@ namespace Game {
 		InitOpenGL(m_DeviceCtx);
 		ResolveGlobalGLFunctions();
 		SetupDebug();
+
+		::glEnable(GL_DEPTH_TEST);
 	}
 
 	bool Window::IsRunning() const
