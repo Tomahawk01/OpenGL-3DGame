@@ -124,9 +124,9 @@ struct std::formatter<Game::mat4>
 	{
 		const float* data = obj.data().data();
 		return std::format_to(ctx.out(), "{} {} {} {}\n{} {} {} {}\n{} {} {} {}\n{} {} {} {}",
-			data[0], data[1], data[2], data[3], 
-			data[4], data[5], data[6], data[7],
-			data[8], data[9], data[10], data[11], 
-			data[12], data[13], data[14], data[15]);
+			data[0], data[4], data[8], data[12], 
+			data[1], data[5], data[9], data[13],
+			data[2], data[6], data[10], data[14], 
+			data[3], data[7], data[11], data[15]);
 	}
 };
