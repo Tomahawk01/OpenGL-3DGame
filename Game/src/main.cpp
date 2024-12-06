@@ -1,4 +1,5 @@
 #include "Utilities/Exception.h"
+#include "Math/Matrix4.h"
 #include "Logger.h"
 #include "Material.h"
 #include "Renderer.h"
@@ -18,9 +19,13 @@ layout(location = 1) in vec3 color;
 
 out vec3 vertex_color;
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 void main()
 {
-	gl_Position = vec4(position, 1.0);
+	gl_Position = projection * view * model * vec4(position, 1.0);
 	vertex_color = color;
 }
 	)";
@@ -41,6 +46,12 @@ void main()
 int main()
 {
 	Game::Logger::Info("Hello world");
+
+	Game::mat4 m1{ {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f} };
+	Game::mat4 m2{ {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f} };
+
+	m1 *= m2;
+	std::println("{}", m1);
 
 	try
 	{
