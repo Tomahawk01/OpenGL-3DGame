@@ -149,13 +149,7 @@ int main()
 			}
 			
 			const float speed = 0.4f;
-
-			walkDirection = Game::vec3::Normalize(walkDirection);
-			walkDirection.x *= speed;
-			walkDirection.y *= speed;
-			walkDirection.z *= speed;
-
-			camera.Translate(walkDirection);
+			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
 
 			renderer.Render(camera, scene);
 			window.Swap();

@@ -5,9 +5,9 @@ namespace {
 	Game::vec3 CreateDirection(float pitch, float yaw)
 	{
 		return Game::vec3::Normalize({
-			.x = std::cos(pitch) * std::cos(yaw),
-			.y = std::sin(pitch),
-			.z = std::cos(pitch) * std::sin(yaw)
+			std::cos(pitch) * std::cos(yaw),
+			std::sin(pitch),
+			std::cos(pitch) * std::sin(yaw)
 		});
 	}
 
