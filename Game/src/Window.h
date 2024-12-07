@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Utilities/AutoRelease.h"
+#include "Events/Event.h"
 
 #include <cstdint>
+#include <optional>
+
 #include <Windows.h>
 
 namespace Game {
@@ -19,8 +22,7 @@ namespace Game {
 		Window(Window&&) = default;
 		Window& operator=(Window&&) = default;
 
-		bool IsRunning() const;
-
+		std::optional<Event> PollEvent() const;
 		void Swap() const;
 
 	private:

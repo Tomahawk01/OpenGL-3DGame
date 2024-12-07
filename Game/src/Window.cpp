@@ -1,16 +1,20 @@
 #include "Window.h"
 
-#include "Utilities/Error.h"
 #include "OpenGL.h"
+#include "Logger.h"
+#include "Utilities/Error.h"
+#include "Events/Event.h"
 
 #include <print>
+#include <queue>
+#include <ranges>
 
 namespace {
 
 	PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB{};
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB{};
 
-	static bool g_Running = true;
+	static std::queue<Game::Event> g_EventQueue{};
 
 	void APIENTRY OpenGLDebugCallback(
 		::GLenum src,
@@ -29,12 +33,17 @@ namespace {
 		switch (Msg)
 		{
 		case WM_CLOSE:
-			std::println("Closing window");
-			g_Running = false;
-			break;
+		{
+			g_EventQueue.emplace(Game::StopEvent{});
+		} break;
+		case WM_KEYUP:
+		{
+			g_EventQueue.emplace(Game::KeyEvent{ static_cast<Game::Key>(wParam), Game::KeyState::UP });
+		} break;
 		case WM_KEYDOWN:
-			std::println("Key down");
-			break;
+		{
+			g_EventQueue.emplace(Game::KeyEvent{ static_cast<Game::Key>(wParam), Game::KeyState::DOWN });
+		} break;
 		}
 
 		return ::DefWindowProcA(hWnd, Msg, wParam, lParam);
@@ -223,7 +232,7 @@ namespace Game {
 		::glEnable(GL_DEPTH_TEST);
 	}
 
-	bool Window::IsRunning() const
+	std::optional<Event> Window::PollEvent() const
 	{
 		MSG message = ::MSG{};
 		while (::PeekMessageA(&message, nullptr, 0, 0, PM_REMOVE) != 0)
@@ -232,7 +241,14 @@ namespace Game {
 			::DispatchMessageA(&message);
 		}
 
-		return g_Running;
+		if (!std::ranges::empty(g_EventQueue))
+		{
+			const Game::Event event = g_EventQueue.front();
+			g_EventQueue.pop();
+			return event;
+		}
+
+		return {};
 	}
 
 	void Window::Swap() const

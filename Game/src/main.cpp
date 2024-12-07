@@ -12,6 +12,9 @@
 #include <iostream>
 #include <print>
 #include <numbers>
+#include <type_traits>
+#include <ranges>
+#include <unordered_map>
 
 namespace {
 
@@ -49,11 +52,7 @@ void main()
 
 int main()
 {
-	Game::mat4 m1{ {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f} };
-	Game::mat4 m2{ {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f} };
-
-	m1 *= m2;
-	std::println("{}", m1);
+	Game::Logger::Info("Hello world");
 
 	try
 	{
@@ -64,21 +63,63 @@ int main()
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{};
 		const Game::Renderer renderer{};
-		const Game::Entity entity1{ &mesh, &material, {.x = 0.0f, .y = -1.0f, .z = 0.0f} };
-		const Game::Entity entity2{&mesh, &material, {.x = 0.0f, .y = 2.0f, .z = 0.0f} };
-		Game::Scene scene{ {&entity1, &entity2} };
+		
+		std::vector<Game::Entity> entities{};
+		for (int i = -10; i < 10; i++)
+		{
+			for (int j = -10; j < 10; j++)
+			{
+				entities.emplace_back(&mesh, &material, Game::vec3{ static_cast<float>(i) * 2.5f, -2.0f, static_cast<float>(j) * 2.5f });
+			}
+		}
 
-		const Game::Camera camera{
-			{3.0f, 0.0f, 5.0f},
+		const Game::Scene scene{ entities | std::views::transform([](const auto& e) { return &e; }) | std::ranges::to<std::vector>() };
+
+		Game::Camera camera{
+			{0.0f, 0.0f, 5.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
 			800.0f, 600.0f,
-			0.1f, 100.0f
+			0.1f, 1000.0f
 		};
 
-		while (window.IsRunning())
+		std::unordered_map<Game::Key, bool> keyState{};
+
+		bool running = true;
+		while (running)
 		{
+			auto event = window.PollEvent();
+			while (event && running)
+			{
+				std::visit([&](auto&& arg) {
+					using T = std::decay_t<decltype(arg)>;
+
+					if constexpr (std::same_as<T, Game::StopEvent>)
+					{
+						running = false;
+					}
+					else if constexpr (std::same_as<T, Game::KeyEvent>)
+					{
+						if (arg.GetKey() == Game::Key::ESC)
+						{
+							running = false;
+						}
+						
+						keyState[arg.GetKey()] = arg.GetState() == Game::KeyState::DOWN;
+					}
+				}, * event);
+				event = window.PollEvent();
+			}
+
+			const Game::vec3 velocity{
+				(keyState[Game::Key::D] ? 1.0f : 0.0f) + (keyState[Game::Key::A] ? -1.0f : 0.0f),
+				(keyState[Game::Key::E] ? 1.0f : 0.0f) + (keyState[Game::Key::Q] ? -1.0f : 0.0f),
+				(keyState[Game::Key::S] ? 1.0f : 0.0f) + (keyState[Game::Key::W] ? -1.0f : 0.0f)
+			};
+
+			camera.Translate(Game::vec3::Normalize(velocity));
+
 			renderer.Render(camera, scene);
 			window.Swap();
 		}
