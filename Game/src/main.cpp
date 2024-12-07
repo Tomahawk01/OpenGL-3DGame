@@ -1,11 +1,13 @@
 #include "Utilities/Exception.h"
-#include "Math/Matrix4.h"
 #include "Logger.h"
 #include "Material.h"
 #include "Renderer.h"
 #include "Shader.h"
 #include "Window.h"
 #include "Camera.h"
+#include "Mesh.h"
+#include "Entity.h"
+#include "Scene.h"
 
 #include <iostream>
 #include <print>
@@ -47,8 +49,6 @@ void main()
 
 int main()
 {
-	Game::Logger::Info("Hello world");
-
 	Game::mat4 m1{ {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f} };
 	Game::mat4 m2{ {1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f, 1.0f, 2.0f, 3.0f, 4.0f} };
 
@@ -62,7 +62,11 @@ int main()
 		const Game::Shader vertexShader{ vertex_shader_src, Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ fragment_shader_src, Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
-		const Game::Renderer renderer{ std::move(material) };
+		const Game::Mesh mesh{};
+		const Game::Renderer renderer{};
+		const Game::Entity entity1{ &mesh, &material, {.x = 0.0f, .y = -1.0f, .z = 0.0f} };
+		const Game::Entity entity2{&mesh, &material, {.x = 0.0f, .y = 2.0f, .z = 0.0f} };
+		Game::Scene scene{ {&entity1, &entity2} };
 
 		const Game::Camera camera{
 			{3.0f, 0.0f, 5.0f},
@@ -75,7 +79,7 @@ int main()
 
 		while (window.IsRunning())
 		{
-			renderer.Render(camera);
+			renderer.Render(camera, scene);
 			window.Swap();
 		}
 	}
