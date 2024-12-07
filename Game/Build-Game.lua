@@ -33,6 +33,12 @@ project "Game"
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
+    postbuildcommands
+    {
+        -- Copy the assets folder to the executable directory
+        ("{COPY} assets %{cfg.targetdir}/assets")
+    }
+
     filter "system:windows"
         systemversion "latest"
         defines { "WINDOWS" }
