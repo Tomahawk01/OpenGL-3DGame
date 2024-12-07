@@ -12,7 +12,7 @@ namespace Game::Logger {
 		TRACE,
 		INFO,
 		WARN,
-		ERROR
+		ERR
 	};
 
 	template<Level L, class... Args>
@@ -21,7 +21,7 @@ namespace Game::Logger {
 	template<Level L, class... Args>
 	struct Print<L, const char*, Args...>
 	{
-		Print(const char* msg, Args&&... args, std::source_location loc = std::source_location::current())
+		Print(const char* msg, Args... args, std::source_location loc = std::source_location::current())
 		{
 			char c = '?';
 			if constexpr (L == Level::TRACE)
@@ -30,7 +30,7 @@ namespace Game::Logger {
 				c = 'I';
 			else if constexpr (L == Level::WARN)
 				c = 'W';
-			else if constexpr (L == Level::ERROR)
+			else if constexpr (L == Level::ERR)
 				c = 'E';
 
 			std::println("[{}] {}:{} {}", c, loc.file_name(), loc.line(), std::vformat(msg, std::make_format_args(args...)));
@@ -50,6 +50,6 @@ namespace Game::Logger {
 	using Warn = Print<Level::WARN, Args...>;
 
 	template<class... Args>
-	using Error = Print<Level::ERROR, Args...>;
+	using Error = Print<Level::ERR, Args...>;
 
 }
