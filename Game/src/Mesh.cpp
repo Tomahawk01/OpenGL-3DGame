@@ -54,22 +54,23 @@ namespace Game {
 
 	Mesh::Mesh()
 		: m_VAO{ 0u, [](auto vao) { ::glDeleteVertexArrays(1, &vao); } }
-	, m_VBO{ 0u, [](auto vbo) { ::glDeleteBuffers(1, &vbo); } }
+		, m_VBO{ 0u, [](auto vbo) { ::glDeleteBuffers(1, &vbo); } }
 	{
-		::glGenVertexArrays(1, &m_VAO);
-		::glGenBuffers(1, &m_VBO);
+		::glCreateBuffers(1, &m_VBO);
+		::glNamedBufferStorage(m_VBO, sizeof(vertex_data), vertex_data, GL_DYNAMIC_STORAGE_BIT);
 
-		::glBindVertexArray(m_VAO);
+		::glCreateVertexArrays(1, &m_VAO);
 
-		::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		::glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+		::glVertexArrayVertexBuffer(m_VAO, 0, m_VBO, 0, sizeof(VertexData));
 
-		::glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(0));
-		::glEnableVertexAttribArray(0);
-		::glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-		::glEnableVertexAttribArray(1);
+		::glEnableVertexArrayAttrib(m_VAO, 0);
+		::glEnableVertexArrayAttrib(m_VAO, 1);
 
-		::glBindVertexArray(0);
+		::glVertexArrayAttribFormat(m_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VertexData, position));
+		::glVertexArrayAttribFormat(m_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VertexData, color));
+
+		::glVertexArrayAttribBinding(m_VAO, 0, 0);
+		::glVertexArrayAttribBinding(m_VAO, 1, 0);
 	}
 
 	void Mesh::Bind() const
