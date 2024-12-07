@@ -18,9 +18,14 @@ namespace Game {
 			   float nearPlane, float farPlane);
 
 		void Translate(const vec3& translation);
+		vec3 RightVector() const;
 
 		std::span<const float> GetView() const;
 		std::span<const float> GetProjection() const;
+		vec3 GetDirection() const;
+
+		void AddYaw(float value);
+		void AddPitch(float value);
 
 	private:
 		mat4 m_View;
@@ -29,6 +34,9 @@ namespace Game {
 		vec3 m_Position;
 		vec3 m_Direction;
 		vec3 m_Up;
+
+		float m_Pitch;
+		float m_Yaw;
 	};
 
 }

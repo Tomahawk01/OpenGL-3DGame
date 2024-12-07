@@ -108,17 +108,54 @@ int main()
 						
 						keyState[arg.GetKey()] = arg.GetState() == Game::KeyState::DOWN;
 					}
-				}, * event);
+					else if constexpr (std::same_as<T, Game::MouseEvent>)
+					{
+						static constexpr float sensitivity{ 0.002f };
+						const float deltaX = arg.GetDeltaX() * sensitivity;
+						const float deltaY = arg.GetDeltaY() * sensitivity;
+
+						camera.AddYaw(deltaX);
+						camera.AddPitch(-deltaY);
+					}
+				}, *event);
 				event = window.PollEvent();
 			}
 
-			const Game::vec3 velocity{
-				(keyState[Game::Key::D] ? 1.0f : 0.0f) + (keyState[Game::Key::A] ? -1.0f : 0.0f),
-				(keyState[Game::Key::E] ? 1.0f : 0.0f) + (keyState[Game::Key::Q] ? -1.0f : 0.0f),
-				(keyState[Game::Key::S] ? 1.0f : 0.0f) + (keyState[Game::Key::W] ? -1.0f : 0.0f)
-			};
+			Game::vec3 walkDirection{ 0.0f, 0.0f, 0.0f };
 
-			camera.Translate(Game::vec3::Normalize(velocity));
+			if (keyState[Game::Key::D])
+			{
+				walkDirection += camera.RightVector();
+			}
+			if (keyState[Game::Key::A])
+			{
+				walkDirection -= camera.RightVector();
+			}
+			if (keyState[Game::Key::W])
+			{
+				walkDirection += camera.GetDirection();
+			}
+			if (keyState[Game::Key::S])
+			{
+				walkDirection -= camera.GetDirection();
+			}
+			if (keyState[Game::Key::Q])
+			{
+				walkDirection -= Game::vec3{ 0.0f, 1.0f, 0.0f };
+			}
+			if (keyState[Game::Key::E])
+			{
+				walkDirection += Game::vec3{ 0.0f, 1.0f, 0.0f };
+			}
+			
+			const float speed = 0.4f;
+
+			walkDirection = Game::vec3::Normalize(walkDirection);
+			walkDirection.x *= speed;
+			walkDirection.y *= speed;
+			walkDirection.z *= speed;
+
+			camera.Translate(walkDirection);
 
 			renderer.Render(camera, scene);
 			window.Swap();
