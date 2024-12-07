@@ -2,50 +2,35 @@
 
 #include "Math/VertexData.h"
 
+#include <ranges>
+
 namespace {
 
-	static constexpr Game::VertexData vertex_data[] = {
-		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
-		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
-		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
-		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
-		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
-		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.85f, 0.22f, 0.47f }},
+	constexpr Game::VertexData vertex_data[] = {
+		{.position = {-0.5f, -0.5f, -0.5f},	.color = {1.0f, 0.0f, 0.0f}},
+		{.position = {0.5f, -0.5f, -0.5f}, .color = {0.0f, 1.0f, 0.0f}},
+		{.position = {0.5f, 0.5f, -0.5f}, .color = {0.0f, 0.0f, 1.0f}},
+		{.position = {-0.5f, 0.5f, -0.5f}, .color = {1.0f, 1.0f, 0.0f}},
 
-		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
-		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
-		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
-		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
-		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
-		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.33f, 0.76f, 0.87f }},
+		{.position = {-0.5f, -0.5f, 0.5f}, .color = {1.0f, 0.0f, 1.0f}},
+		{.position = {0.5f, -0.5f, 0.5f}, .color = {0.0f, 1.0f, 1.0f}},
+		{.position = {0.5f, 0.5f, 0.5f}, .color = {0.5f, 0.5f, 0.5f}},
+		{.position = {-0.5f, 0.5f, 0.5f}, .color = {1.0f, 1.0f, 1.0f}}
+	};
 
-		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
-		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
-		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
-		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
-		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
-		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.29f, 0.68f, 0.31f }},
-
-		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
-		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
-		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
-		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
-		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
-		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.91f, 0.43f, 0.15f }},
-
-		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
-		{.position = { 1.0f, 1.0f, 1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
-		{.position = { 1.0f, 1.0f, -1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
-		{.position = { -1.0f, 1.0f, -1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
-		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
-		{.position = { -1.0f, 1.0f, 1.0f }, .color = { 0.56f, 0.34f, 0.82f }},
-
-		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
-		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
-		{.position = { 1.0f, -1.0f, -1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
-		{.position = { -1.0f, -1.0f, -1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
-		{.position = { -1.0f, -1.0f, 1.0f }, .color = { 0.94f, 0.91f, 0.17f }},
-		{.position = { 1.0f, -1.0f, 1.0f }, .color = { 0.94f, 0.91f, 0.17f }}
+	constexpr GLuint indices[] = {
+		// Front face
+		0, 1, 2, 0, 2, 3,
+		// Back face
+		4, 5, 6, 4, 6, 7,
+		// Left face
+		0, 3, 7, 0, 7, 4,
+		// Right face
+		1, 2, 6, 1, 6, 5,
+		// Bottom face
+		0, 1, 5, 0, 5, 4,
+		// Top face
+		3, 2, 6, 3, 6, 7
 	};
 
 }
@@ -55,13 +40,17 @@ namespace Game {
 	Mesh::Mesh()
 		: m_VAO{ 0u, [](auto vao) { ::glDeleteVertexArrays(1, &vao); } }
 		, m_VBO{ 0u, [](auto vbo) { ::glDeleteBuffers(1, &vbo); } }
+		, m_IndexCount(static_cast<std::uint32_t>(std::ranges::distance(indices)))
+		, m_IndexOffset(sizeof(vertex_data))
 	{
 		::glCreateBuffers(1, &m_VBO);
-		::glNamedBufferStorage(m_VBO, sizeof(vertex_data), vertex_data, GL_DYNAMIC_STORAGE_BIT);
+		::glNamedBufferStorage(m_VBO, sizeof(vertex_data) + sizeof(indices), nullptr, GL_DYNAMIC_STORAGE_BIT);
+		::glNamedBufferSubData(m_VBO, 0, sizeof(vertex_data), vertex_data);
+		::glNamedBufferSubData(m_VBO, sizeof(vertex_data), sizeof(indices), indices);
 
 		::glCreateVertexArrays(1, &m_VAO);
-
 		::glVertexArrayVertexBuffer(m_VAO, 0, m_VBO, 0, sizeof(VertexData));
+		::glVertexArrayElementBuffer(m_VAO, m_VBO);
 
 		::glEnableVertexArrayAttrib(m_VAO, 0);
 		::glEnableVertexArrayAttrib(m_VAO, 1);
@@ -81,6 +70,16 @@ namespace Game {
 	void Mesh::UnBind() const
 	{
 		::glBindVertexArray(0);
+	}
+
+	std::uint32_t Mesh::IndexCount() const
+	{
+		return m_IndexCount;
+	}
+
+	std::uintptr_t Mesh::IndexOffset() const
+	{
+		return m_IndexOffset;
 	}
 
 }

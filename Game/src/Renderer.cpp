@@ -30,7 +30,7 @@ namespace Game {
 			::glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, camera.GetProjection().data());
 
 			mesh->Bind();
-			::glDrawArrays(GL_TRIANGLES, 0, 36);
+			::glDrawElements(GL_TRIANGLES, mesh->IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(mesh->IndexOffset()));
 			mesh->UnBind();
 		}
 	}
