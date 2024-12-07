@@ -5,6 +5,8 @@
 #include "Utilities/Error.h"
 #include "Events/Event.h"
 
+#include <hidusage.h>
+
 #include <print>
 #include <queue>
 #include <ranges>
@@ -43,6 +45,20 @@ namespace {
 		case WM_KEYDOWN:
 		{
 			g_EventQueue.emplace(Game::KeyEvent{ static_cast<Game::Key>(wParam), Game::KeyState::DOWN });
+		} break;
+		case WM_INPUT:
+		{
+			::RAWINPUT raw{};
+			::UINT dwSize{ sizeof(::RAWINPUT) };
+			Game::Ensure(::GetRawInputData(reinterpret_cast<::HRAWINPUT>(lParam), RID_INPUT, &raw, &dwSize, sizeof(::RAWINPUTHEADER)) != static_cast<::UINT>(-1), "Failed to get raw input");
+
+			if (raw.header.dwType == RIM_TYPEMOUSE)
+			{
+				const auto x = raw.data.mouse.lLastX;
+				const auto y = raw.data.mouse.lLastY;
+
+				g_EventQueue.emplace(Game::MouseEvent{ static_cast<float>(x), static_cast<float>(y) });
+			}
 		} break;
 		}
 
@@ -223,6 +239,14 @@ namespace Game {
 
 		::ShowWindow(m_Window, SW_SHOW);
 		::UpdateWindow(m_Window);
+
+		const ::RAWINPUTDEVICE rid{
+			.usUsagePage = HID_USAGE_PAGE_GENERIC,
+			.usUsage = HID_USAGE_GENERIC_MOUSE,
+			.dwFlags = RIDEV_INPUTSINK,
+			.hwndTarget = m_Window
+		};
+		Ensure(::RegisterRawInputDevices(&rid, 1, sizeof(rid)) == TRUE, "Failed to register input device");
 
 		ResolveWGLFunctions(m_WndClass.hInstance);
 		InitOpenGL(m_DeviceCtx);
