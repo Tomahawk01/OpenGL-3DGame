@@ -10,7 +10,17 @@ namespace Game {
 				   float nearPlane, float farPlane)
 		: m_View(mat4::LookAt(position, lookAt, up))
 		, m_Projection(mat4::Perspective(fov, width, height, nearPlane, farPlane))
+		, m_Position(position)
+		, m_Direction(lookAt)
+		, m_Up(up)
 	{}
+
+	void Camera::Translate(const vec3& translation)
+	{
+		m_Position += translation;
+		m_Direction += translation;
+		m_View = mat4::LookAt(m_Position, m_Direction, m_Up);
+	}
 
 	std::span<const float> Camera::GetView() const
 	{
