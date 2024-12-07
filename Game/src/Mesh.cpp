@@ -1,6 +1,7 @@
 #include "Mesh.h"
 
 #include "Math/VertexData.h"
+#include "BufferWriter.h"
 
 #include <ranges>
 
@@ -39,18 +40,19 @@ namespace Game {
 
 	Mesh::Mesh()
 		: m_VAO{ 0u, [](auto vao) { ::glDeleteVertexArrays(1, &vao); } }
-		, m_VBO{ 0u, [](auto vbo) { ::glDeleteBuffers(1, &vbo); } }
+		, m_VBO{ sizeof(vertex_data) + sizeof(indices) }
 		, m_IndexCount(static_cast<std::uint32_t>(std::ranges::distance(indices)))
 		, m_IndexOffset(sizeof(vertex_data))
 	{
-		::glCreateBuffers(1, &m_VBO);
-		::glNamedBufferStorage(m_VBO, sizeof(vertex_data) + sizeof(indices), nullptr, GL_DYNAMIC_STORAGE_BIT);
-		::glNamedBufferSubData(m_VBO, 0, sizeof(vertex_data), vertex_data);
-		::glNamedBufferSubData(m_VBO, sizeof(vertex_data), sizeof(indices), indices);
+		{
+			BufferWriter writer{ m_VBO };
+			writer.Write(vertex_data);
+			writer.Write(indices);
+		}
 
 		::glCreateVertexArrays(1, &m_VAO);
-		::glVertexArrayVertexBuffer(m_VAO, 0, m_VBO, 0, sizeof(VertexData));
-		::glVertexArrayElementBuffer(m_VAO, m_VBO);
+		::glVertexArrayVertexBuffer(m_VAO, 0, m_VBO.NativeHandle(), 0, sizeof(VertexData));
+		::glVertexArrayElementBuffer(m_VAO, m_VBO.NativeHandle());
 
 		::glEnableVertexArrayAttrib(m_VAO, 0);
 		::glEnableVertexArrayAttrib(m_VAO, 1);

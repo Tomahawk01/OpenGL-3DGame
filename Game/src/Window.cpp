@@ -27,7 +27,10 @@ namespace {
 		const ::GLchar* message,
 		const void*)
 	{
-		std::println("{} {} {} {} {}", src, type, id, severity, message);
+		if (type == GL_DEBUG_TYPE_ERROR)
+			throw Game::Exception(std::format("{} {} {} {} {}", src, type, id, severity, message));
+
+		Game::Logger::Error("{} {} {} {} {}", src, type, id, severity, message);
 	}
 
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)

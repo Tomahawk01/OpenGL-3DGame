@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "BufferWriter.h"
 #include "Camera.h"
 #include "Entity.h"
 #include "Material.h"
@@ -9,9 +10,21 @@
 
 namespace Game {
 
+	Renderer::Renderer()
+		: m_CameraBuffer(sizeof(mat4) * 2u)
+	{}
+
 	void Renderer::Render(const Camera& camera, const Scene& scene) const
 	{
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		{
+			BufferWriter writer{ m_CameraBuffer };
+			writer.Write(camera.GetView());
+			writer.Write(camera.GetProjection());
+		}
+
+		::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.NativeHandle());
 
 		for (const Entity* entity : scene.entities)
 		{
@@ -22,12 +35,6 @@ namespace Game {
 
 			const GLint modelUniform = ::glGetUniformLocation(material->GetNativeHandle(), "model");
 			::glUniformMatrix4fv(modelUniform, 1, GL_FALSE, entity->GetModel().data());
-
-			const GLint viewUniform = ::glGetUniformLocation(material->GetNativeHandle(), "view");
-			::glUniformMatrix4fv(viewUniform, 1, GL_FALSE, camera.GetView().data());
-
-			const GLint projectionUniform = ::glGetUniformLocation(material->GetNativeHandle(), "projection");
-			::glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, camera.GetProjection().data());
 
 			mesh->Bind();
 			::glDrawElements(GL_TRIANGLES, mesh->IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(mesh->IndexOffset()));
