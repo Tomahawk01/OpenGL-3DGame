@@ -2,6 +2,8 @@
 
 #include "Key.h"
 
+#include <format>
+
 namespace Game {
 
 	class KeyEvent
@@ -18,3 +20,17 @@ namespace Game {
 	};
 
 }
+
+template<>
+struct std::formatter<Game::KeyEvent>
+{
+	constexpr auto parse(std::format_parse_context& ctx)
+	{
+		return std::begin(ctx);
+	}
+
+	auto format(const Game::KeyEvent& obj, std::format_context& ctx) const
+	{
+		return std::format_to(ctx.out(), "KeyEvent {} {}", obj.GetKey(), obj.GetState());
+	}
+};
