@@ -12,16 +12,13 @@ namespace Game::Logger {
 		TRACE,
 		INFO,
 		WARN,
-		ERR
+		ERR	// NOTE: ERROR defined in wingdi.h :(
 	};
 
 	template<Level L, class... Args>
-	struct Print {};
-
-	template<Level L, class... Args>
-	struct Print<L, const char*, Args...>
+	struct Print
 	{
-		Print(const char* msg, Args... args, std::source_location loc = std::source_location::current())
+		Print(std::format_string<Args...> msg, Args&&... args, std::source_location loc = std::source_location::current())
 		{
 			char c = '?';
 			if constexpr (L == Level::TRACE)
@@ -33,12 +30,12 @@ namespace Game::Logger {
 			else if constexpr (L == Level::ERR)
 				c = 'E';
 
-			std::println("[{}] {}:{} {}", c, loc.file_name(), loc.line(), std::vformat(msg, std::make_format_args(args...)));
+			std::println("[{}] {}:{} {}", c, loc.file_name(), loc.line(), std::format(msg, std::forward<Args>(args)...));
 		}
 	};
 
 	template<Level L, class... Args>
-	Print(Args...) -> Print<L, Args...>;
+	Print(std::format_string<Args...> msg, Args&&...) -> Print<L, Args...>;
 
 	template<class... Args>
 	using Trace = Print<Level::TRACE, Args...>;
