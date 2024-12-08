@@ -8,30 +8,56 @@
 namespace {
 
 	constexpr Game::VertexData vertex_data[] = {
-		{.position = {-0.5f, -0.5f, -0.5f},	.color = {1.0f, 0.0f, 0.0f}},
-		{.position = {0.5f, -0.5f, -0.5f}, .color = {0.0f, 1.0f, 0.0f}},
-		{.position = {0.5f, 0.5f, -0.5f}, .color = {0.0f, 0.0f, 1.0f}},
-		{.position = {-0.5f, 0.5f, -0.5f}, .color = {1.0f, 1.0f, 0.0f}},
+		// Front face
+		{ .position = {-0.5f, -0.5f, -0.5f}, .uv = {0.0f, 0.0f} },
+		{ .position = {0.5f,  -0.5f, -0.5f}, .uv = {1.0f, 0.0f} },
+		{ .position = {0.5f,  0.5f,  -0.5f}, .uv = {1.0f, 1.0f} },
+		{ .position = {-0.5f, 0.5f,  -0.5f}, .uv = {0.0f, 1.0f} },
 
-		{.position = {-0.5f, -0.5f, 0.5f}, .color = {1.0f, 0.0f, 1.0f}},
-		{.position = {0.5f, -0.5f, 0.5f}, .color = {0.0f, 1.0f, 1.0f}},
-		{.position = {0.5f, 0.5f, 0.5f}, .color = {0.5f, 0.5f, 0.5f}},
-		{.position = {-0.5f, 0.5f, 0.5f}, .color = {1.0f, 1.0f, 1.0f}}
+		// Back face
+		{ .position = {-0.5f, -0.5f,  0.5f}, .uv = {1.0f, 0.0f} },
+		{ .position = {0.5f,  -0.5f,  0.5f}, .uv = {0.0f, 0.0f} },
+		{ .position = {0.5f,  0.5f,   0.5f}, .uv = {0.0f, 1.0f} },
+		{ .position = {-0.5f, 0.5f,   0.5f}, .uv = {1.0f, 1.0f} },
+
+		// Left face
+		{ .position = {-0.5f, -0.5f,  0.5f}, .uv = {0.0f, 0.0f} },
+		{ .position = {-0.5f, -0.5f, -0.5f}, .uv = {1.0f, 0.0f} },
+		{ .position = {-0.5f,  0.5f, -0.5f}, .uv = {1.0f, 1.0f} },
+		{ .position = {-0.5f,  0.5f,  0.5f}, .uv = {0.0f, 1.0f} },
+
+		// Right face
+		{ .position = {0.5f,  -0.5f, -0.5f}, .uv = {0.0f, 0.0f} },
+		{ .position = {0.5f,  -0.5f,  0.5f}, .uv = {1.0f, 0.0f} },
+		{ .position = {0.5f,   0.5f,  0.5f}, .uv = {1.0f, 1.0f} },
+		{ .position = {0.5f,   0.5f, -0.5f}, .uv = {0.0f, 1.0f} },
+
+		// Top face
+		{ .position = {-0.5f,  0.5f, -0.5f}, .uv = {0.0f, 0.0f} },
+		{ .position = {0.5f,   0.5f, -0.5f}, .uv = {1.0f, 0.0f} },
+		{ .position = {0.5f,   0.5f,  0.5f}, .uv = {1.0f, 1.0f} },
+		{ .position = {-0.5f,  0.5f,  0.5f}, .uv = {0.0f, 1.0f} },
+
+		// Bottom face
+		{ .position = {-0.5f, -0.5f,  0.5f}, .uv = {0.0f, 0.0f} },
+		{ .position = {0.5f,  -0.5f,  0.5f}, .uv = {1.0f, 0.0f} },
+		{ .position = {0.5f,  -0.5f, -0.5f}, .uv = {1.0f, 1.0f} },
+		{ .position = {-0.5f, -0.5f, -0.5f}, .uv = {0.0f, 1.0f} }
 	};
 
 	constexpr GLuint indices[] = {
 		// Front face
-		0, 1, 2, 0, 2, 3,
+		0, 1, 2, 2, 3, 0,
 		// Back face
-		4, 5, 6, 4, 6, 7,
+		4, 5, 6, 6, 7, 4,
 		// Left face
-		0, 3, 7, 0, 7, 4,
+		8, 9, 10, 10, 11, 8,
 		// Right face
-		1, 2, 6, 1, 6, 5,
-		// Bottom face
-		0, 1, 5, 0, 5, 4,
+		12, 13, 14, 14, 15, 12,
 		// Top face
-		3, 2, 6, 3, 6, 7
+		16, 17, 18, 18, 19, 16,
+		// Bottom face
+		20, 21, 22, 22, 23, 20
 	};
 
 }
@@ -51,14 +77,14 @@ namespace Game {
 		}
 
 		::glCreateVertexArrays(1, &m_VAO);
-		::glVertexArrayVertexBuffer(m_VAO, 0, m_VBO.NativeHandle(), 0, sizeof(VertexData));
-		::glVertexArrayElementBuffer(m_VAO, m_VBO.NativeHandle());
+		::glVertexArrayVertexBuffer(m_VAO, 0, m_VBO.GetNativeHandle(), 0, sizeof(VertexData));
+		::glVertexArrayElementBuffer(m_VAO, m_VBO.GetNativeHandle());
 
 		::glEnableVertexArrayAttrib(m_VAO, 0);
 		::glEnableVertexArrayAttrib(m_VAO, 1);
 
 		::glVertexArrayAttribFormat(m_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VertexData, position));
-		::glVertexArrayAttribFormat(m_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VertexData, color));
+		::glVertexArrayAttribFormat(m_VAO, 1, 2, GL_FLOAT, GL_FALSE, offsetof(VertexData, uv));
 
 		::glVertexArrayAttribBinding(m_VAO, 0, 0);
 		::glVertexArrayAttribBinding(m_VAO, 1, 0);

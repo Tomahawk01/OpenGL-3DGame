@@ -18,7 +18,8 @@ project "Game"
     includedirs
     {
         "src",
-        "%{wks.location}/vendor/OpenGL/include"
+        "%{wks.location}/vendor/OpenGL/include",
+        "%{wks.location}/vendor/stb"
     }
 
     libdirs

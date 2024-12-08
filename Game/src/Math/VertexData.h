@@ -1,14 +1,19 @@
 #pragma once
 
-#include "Color.h"
 #include "Vector3.h"
 
 namespace Game {
 
+	struct UV
+	{
+		float x;
+		float y;
+	};
+
 	struct VertexData
 	{
 		vec3 position;
-		Color color;
+		UV uv;
 	};
 
 }

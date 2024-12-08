@@ -16,7 +16,7 @@ namespace Game {
 
 		void Write(std::span<const std::byte> data, std::size_t offset) const;
 
-		GLuint NativeHandle() const;
+		GLuint GetNativeHandle() const;
 
 	private:
 		AutoRelease<::GLuint> m_Buffer;

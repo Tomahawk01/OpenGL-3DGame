@@ -3,6 +3,8 @@
 #include "AutoRelease.h"
 #include "Exception.h"
 
+#include <memory>
+
 namespace Game {
 
 	template<class ...Args>
@@ -14,6 +16,12 @@ namespace Game {
 
 	template<class T, T Invalid, class ...Args>
 	void Ensure(AutoRelease<T, Invalid>& obj, std::string_view msg, Args&&... args)
+	{
+		Ensure(!!obj, msg, std::forward<Args>(args)...);
+	}
+
+	template<class T, class D, class ...Args>
+	void Ensure(std::unique_ptr<T, D>& obj, std::string_view msg, Args&&... args)
 	{
 		Ensure(!!obj, msg, std::forward<Args>(args)...);
 	}

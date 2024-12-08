@@ -14,7 +14,7 @@ namespace Game {
 		::glNamedBufferSubData(m_Buffer, offset, data.size(), data.data());
 	}
 
-	GLuint Buffer::NativeHandle() const
+	GLuint Buffer::GetNativeHandle() const
 	{
 		return m_Buffer;
 	}

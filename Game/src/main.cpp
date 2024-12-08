@@ -1,5 +1,7 @@
 #include "Utilities/Exception.h"
 #include "Logger.h"
+#include "Texture.h"
+#include "Sampler.h"
 #include "Material.h"
 #include "Renderer.h"
 #include "Shader.h"
@@ -27,6 +29,9 @@ int main(int argc, char** argv)
 
 		Game::ResourceLoader resourceLoader{ argv[0] };
 
+		Game::Texture texture{ resourceLoader.LoadBinary("../assets/textures/crate.png"), 500, 500 };
+		Game::Sampler sampler{};
+
 		const Game::Shader vertexShader{ resourceLoader.LoadStr("../assets/shaders/basic.vert"), Game::ShaderType::VERTEX};
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("../assets/shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
@@ -38,7 +43,12 @@ int main(int argc, char** argv)
 		{
 			for (int j = -10; j < 10; j++)
 			{
-				entities.emplace_back(&mesh, &material, Game::vec3{ static_cast<float>(i) * 2.5f, -2.0f, static_cast<float>(j) * 2.5f });
+				entities.emplace_back(
+					&mesh,
+					&material,
+					Game::vec3{ static_cast<float>(i) * 2.5f, -2.0f, static_cast<float>(j) * 2.5f },
+					&texture,
+					&sampler);
 			}
 		}
 
