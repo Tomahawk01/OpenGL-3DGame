@@ -25,9 +25,11 @@ int main(int argc, char** argv)
 
 	try
 	{
+		Game::Ensure(argc == 2, "game.exe <root_path>");
+
 		Game::Window window{ 800u, 600u };
 
-		Game::ResourceLoader resourceLoader{ argv[0] };
+		Game::ResourceLoader resourceLoader{ argv[1] };
 
 		Game::Texture texture{ resourceLoader.LoadBinary("../assets/textures/crate.png"), 500, 500 };
 		Game::Sampler sampler{};
