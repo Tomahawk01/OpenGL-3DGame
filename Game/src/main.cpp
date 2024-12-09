@@ -15,6 +15,7 @@
 #include <iostream>
 #include <print>
 #include <numbers>
+#include <cmath>
 #include <type_traits>
 #include <ranges>
 #include <unordered_map>
@@ -31,16 +32,20 @@ int main(int argc, char** argv)
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
 
-		Game::Texture texture{ resourceLoader.LoadBinary("../assets/textures/crate.png"), 500, 500 };
+		Game::Texture texture{ resourceLoader.LoadBinary("textures/crate.png"), 500, 500 };
+		Game::Texture specMap{ resourceLoader.LoadBinary("textures/crate_specular.png"), 500, 500 };
 		Game::Sampler sampler{};
 
-		const Game::Shader vertexShader{ resourceLoader.LoadStr("../assets/shaders/basic.vert"), Game::ShaderType::VERTEX};
-		const Game::Shader fragmentShader{ resourceLoader.LoadStr("../assets/shaders/basic.frag"), Game::ShaderType::FRAGMENT };
+		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{};
 		const Game::Renderer renderer{};
 		
 		std::vector<Game::Entity> entities{};
+
+		std::vector<const Game::Texture*> texPtrs{&texture, &specMap};
+
 		for (int i = -10; i < 10; i++)
 		{
 			for (int j = -10; j < 10; j++)
@@ -49,12 +54,17 @@ int main(int argc, char** argv)
 					&mesh,
 					&material,
 					Game::vec3{ static_cast<float>(i) * 2.5f, -2.0f, static_cast<float>(j) * 2.5f },
-					&texture,
+					texPtrs,
 					&sampler);
 			}
 		}
 
-		const Game::Scene scene{ entities | std::views::transform([](const auto& e) { return &e; }) | std::ranges::to<std::vector>() };
+		Game::Scene scene{
+			.entities = entities | std::views::transform([](const auto& e) { return &e; }) | std::ranges::to<std::vector>(),
+			.ambient = {0.3f, 0.3f, 0.3f},
+			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
+			.pointLight = {.position = {5.0f, 5.0f, 0.0f}, .color = {0.5f, 0.5f, 0.5f}}
+		};
 
 		Game::Camera camera{
 			{0.0f, 0.0f, 5.0f},
@@ -131,6 +141,11 @@ int main(int argc, char** argv)
 			
 			const float speed = 0.4f;
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
+
+			static float t = 0.0f;
+			t += 0.01f;
+			scene.pointLight.position.x = std::sin(t) * 10.0f;
+			scene.pointLight.position.z = std::cos(t) * 10.0f;
 
 			renderer.Render(camera, scene);
 			window.Swap();

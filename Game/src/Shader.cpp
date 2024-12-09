@@ -33,7 +33,14 @@ namespace Game {
 
 		::GLint result{};
 		::glGetShaderiv(m_Handle, GL_COMPILE_STATUS, &result);
-		Game::Ensure(result, "Failed to compile shader {}", m_Type);
+
+		if (result != GL_TRUE)
+		{
+			char log[512];
+			::glGetShaderInfoLog(m_Handle, sizeof(log), nullptr, log);
+
+			Game::Ensure(result, "Failed to compile shader {}\n{}", m_Type, log);
+		}
 	}
 
 	ShaderType Shader::GetType() const

@@ -4,6 +4,7 @@
 #include "Math/Vector3.h"
 
 #include <span>
+#include <vector>
 
 namespace Game {
 
@@ -15,18 +16,18 @@ namespace Game {
 	class Entity
 	{
 	public:
-		Entity(const Mesh* mesh, const Material* material, const vec3& position, const Texture* texture, const Sampler* sampler);
+		Entity(const Mesh* mesh, const Material* material, const vec3& position, const std::vector<const Texture*> &textures, const Sampler* sampler);
 
 		const Mesh* GetMesh() const;
 		const Material* GetMaterial() const;
-		const Texture* GetTexture() const;
+		const std::vector<const Texture*>& GetTextures() const;
 		const Sampler* GetSampler() const;
 		std::span<const float> GetModel() const;
 
 	private:
 		const Mesh* m_Mesh;
 		const Material* m_Material;
-		const Texture* m_Texture;
+		std::vector<const Texture*> m_Textures;
 		const Sampler* m_Sampler;
 
 		mat4 m_Model;

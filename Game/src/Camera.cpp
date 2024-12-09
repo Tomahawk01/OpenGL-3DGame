@@ -52,6 +52,11 @@ namespace Game {
 		return m_Projection.data();
 	}
 
+	vec3 Camera::GetPosition() const
+	{
+		return m_Position;
+	}
+
 	vec3 Camera::GetDirection() const
 	{
 		return m_Direction;

@@ -12,6 +12,13 @@ namespace Game {
 			, m_Offset{}
 		{}
 
+		template<class T>
+		void Write(const T& obj) requires (std::is_trivially_copyable_v<T>)
+		{
+			std::span<const T> spn{ &obj, 1 };
+			Write(spn);
+		}
+
 		template<class T, std::size_t N>
 		void Write(const T(&data)[N])
 		{

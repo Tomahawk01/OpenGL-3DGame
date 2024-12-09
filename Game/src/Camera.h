@@ -22,6 +22,7 @@ namespace Game {
 
 		std::span<const float> GetView() const;
 		std::span<const float> GetProjection() const;
+		vec3 GetPosition() const;
 		vec3 GetDirection() const;
 
 		void AddYaw(float value);

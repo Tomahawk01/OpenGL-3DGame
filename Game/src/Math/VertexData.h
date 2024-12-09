@@ -13,6 +13,7 @@ namespace Game {
 	struct VertexData
 	{
 		vec3 position;
+		vec3 normal;
 		UV uv;
 	};
 
