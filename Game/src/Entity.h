@@ -3,8 +3,8 @@
 #include "Math/Matrix4.h"
 #include "Math/Vector3.h"
 
-#include <span>
 #include <vector>
+#include <tuple>
 
 namespace Game {
 
@@ -16,18 +16,21 @@ namespace Game {
 	class Entity
 	{
 	public:
-		Entity(const Mesh* mesh, const Material* material, const vec3& position, const std::vector<const Texture*> &textures, const Sampler* sampler);
+		Entity(const Mesh* mesh,
+			   const Material* material,
+			   const vec3& position,
+			   const std::vector<std::tuple<const Texture*, const Sampler*>>& textures);
 
 		const Mesh* GetMesh() const;
 		const Material* GetMaterial() const;
-		const std::vector<const Texture*>& GetTextures() const;
+		std::span<const std::tuple<const Texture*, const Sampler*>> GetTextures() const;
 		const Sampler* GetSampler() const;
-		std::span<const float> GetModel() const;
+		const mat4& GetModel() const;
 
 	private:
 		const Mesh* m_Mesh;
 		const Material* m_Material;
-		std::vector<const Texture*> m_Textures;
+		std::vector<std::tuple<const Texture*, const Sampler*>> m_Textures;
 		const Sampler* m_Sampler;
 
 		mat4 m_Model;

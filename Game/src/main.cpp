@@ -32,9 +32,13 @@ int main(int argc, char** argv)
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
 
-		Game::Texture texture{ resourceLoader.LoadBinary("textures/crate.png"), 500, 500 };
-		Game::Texture specMap{ resourceLoader.LoadBinary("textures/crate_specular.png"), 500, 500 };
+		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/crate.png"), 500, 500 };
 		Game::Sampler sampler{};
+		Game::Texture specMap{ resourceLoader.LoadBinary("textures/crate_specular.png"), 500, 500 };
+
+		const Game::Texture* textures[]{ &albedoTex, &specMap };
+		const Game::Sampler* samplers[]{ &sampler, &sampler };
+		const auto texSamp = std::views::zip(textures, samplers) | std::ranges::to<std::vector>();
 
 		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
@@ -44,8 +48,6 @@ int main(int argc, char** argv)
 		
 		std::vector<Game::Entity> entities{};
 
-		std::vector<const Game::Texture*> texPtrs{&texture, &specMap};
-
 		for (int i = -10; i < 10; i++)
 		{
 			for (int j = -10; j < 10; j++)
@@ -54,8 +56,7 @@ int main(int argc, char** argv)
 					&mesh,
 					&material,
 					Game::vec3{ static_cast<float>(i) * 2.5f, -2.0f, static_cast<float>(j) * 2.5f },
-					texPtrs,
-					&sampler);
+					texSamp);
 			}
 		}
 
