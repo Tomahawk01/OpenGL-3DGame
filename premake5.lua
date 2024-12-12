@@ -18,4 +18,8 @@ workspace "OpenGL_Game"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+group "Dependencies"
+    include "vendor/ImGui/Build-ImGui.lua"
+group ""
+
 include "Game/Build-Game.lua"

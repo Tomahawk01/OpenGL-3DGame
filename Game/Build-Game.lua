@@ -19,7 +19,8 @@ project "Game"
     {
         "src",
         "%{wks.location}/vendor/OpenGL/include",
-        "%{wks.location}/vendor/stb"
+        "%{wks.location}/vendor/stb",
+        "%{wks.location}/vendor/ImGui/src"
     }
 
     libdirs
@@ -28,7 +29,8 @@ project "Game"
 
     links
     {
-        "OpenGL32.lib"
+        "OpenGL32.lib",
+        "ImGui"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
