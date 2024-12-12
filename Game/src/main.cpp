@@ -1,4 +1,5 @@
 #include "Utilities/Exception.h"
+#include "UI/DebugUI.h"
 #include "Logger.h"
 #include "Texture.h"
 #include "Sampler.h"
@@ -78,6 +79,8 @@ int main(int argc, char** argv)
 
 		std::unordered_map<Game::Key, bool> keyState{};
 
+		const Game::DebugUI debugUI{ window.NativeHandle(), scene };
+
 		bool running = true;
 		while (running)
 		{
@@ -108,6 +111,10 @@ int main(int argc, char** argv)
 
 						camera.AddYaw(deltaX);
 						camera.AddPitch(-deltaY);
+					}
+					else if constexpr (std::same_as<T, Game::MouseButtonEvent>)
+					{
+						debugUI.AddMouseEvent(arg);
 					}
 				}, *event);
 				event = window.PollEvent();
@@ -149,6 +156,7 @@ int main(int argc, char** argv)
 			scene.pointLight.position.z = std::cos(t) * 10.0f;
 
 			renderer.Render(camera, scene);
+			debugUI.Render();
 			window.Swap();
 		}
 	}

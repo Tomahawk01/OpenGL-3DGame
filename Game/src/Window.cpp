@@ -5,6 +5,7 @@
 #include "Utilities/Error.h"
 #include "Events/Event.h"
 
+#include <windowsx.h>
 #include <hidusage.h>
 
 #include <print>
@@ -62,6 +63,18 @@ namespace {
 
 				g_EventQueue.emplace(Game::MouseEvent{ static_cast<float>(x), static_cast<float>(y) });
 			}
+		} break;
+		case WM_LBUTTONUP:
+		{
+			g_EventQueue.emplace(Game::MouseButtonEvent{ static_cast<float>(GET_X_LPARAM(lParam)),
+														 static_cast<float>(GET_Y_LPARAM(lParam)),
+														 Game::MouseButtonState::UP });
+		} break;
+		case WM_LBUTTONDOWN:
+		{
+			g_EventQueue.emplace(Game::MouseButtonEvent{ static_cast<float>(GET_X_LPARAM(lParam)),
+														 static_cast<float>(GET_Y_LPARAM(lParam)),
+														 Game::MouseButtonState::DOWN });
 		} break;
 		}
 
@@ -281,6 +294,11 @@ namespace Game {
 	void Window::Swap() const
 	{
 		::SwapBuffers(m_DeviceCtx);
+	}
+
+	HWND Window::NativeHandle() const
+	{
+		return m_Window;
 	}
 
 }

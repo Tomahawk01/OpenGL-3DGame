@@ -25,6 +25,8 @@ namespace Game {
 		std::optional<Event> PollEvent() const;
 		void Swap() const;
 
+		HWND NativeHandle() const;
+
 	private:
 		AutoRelease<::HWND, nullptr> m_Window;
 		AutoRelease<::HDC> m_DeviceCtx;
