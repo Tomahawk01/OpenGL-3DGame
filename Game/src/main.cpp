@@ -79,6 +79,7 @@ int main(int argc, char** argv)
 
 		std::unordered_map<Game::Key, bool> keyState{};
 
+		bool showDebug = true;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene };
 
 		bool running = true;
@@ -102,15 +103,23 @@ int main(int argc, char** argv)
 						}
 						
 						keyState[arg.GetKey()] = arg.GetState() == Game::KeyState::DOWN;
+
+						if (arg.GetKey() == Game::Key::F1 && arg.GetState() == Game::KeyState::UP)
+						{
+							showDebug = !showDebug;
+						}
 					}
 					else if constexpr (std::same_as<T, Game::MouseEvent>)
 					{
-						static constexpr float sensitivity{ 0.002f };
-						const float deltaX = arg.GetDeltaX() * sensitivity;
-						const float deltaY = arg.GetDeltaY() * sensitivity;
+						if (!showDebug)
+						{
+							static constexpr float sensitivity{ 0.002f };
+							const float deltaX = arg.GetDeltaX() * sensitivity;
+							const float deltaY = arg.GetDeltaY() * sensitivity;
 
-						camera.AddYaw(deltaX);
-						camera.AddPitch(-deltaY);
+							camera.AddYaw(deltaX);
+							camera.AddPitch(-deltaY);
+						}
 					}
 					else if constexpr (std::same_as<T, Game::MouseButtonEvent>)
 					{
@@ -156,7 +165,9 @@ int main(int argc, char** argv)
 			scene.pointLight.position.z = std::cos(t) * 10.0f;
 
 			renderer.Render(camera, scene);
-			debugUI.Render();
+			if (showDebug)
+				debugUI.Render();
+
 			window.Swap();
 		}
 	}

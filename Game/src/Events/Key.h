@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #include <string_view>
 #include <format>
 
@@ -37,6 +39,8 @@ namespace Game {
 		X =     0x58,
 		Y =     0x59,
 		Z =     0x5A,
+
+		F1 =	VK_F1,
 	};
 
 	enum class KeyState
