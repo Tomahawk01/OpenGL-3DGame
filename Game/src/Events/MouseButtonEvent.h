@@ -13,15 +13,11 @@ namespace Game {
 	class MouseButtonEvent
 	{
 	public:
-		MouseButtonEvent(float x, float y, MouseButtonState state)
-			: m_X(x)
-			, m_Y(y)
-			, m_State(state)
-		{}
+		MouseButtonEvent(float x, float y, MouseButtonState state);
 
-		float GetX() const { return m_X; }
-		float GetY() const { return m_Y; }
-		MouseButtonState GetState() const { return m_State; }
+		float GetX() const;
+		float GetY() const;
+		MouseButtonState GetState() const;
 
 	private:
 		float m_X;
@@ -31,18 +27,38 @@ namespace Game {
 
 }
 
-// TODO: Add formatter
+template<>
+struct std::formatter<Game::MouseButtonState>
+{
+	constexpr auto parse(std::format_parse_context& ctx)
+	{
+		return std::begin(ctx);
+	}
 
-//template<>
-//struct std::formatter<Game::MouseButtonEvent>
-//{
-//	constexpr auto parse(std::format_parse_context& ctx)
-//	{
-//		return std::begin(ctx);
-//	}
-//
-//	auto format(const Game::MouseButtonEvent& obj, std::format_context& ctx) const
-//	{
-//		return std::format_to(ctx.out(), "MouseButtonEvent {} {}", obj.GetX(), obj.GetY());
-//	}
-//};
+	auto format(const Game::MouseButtonState& obj, std::format_context& ctx) const
+	{
+		switch (obj)
+		{
+		case Game::MouseButtonState::UP:
+			return std::format_to(ctx.out(), "UP");
+		case Game::MouseButtonState::DOWN:
+			return std::format_to(ctx.out(), "DOWN");
+		default:
+			return std::format_to(ctx.out(), "UNKNOWN");
+		}
+	}
+};
+
+template<>
+struct std::formatter<Game::MouseButtonEvent>
+{
+	constexpr auto parse(std::format_parse_context& ctx)
+	{
+		return std::begin(ctx);
+	}
+
+	auto format(const Game::MouseButtonEvent& obj, std::format_context& ctx) const
+	{
+		return std::format_to(ctx.out(), "MouseButtonEvent {} {} {}", obj.GetState(), obj.GetX(), obj.GetY());
+	}
+};
