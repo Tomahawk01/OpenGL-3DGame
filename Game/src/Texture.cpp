@@ -10,9 +10,9 @@ namespace Game {
 	Texture::Texture(std::span<const std::byte> data, std::uint32_t width, std::uint32_t height)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
-		int w = static_cast<int>(width);
-		int h = static_cast<int>(height);
-		int numChannels{ 4 };
+		int w{};
+		int h{};
+		int numChannels{};
 
 		auto rawData = std::unique_ptr<::stbi_uc, void(*)(void*)>(
 			::stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(data.data()), static_cast<int>(data.size()), &w, &h, &numChannels, 0),
