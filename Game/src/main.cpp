@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	{
 		Game::Ensure(argc == 2, "game.exe <root_path>");
 
-		Game::Window window{ 800u, 600u };
+		Game::Window window{ 1280u, 720u };
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
 
@@ -73,13 +73,13 @@ int main(int argc, char** argv)
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
-			800.0f, 600.0f,
+			static_cast<float>(window.GetWidth()), static_cast<float>(window.GetHeight()),
 			0.1f, 1000.0f
 		};
 
 		std::unordered_map<Game::Key, bool> keyState{};
 
-		const Game::DebugUI debugUI{ window.NativeHandle(), scene };
+		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene };
 
 		bool running = true;
 		while (running)

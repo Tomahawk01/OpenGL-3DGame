@@ -216,6 +216,8 @@ namespace Game {
 		: m_Window({})
 		, m_DeviceCtx({})
 		, m_WndClass({})
+		, m_Width(width)
+		, m_Height(height)
 	{
 		m_WndClass = {
 			.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
@@ -296,9 +298,19 @@ namespace Game {
 		::SwapBuffers(m_DeviceCtx);
 	}
 
-	HWND Window::NativeHandle() const
+	HWND Window::GetNativeHandle() const
 	{
 		return m_Window;
+	}
+
+	std::uint32_t Window::GetWidth() const
+	{
+		return m_Width;
+	}
+
+	std::uint32_t Window::GetHeight() const
+	{
+		return m_Height;
 	}
 
 }
