@@ -22,6 +22,7 @@ layout(std140, binding = 1) uniform lights
 	vec3 direction_color;
 	vec3 point;
 	vec3 point_color;
+	vec3 attenuation;
 };
 
 vec3 calc_ambient()
@@ -38,13 +39,16 @@ vec3 calc_direction()
 
 vec3 calc_point()
 {
+	float distance = length(point - frag_position.xyz);
+	float att = 1.0 / (attenuation.x + (attenuation.y * distance) + (attenuation.z * (distance * distance)));
+
 	vec3 light_dir = normalize(point - frag_position.xyz);
-	float diff = max(dot(normal, light_dir), 0.0) * 10.0;
+	float diff = max(dot(normal, light_dir), 0.0);
 
 	vec3 reflect_dir = reflect(-light_dir, normal);
-	float spec = pow(max(dot(normalize(eye - frag_position.xyz), reflect_dir), 0.0), 32) * (50.0 * texture(tex1, tex_coord).r);
+	float spec = pow(max(dot(normalize(eye - frag_position.xyz), reflect_dir), 0.0), 32) * texture(tex1, tex_coord).r;
 
-	return ((diff + spec) / (length(point - frag_position.xyz))) * point_color;
+	return ((diff + spec) * att) * point_color;
 }
 
 void main()

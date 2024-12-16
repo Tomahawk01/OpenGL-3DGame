@@ -19,6 +19,7 @@ namespace {
 		alignas(16) Game::Color directionColor;
 		alignas(16) Game::vec3 point;
 		alignas(16) Game::Color pointColor;
+		alignas(16) Game::vec3 attenuation;
 	};
 
 }
@@ -48,7 +49,11 @@ namespace Game {
 				.direction = scene.directionalLight.direction,
 				.directionColor = scene.directionalLight.color,
 				.point = scene.pointLight.position,
-				.pointColor = scene.pointLight.color
+				.pointColor = scene.pointLight.color,
+				.attenuation = {
+					scene.pointLight.constAttenuation,
+					scene.pointLight.linearAttenuation,
+					scene.pointLight.quadAttenuation }
 			};
 			BufferWriter writer{ m_LightBuffer };
 			writer.Write(lightBuffer);

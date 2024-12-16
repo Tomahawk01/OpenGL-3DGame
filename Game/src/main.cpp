@@ -65,7 +65,12 @@ int main(int argc, char** argv)
 			.entities = entities | std::views::transform([](const auto& e) { return &e; }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
-			.pointLight = {.position = {5.0f, 5.0f, 0.0f}, .color = {0.5f, 0.5f, 0.5f}}
+			.pointLight = {
+				.position = {5.0f, 5.0f, 0.0f},
+				.color = {0.5f, 0.5f, 0.5f},
+				.constAttenuation = 1.0f,
+				.linearAttenuation = 0.07f,
+				.quadAttenuation = 0.017f }
 		};
 
 		Game::Camera camera{

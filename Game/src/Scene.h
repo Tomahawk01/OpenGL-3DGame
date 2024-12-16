@@ -19,6 +19,9 @@ namespace Game {
 	{
 		vec3 position;
 		Color color;
+		float constAttenuation;
+		float linearAttenuation;
+		float quadAttenuation;
 	};
 
 	struct Scene
