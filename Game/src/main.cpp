@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 		std::unordered_map<Game::Key, bool> keyState{};
 
 		bool showDebug = true;
-		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene };
+		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera };
 
 		bool running = true;
 		while (running)
@@ -163,11 +163,6 @@ int main(int argc, char** argv)
 			
 			const float speed = 0.4f;
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
-
-			static float t = 0.0f;
-			t += 0.01f;
-			scene.pointLight.position.x = std::sin(t) * 10.0f;
-			scene.pointLight.position.z = std::cos(t) * 10.0f;
 
 			renderer.Render(camera, scene);
 			if (showDebug)

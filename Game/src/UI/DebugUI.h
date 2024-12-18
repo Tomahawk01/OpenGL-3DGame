@@ -2,6 +2,7 @@
 
 #include "Events/MouseButtonEvent.h"
 #include "Scene.h"
+#include "Camera.h"
 
 #include <Windows.h>
 
@@ -12,7 +13,7 @@ namespace Game {
 	class DebugUI
 	{
 	public:
-		DebugUI(HWND window, Scene& scene);
+		DebugUI(HWND window, Scene& scene, Camera& camera);
 		~DebugUI();
 
 		void Render() const;
@@ -20,6 +21,7 @@ namespace Game {
 
 	private:
 		Scene& m_Scene;
+		Camera& m_Camera;
 	};
 
 }
