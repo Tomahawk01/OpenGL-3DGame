@@ -15,14 +15,20 @@ layout(std140, binding = 0) uniform camera
 	vec3 eye;
 };
 
-layout(std140, binding = 1) uniform lights
+struct PointLight
 {
-    vec3 ambient;
-	vec3 direction;
-	vec3 direction_color;
 	vec3 point;
 	vec3 point_color;
 	vec3 attenuation;
+};
+
+layout(std430, binding = 1) readonly buffer lights
+{
+	vec3 ambient;
+	vec3 direction;
+	vec3 direction_color;
+	int num_points;
+	PointLight points[];
 };
 
 vec3 calc_ambient()
@@ -37,8 +43,12 @@ vec3 calc_direction()
 	return diff * direction_color;
 }
 
-vec3 calc_point()
+vec3 calc_point(int index)
 {
+	vec3 point = points[index].point;
+	vec3 point_color = points[index].point_color;
+	vec3 attenuation = points[index].attenuation;
+
 	float distance = length(point - frag_position.xyz);
 	float att = 1.0 / (attenuation.x + (attenuation.y * distance) + (attenuation.z * (distance * distance)));
 
@@ -54,9 +64,13 @@ vec3 calc_point()
 void main()
 {
 	vec4 albedo = texture(tex0, tex_coord);
-	vec3 amb_color = calc_ambient();
-	vec3 dir_color = calc_direction();
-	vec3 point_color = calc_point();
+	vec3 color = calc_ambient();
+	color += calc_direction();
 
-	frag_color = vec4((amb_color + dir_color + point_color) * albedo.rgb, 1.0);
+	for (int i = 0; i < num_points; i++)
+	{
+		color += calc_point(i);
+	}
+
+	frag_color = vec4(color * albedo.rgb, 1.0);
 }

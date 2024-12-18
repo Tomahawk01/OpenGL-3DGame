@@ -29,7 +29,7 @@ namespace Game {
 		std::vector<const Entity*> entities;
 		Color ambient;
 		DirectionalLight directionalLight;
-		PointLight pointLight;
+		std::vector<PointLight> pointLights;
 	};
 
 }

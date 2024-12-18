@@ -20,6 +20,7 @@
 #include <type_traits>
 #include <ranges>
 #include <unordered_map>
+#include <random>
 
 int main(int argc, char** argv)
 {
@@ -46,8 +47,12 @@ int main(int argc, char** argv)
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{};
 		const Game::Renderer renderer{};
-		
+
 		std::vector<Game::Entity> entities{};
+
+		std::random_device rd{};
+		std::mt19937 gen{ rd() };
+		std::uniform_real_distribution dis{ -5.0f, 5.0f };
 
 		for (int i = -10; i < 10; i++)
 		{
@@ -56,7 +61,7 @@ int main(int argc, char** argv)
 				entities.emplace_back(
 					&mesh,
 					&material,
-					Game::vec3{ static_cast<float>(i) * 2.5f, -2.0f, static_cast<float>(j) * 2.5f },
+					Game::vec3{ static_cast<float>(i) * 2.5f, dis(gen), static_cast<float>(j) * 2.5f},
 					texSamp);
 			}
 		}
@@ -65,12 +70,19 @@ int main(int argc, char** argv)
 			.entities = entities | std::views::transform([](const auto& e) { return &e; }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
-			.pointLight = {
-				.position = {5.0f, 5.0f, 0.0f},
-				.color = {0.5f, 0.5f, 0.5f},
+			.pointLights = {
+				{.position = {5.0f, 5.0f, 0.0f},
+				.color = {0.0f, 1.0f, 0.0f},
 				.constAttenuation = 1.0f,
 				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.017f }
+				.quadAttenuation = 0.007f },
+
+				{.position = {-5.0f, 5.0f, 0.0f},
+				.color = {1.0f, 0.0f, 0.0f},
+				.constAttenuation = 1.0f,
+				.linearAttenuation = 0.07f,
+				.quadAttenuation = 0.007f }
+			}
 		};
 
 		Game::Camera camera{
