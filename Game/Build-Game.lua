@@ -7,7 +7,9 @@ project "Game"
     files
     {
         "**.h",
-        "**.cpp"
+        "**.cpp",
+
+        "%{wks.location}/vendor/ImGuizmo/ImGuizmo.cpp"
     }
 
     defines
@@ -18,9 +20,11 @@ project "Game"
     includedirs
     {
         "src",
+        
         "%{wks.location}/vendor/OpenGL/include",
         "%{wks.location}/vendor/stb",
-        "%{wks.location}/vendor/ImGui/src"
+        "%{wks.location}/vendor/ImGui/src",
+        "%{wks.location}/vendor/ImGuizmo"
     }
 
     libdirs
