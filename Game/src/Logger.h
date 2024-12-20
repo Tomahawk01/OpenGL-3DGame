@@ -34,7 +34,7 @@ namespace Game::Logger {
 		}
 	};
 
-	template<Level L, class... Args>
+	template<Level L = {}, class... Args >
 	Print(std::format_string<Args...> msg, Args&&...) -> Print<L, Args...>;
 
 	template<class... Args>
