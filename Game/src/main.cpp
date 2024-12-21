@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 		Game::Window window{ 1280u, 720u };
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
-		Game::ModelLoader modelLoader{};
+		Game::ModelLoader modelLoader{ resourceLoader };
 
 		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/crate.png"), 500, 500 };
 		Game::Sampler sampler{};
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
-		const Game::Mesh mesh{ modelLoader.Cube() };
+		const Game::Mesh mesh{ modelLoader.Load("models/monkey.obj", "Suzanne")};
 		const Game::Renderer renderer{};
 
 		std::vector<Game::Entity> entities{};
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 		std::random_device rd{};
 		std::mt19937 gen{ rd() };
 		std::uniform_real_distribution dis{ -5.0f, 5.0f };
-
+			
 		for (int i = -10; i < 10; i++)
 		{
 			for (int j = -10; j < 10; j++)
@@ -63,7 +63,8 @@ int main(int argc, char** argv)
 				entities.emplace_back(
 					&mesh,
 					&material,
-					Game::vec3{ static_cast<float>(i) * 2.5f, dis(gen), static_cast<float>(j) * 2.5f},
+					Game::vec3{ static_cast<float>(i) * 2.5f, dis(gen), static_cast<float>(j) * 2.5f },
+					Game::vec3{ 1.0f },
 					texSamp);
 			}
 		}

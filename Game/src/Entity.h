@@ -19,6 +19,7 @@ namespace Game {
 		Entity(const Mesh* mesh,
 			   const Material* material,
 			   const vec3& position,
+			   const vec3& scale,
 			   const std::vector<std::tuple<const Texture*, const Sampler*>>& textures);
 
 		const Mesh* GetMesh() const;

@@ -1,6 +1,14 @@
 #include "ModelLoader.h"
 
 #include "Math/Vector3.h"
+#include "Utilities/Error.h"
+#include "Logger.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/Logger.hpp>
+#include <assimp/cimport.h>
 
 #include <ranges>
 
@@ -18,6 +26,10 @@ namespace {
 }
 
 namespace Game {
+
+	ModelLoader::ModelLoader(ResourceLoader& resourceLoader)
+		: m_ResourceLoader(resourceLoader)
+	{}
 
 	ModelData ModelLoader::Cube()
 	{
@@ -123,6 +135,67 @@ namespace Game {
 		const auto newItem = m_LoadedModels.emplace("cube", LoadedModelData{ Vertices(positions, normals, uvs), std::move(indices) });
 
 		return {.vertices = newItem.first->second.vertices, .indices = newItem.first->second.indices };
+	}
+
+	ModelData ModelLoader::Load(std::string_view modelFile, std::string_view modelName)
+	{
+		auto stream = ::aiGetPredefinedLogStream(::aiDefaultLogStream_STDOUT, NULL);
+		::aiAttachLogStream(&stream);
+
+		::aiEnableVerboseLogging(true);
+
+		const auto modelFileData = m_ResourceLoader.LoadBinary(modelFile);
+		Ensure(!modelFileData.empty(), "No loaded data");
+
+		::Assimp::Importer importer{};
+		const auto* scene = importer.ReadFileFromMemory(modelFileData.data(), modelFileData.size(), ::aiProcess_Triangulate);
+
+		Ensure(scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE), "Failed to load model {} {}", modelFile, modelName);
+
+		const std::span<::aiMesh*> loadedMeshes{ scene->mMeshes, scene->mMeshes + scene->mNumMeshes };
+
+		Logger::Trace("Found {} meshes", loadedMeshes.size());
+
+		for (const auto* mesh : loadedMeshes)
+		{
+			const auto loaded = m_LoadedModels.find(mesh->mName.C_Str());
+			if (loaded != std::ranges::cend(m_LoadedModels))
+				continue;
+
+			const auto toVector3 = [](const ::aiVector3D& v) { return vec3{ v.x, v.y, v.z }; };
+			const auto positions = std::span<::aiVector3D>{ mesh->mVertices, mesh->mVertices + mesh->mNumVertices } | std::views::transform(toVector3);
+			const auto normals = std::span<::aiVector3D>{ mesh->mNormals, mesh->mNormals + mesh->mNumVertices } | std::views::transform(toVector3);
+
+			std::vector<UV> uvs{};
+			for (auto i = 0u; i < mesh->mNumVertices; i++)
+			{
+				uvs.push_back({ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y });
+			}
+
+			std::vector<std::uint32_t> indices{};
+			for (auto i = 0u; i < mesh->mNumFaces; i++)
+			{
+				const auto& face = mesh->mFaces[i];
+				for (auto j = 0u; j < face.mNumIndices; j++)
+				{
+					indices.push_back(face.mIndices[j]);
+				}
+			}
+
+			m_LoadedModels.emplace(mesh->mName.C_Str(), LoadedModelData{Vertices(positions, normals, uvs), std::move(indices)});
+		}
+
+		const auto loaded = m_LoadedModels.find(modelName);
+		if (loaded != std::ranges::cend(m_LoadedModels))
+		{
+			return {
+				.vertices = loaded->second.vertices,
+				.indices = loaded->second.indices
+			};
+		}
+
+		Ensure(false, "Failed to load {} from {}", modelName, modelFile);
+		return {};
 	}
 
 }

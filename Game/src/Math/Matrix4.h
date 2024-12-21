@@ -8,6 +8,10 @@
 
 namespace Game {
 
+	struct Scale
+	{
+	};
+
 	class mat4
 	{
 	public:
@@ -31,6 +35,15 @@ namespace Game {
 				0.0f, 0.0f, 1.0f, 0.0f,
 				translation.x, translation.y, translation.z, 1.0f
 			})
+		{}
+
+		constexpr mat4(const vec3& scale, Scale)
+			: m_Elements({
+				scale.x, 0.0f, 0.0f, 0.0f,
+				0.0f, scale.y, 0.0f, 0.0f,
+				0.0f, 0.0f, scale.z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+				})
 		{}
 
 		static mat4 LookAt(const vec3& eye, const vec3& lookAt, const vec3& up);

@@ -2,11 +2,11 @@
 
 namespace Game {
 
-	Entity::Entity(const Mesh* mesh, const Material* material, const vec3& position, const std::vector<std::tuple<const Texture*, const Sampler*>>& textures)
+	Entity::Entity(const Mesh* mesh, const Material* material, const vec3& position, const vec3& scale, const std::vector<std::tuple<const Texture*, const Sampler*>>& textures)
 		: m_Mesh(mesh)
 		, m_Material(material)
 		, m_Textures(textures)
-		, m_Model(position)
+		, m_Model(mat4{ position } * mat4{ scale, {} })
 	{}
 
 	const Mesh* Entity::GetMesh() const
