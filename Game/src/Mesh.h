@@ -3,14 +3,14 @@
 #include "Utilities/AutoRelease.h"
 #include "OpenGL.h"
 #include "Buffer.h"
-#include "ModelLoader.h"
+#include "MeshLoader.h"
 
 namespace Game {
 
 	class Mesh
 	{
 	public:
-		Mesh(const ModelData& data);
+		Mesh(const MeshData& data);
 
 		void Bind() const;
 		void UnBind() const;

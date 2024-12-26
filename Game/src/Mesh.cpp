@@ -7,7 +7,7 @@
 
 namespace Game {
 
-	Mesh::Mesh(const ModelData& data)
+	Mesh::Mesh(const MeshData& data)
 		: m_VAO{ 0u, [](auto vao) { ::glDeleteVertexArrays(1, &vao); } }
 		, m_VBO{ static_cast<std::uint32_t>(data.vertices.size_bytes() + data.indices.size_bytes()) }
 		, m_IndexCount(static_cast<std::uint32_t>(data.indices.size()))

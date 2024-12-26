@@ -12,7 +12,7 @@
 #include "Entity.h"
 #include "Scene.h"
 #include "ResourceLoader.h"
-#include "ModelLoader.h"
+#include "MeshLoader.h"
 
 #include <iostream>
 #include <print>
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 		Game::Window window{ 1280u, 720u };
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
-		Game::ModelLoader modelLoader{ resourceLoader };
+		Game::MeshLoader meshLoader{ resourceLoader };
 
 		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/crate.png"), 500, 500 };
 		Game::Sampler sampler{};
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
-		const Game::Mesh mesh{ modelLoader.Load("models/monkey.obj", "Suzanne")};
+		const Game::Mesh mesh{ meshLoader.Load("models/monkey.obj", "Suzanne")};
 		const Game::Renderer renderer{};
 
 		std::vector<Game::Entity> entities{};

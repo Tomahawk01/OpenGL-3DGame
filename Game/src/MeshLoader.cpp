@@ -1,4 +1,4 @@
-#include "ModelLoader.h"
+#include "MeshLoader.h"
 
 #include "Math/Vector3.h"
 #include "Utilities/Error.h"
@@ -27,14 +27,14 @@ namespace {
 
 namespace Game {
 
-	ModelLoader::ModelLoader(ResourceLoader& resourceLoader)
+	MeshLoader::MeshLoader(ResourceLoader& resourceLoader)
 		: m_ResourceLoader(resourceLoader)
 	{}
 
-	ModelData ModelLoader::Cube()
+	MeshData MeshLoader::Cube()
 	{
-		const auto loaded = m_LoadedModels.find("cube");
-		if (loaded != std::ranges::cend(m_LoadedModels))
+		const auto loaded = m_LoadedMeshes.find("cube");
+		if (loaded != std::ranges::cend(m_LoadedMeshes))
 		{
 			return {
 				.vertices = loaded->second.vertices,
@@ -132,25 +132,25 @@ namespace Game {
 			20, 21, 22, 22, 23, 20
 		};
 
-		const auto newItem = m_LoadedModels.emplace("cube", LoadedModelData{ Vertices(positions, normals, uvs), std::move(indices) });
+		const auto newItem = m_LoadedMeshes.emplace("cube", LoadedMeshData{ Vertices(positions, normals, uvs), std::move(indices) });
 
 		return {.vertices = newItem.first->second.vertices, .indices = newItem.first->second.indices };
 	}
 
-	ModelData ModelLoader::Load(std::string_view modelFile, std::string_view modelName)
+	MeshData MeshLoader::Load(std::string_view meshFile, std::string_view modelName)
 	{
 		auto stream = ::aiGetPredefinedLogStream(::aiDefaultLogStream_STDOUT, NULL);
 		::aiAttachLogStream(&stream);
 
 		::aiEnableVerboseLogging(true);
 
-		const auto modelFileData = m_ResourceLoader.LoadBinary(modelFile);
+		const auto modelFileData = m_ResourceLoader.LoadBinary(meshFile);
 		Ensure(!modelFileData.empty(), "No loaded data");
 
 		::Assimp::Importer importer{};
 		const auto* scene = importer.ReadFileFromMemory(modelFileData.data(), modelFileData.size(), ::aiProcess_Triangulate);
 
-		Ensure(scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE), "Failed to load model {} {}", modelFile, modelName);
+		Ensure(scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE), "Failed to load model {} {}", meshFile, modelName);
 
 		const std::span<::aiMesh*> loadedMeshes{ scene->mMeshes, scene->mMeshes + scene->mNumMeshes };
 
@@ -158,8 +158,8 @@ namespace Game {
 
 		for (const auto* mesh : loadedMeshes)
 		{
-			const auto loaded = m_LoadedModels.find(mesh->mName.C_Str());
-			if (loaded != std::ranges::cend(m_LoadedModels))
+			const auto loaded = m_LoadedMeshes.find(mesh->mName.C_Str());
+			if (loaded != std::ranges::cend(m_LoadedMeshes))
 				continue;
 
 			const auto toVector3 = [](const ::aiVector3D& v) { return vec3{ v.x, v.y, v.z }; };
@@ -182,11 +182,11 @@ namespace Game {
 				}
 			}
 
-			m_LoadedModels.emplace(mesh->mName.C_Str(), LoadedModelData{Vertices(positions, normals, uvs), std::move(indices)});
+			m_LoadedMeshes.emplace(mesh->mName.C_Str(), LoadedMeshData{Vertices(positions, normals, uvs), std::move(indices)});
 		}
 
-		const auto loaded = m_LoadedModels.find(modelName);
-		if (loaded != std::ranges::cend(m_LoadedModels))
+		const auto loaded = m_LoadedMeshes.find(modelName);
+		if (loaded != std::ranges::cend(m_LoadedMeshes))
 		{
 			return {
 				.vertices = loaded->second.vertices,
@@ -194,7 +194,7 @@ namespace Game {
 			};
 		}
 
-		Ensure(false, "Failed to load {} from {}", modelName, modelFile);
+		Ensure(false, "Failed to load {} from {}", modelName, meshFile);
 		return {};
 	}
 

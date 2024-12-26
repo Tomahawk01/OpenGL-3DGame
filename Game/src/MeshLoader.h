@@ -11,29 +11,29 @@
 
 namespace Game {
 
-	struct ModelData
+	struct MeshData
 	{
 		std::span<const VertexData> vertices;
 		std::span<const std::uint32_t> indices;
 	};
 
-	class ModelLoader
+	class MeshLoader
 	{
 	public:
-		ModelLoader(ResourceLoader& resourceLoader);
+		MeshLoader(ResourceLoader& resourceLoader);
 
-		ModelData Cube();
+		MeshData Cube();
 
-		ModelData Load(std::string_view modelFile, std::string_view modelName);
+		MeshData Load(std::string_view meshFile, std::string_view meshName);
 
 	private:
-		struct LoadedModelData
+		struct LoadedMeshData
 		{
 			std::vector<VertexData> vertices;
 			std::vector<std::uint32_t> indices;
 		};
 
-		StringMap<LoadedModelData> m_LoadedModels;
+		StringMap<LoadedMeshData> m_LoadedMeshes;
 		ResourceLoader& m_ResourceLoader;
 	};
 
