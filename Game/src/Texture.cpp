@@ -21,12 +21,11 @@ namespace Game {
 		Ensure(rawData, "Failed to parse texture data");
 		Ensure(static_cast<std::uint32_t>(w) == width, "Width has changed");
 		Ensure(static_cast<std::uint32_t>(h) == height, "Height has changed");
-		Ensure(numChannels == 4, "Incorrect number of channels: {}", numChannels);
 
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
-		::glTextureStorage2D(m_Handle, 1, GL_RGBA8, width, height);
-		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, rawData.get());
+		::glTextureStorage2D(m_Handle, 1, numChannels == 4 ? GL_RGBA8 : GL_RGB8, width, height);
+		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
 	}
 
 	::GLuint Texture::GetNativeHandle() const

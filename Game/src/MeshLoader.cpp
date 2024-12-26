@@ -132,7 +132,7 @@ namespace Game {
 			20, 21, 22, 22, 23, 20
 		};
 
-		const auto newItem = m_LoadedMeshes.emplace("cube", LoadedMeshData{ Vertices(positions, normals, uvs), std::move(indices) });
+		const auto newItem = m_LoadedMeshes.emplace("cube", LoadedMeshData{ Vertices(positions, normals, normals, uvs), std::move(indices) });
 
 		return {.vertices = newItem.first->second.vertices, .indices = newItem.first->second.indices };
 	}
@@ -148,7 +148,10 @@ namespace Game {
 		Ensure(!modelFileData.empty(), "No loaded data");
 
 		::Assimp::Importer importer{};
-		const auto* scene = importer.ReadFileFromMemory(modelFileData.data(), modelFileData.size(), ::aiProcess_Triangulate | ::aiProcess_FlipUVs);
+		const auto* scene = importer.ReadFileFromMemory(
+			modelFileData.data(),
+			modelFileData.size(),
+			::aiProcess_Triangulate | ::aiProcess_FlipUVs | ::aiProcess_CalcTangentSpace);
 
 		Ensure(scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE), "Failed to load model {} {}", meshFile, modelName);
 
@@ -167,9 +170,11 @@ namespace Game {
 			const auto normals = std::span<::aiVector3D>{ mesh->mNormals, mesh->mNormals + mesh->mNumVertices } | std::views::transform(toVector3);
 
 			std::vector<UV> uvs{};
+			std::vector<vec3> tangents{};
 			for (auto i = 0u; i < mesh->mNumVertices; i++)
 			{
 				uvs.push_back({ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y });
+				tangents.push_back({ mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z });
 			}
 
 			std::vector<std::uint32_t> indices{};
@@ -182,7 +187,7 @@ namespace Game {
 				}
 			}
 
-			m_LoadedMeshes.emplace(mesh->mName.C_Str(), LoadedMeshData{Vertices(positions, normals, uvs), std::move(indices)});
+			m_LoadedMeshes.emplace(mesh->mName.C_Str(), LoadedMeshData{Vertices(positions, normals, tangents, uvs), std::move(indices)});
 		}
 
 		const auto loaded = m_LoadedMeshes.find(modelName);

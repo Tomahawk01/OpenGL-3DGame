@@ -36,12 +36,13 @@ int main(int argc, char** argv)
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
 
-		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
 		Game::Sampler sampler{};
+		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
 		Game::Texture specMap{ resourceLoader.LoadBinary("textures/falcon_Specular.png"), 4096, 4096 };
+		Game::Texture normalMap{ resourceLoader.LoadBinary("textures/falcon_Normal.png"), 4096, 4096 };
 
-		const Game::Texture* textures[]{ &albedoTex, &specMap };
-		const Game::Sampler* samplers[]{ &sampler, &sampler };
+		const Game::Texture* textures[]{ &albedoTex, &specMap, &normalMap };
+		const Game::Sampler* samplers[]{ &sampler, &sampler, &sampler };
 		const auto texSamp = std::views::zip(textures, samplers) | std::ranges::to<std::vector>();
 
 		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
