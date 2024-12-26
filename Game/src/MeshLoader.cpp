@@ -148,7 +148,7 @@ namespace Game {
 		Ensure(!modelFileData.empty(), "No loaded data");
 
 		::Assimp::Importer importer{};
-		const auto* scene = importer.ReadFileFromMemory(modelFileData.data(), modelFileData.size(), ::aiProcess_Triangulate);
+		const auto* scene = importer.ReadFileFromMemory(modelFileData.data(), modelFileData.size(), ::aiProcess_Triangulate | ::aiProcess_FlipUVs);
 
 		Ensure(scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE), "Failed to load model {} {}", meshFile, modelName);
 

@@ -20,7 +20,7 @@ layout(std140, binding = 0) uniform camera
 void main()
 {
     gl_Position = projection * view * model * vec4(in_position, 1.0);
-    normal = (model * vec4(in_normal, 0)).xyz;
+    normal = normalize(transpose(inverse(mat3(model))) * in_normal);
     tex_coord = in_uv;
 
     frag_position = model * vec4(in_position, 1);

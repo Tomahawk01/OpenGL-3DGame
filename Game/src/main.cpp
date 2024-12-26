@@ -36,9 +36,9 @@ int main(int argc, char** argv)
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
 
-		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/crate.png"), 500, 500 };
+		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
 		Game::Sampler sampler{};
-		Game::Texture specMap{ resourceLoader.LoadBinary("textures/crate_specular.png"), 500, 500 };
+		Game::Texture specMap{ resourceLoader.LoadBinary("textures/falcon_Specular.png"), 4096, 4096 };
 
 		const Game::Texture* textures[]{ &albedoTex, &specMap };
 		const Game::Sampler* samplers[]{ &sampler, &sampler };
@@ -47,14 +47,10 @@ int main(int argc, char** argv)
 		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
-		const Game::Mesh mesh{ meshLoader.Load("models/monkey.obj", "Suzanne")};
+		const Game::Mesh mesh{ meshLoader.Load("models/falcon.obj", "Plane_Plane.001")};
 		const Game::Renderer renderer{};
 
 		std::vector<Game::Entity> entities{};
-
-		std::random_device rd{};
-		std::mt19937 gen{ rd() };
-		std::uniform_real_distribution dis{ -5.0f, 5.0f };
 			
 		for (int i = -10; i < 10; i++)
 		{
@@ -63,7 +59,7 @@ int main(int argc, char** argv)
 				entities.emplace_back(
 					&mesh,
 					&material,
-					Game::vec3{ static_cast<float>(i) * 2.5f, dis(gen), static_cast<float>(j) * 2.5f },
+					Game::vec3{ static_cast<float>(i) * 15.0f, 0.0f, static_cast<float>(j) * 15.0f },
 					Game::vec3{ 1.0f },
 					texSamp);
 			}

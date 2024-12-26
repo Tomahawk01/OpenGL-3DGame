@@ -55,7 +55,7 @@ namespace Game {
 				const ::GLint location = ::glGetUniformLocation(m_Handle, name.c_str());
 				m_Uniforms[name] = location;
 
-				Logger::Trace("Fount uniform: {}", name);
+				Logger::Trace("Found uniform: {}", name);
 			}
 		}
 
