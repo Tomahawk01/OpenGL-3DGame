@@ -6,7 +6,7 @@ namespace Game {
 		: m_Mesh(mesh)
 		, m_Material(material)
 		, m_Textures(textures)
-		, m_Model(mat4{ position } * mat4{ scale, {} })
+		, m_Model(position * scale)
 	{}
 
 	const Mesh* Entity::GetMesh() const

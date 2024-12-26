@@ -8,10 +8,6 @@
 
 namespace Game {
 
-	struct Scale
-	{
-	};
-
 	class mat4
 	{
 	public:
@@ -37,14 +33,14 @@ namespace Game {
 			})
 		{}
 
-		constexpr mat4(const vec3& scale, Scale)
+		constexpr mat4(const vec3& translation, const vec3& scale)
 			: m_Elements({
 				scale.x, 0.0f, 0.0f, 0.0f,
 				0.0f, scale.y, 0.0f, 0.0f,
 				0.0f, 0.0f, scale.z, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f
-				})
-		{}
+				translation.x, translation.y, translation.z, 1.0f
+			})
+		{}	
 
 		static mat4 LookAt(const vec3& eye, const vec3& lookAt, const vec3& up);
 		static mat4 Perspective(float fov, float width, float height, float nearPlane, float farPlane);
