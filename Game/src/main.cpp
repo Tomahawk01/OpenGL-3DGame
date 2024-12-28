@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{ meshLoader.Load("models/falcon.obj", "Plane_Plane.001")};
-		const Game::Renderer renderer{};
+		const Game::Renderer renderer{resourceLoader, meshLoader};
 
 		std::vector<Game::Entity> entities{};
 			
@@ -93,6 +93,17 @@ int main(int argc, char** argv)
 			static_cast<float>(window.GetWidth()), static_cast<float>(window.GetHeight()),
 			0.1f, 1000.0f
 		};
+
+		Game::CubeMap skybox{
+			{resourceLoader.LoadBinary("textures/right.jpg"),
+			 resourceLoader.LoadBinary("textures/left.jpg"),
+			 resourceLoader.LoadBinary("textures/top.jpg"),
+			 resourceLoader.LoadBinary("textures/bottom.jpg"),
+			 resourceLoader.LoadBinary("textures/front.jpg"),
+			 resourceLoader.LoadBinary("textures/back.jpg")},
+			2048u, 2048u
+		};
+		Game::Sampler skyboxSampler{};
 
 		std::unordered_map<Game::Key, bool> keyState{};
 
@@ -176,7 +187,7 @@ int main(int argc, char** argv)
 			const float speed = 0.4f;
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
 
-			renderer.Render(camera, scene);
+			renderer.Render(camera, scene, skybox, skyboxSampler);
 			if (showDebug)
 				debugUI.Render();
 

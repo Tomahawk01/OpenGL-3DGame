@@ -27,16 +27,25 @@ namespace {
 		int numPoints;
 	};
 
+	Game::Material CreateSkyboxMaterial(Game::ResourceLoader& resourceLoader)
+	{
+		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/cubeMap.vert"), Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/cubeMap.frag"), Game::ShaderType::FRAGMENT };
+		return Game::Material{ vertexShader, fragmentShader };
+	}
+
 }
 
 namespace Game {
 
-	Renderer::Renderer()
+	Renderer::Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader)
 		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3))
 		, m_LightBuffer(10240u)
+		, m_SkyboxCube(meshLoader.Cube())
+		, m_SkyboxMaterial(CreateSkyboxMaterial(resourceLoader))
 	{}
 
-	void Renderer::Render(const Camera& camera, const Scene& scene) const
+	void Renderer::Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler) const
 	{
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -72,6 +81,18 @@ namespace Game {
 			}
 		}
 		::glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightBuffer.GetNativeHandle());
+
+		::glDepthMask(GL_FALSE);
+
+		m_SkyboxMaterial.Use();
+		m_SkyboxCube.Bind();
+
+		m_SkyboxMaterial.BindCubeMap(&skybox, &skyboxSampler);
+		::glDrawElements(GL_TRIANGLES, m_SkyboxCube.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_SkyboxCube.IndexOffset()));
+
+		m_SkyboxCube.UnBind();
+
+		::glDepthMask(GL_TRUE);
 
 		for (const Entity* entity : scene.entities)
 		{

@@ -3,19 +3,26 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Buffer.h"
+#include "CubeMap.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "ResourceLoader.h"
+#include "MeshLoader.h"
 
 namespace Game {
 
 	class Renderer
 	{
 	public:
-		Renderer();
+		Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader);
 
-		void Render(const Camera& camera, const Scene& scene) const;
+		void Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler) const;
 
 	private:
 		Buffer m_CameraBuffer;
 		Buffer m_LightBuffer;
+		Mesh m_SkyboxCube;
+		Material m_SkyboxMaterial;
 	};
 
 }
