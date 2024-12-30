@@ -28,6 +28,21 @@ namespace Game {
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
 	}
 
+	Texture::Texture(TextureUsage usage, std::uint32_t width, std::uint32_t height)
+		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+	{
+		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
+		switch (usage)
+		{
+		case Game::TextureUsage::FRAMEBUFFER:
+			::glTextureStorage2D(m_Handle, 1, GL_RGB8, width, height);
+			break;
+		case Game::TextureUsage::DEPTH:
+			::glTextureStorage2D(m_Handle, 1, GL_DEPTH_COMPONENT24, width, height);
+			break;
+		}
+	}
+
 	::GLuint Texture::GetNativeHandle() const
 	{
 		return m_Handle;
