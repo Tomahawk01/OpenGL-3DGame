@@ -5,11 +5,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <algorithm>
+
 namespace Game {
 
-	Texture::Texture(std::span<const std::byte> data, std::uint32_t width, std::uint32_t height)
+	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, std::uint32_t width, std::uint32_t height)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
+		TextureUsage validUsage[] = { TextureUsage::SRGB, TextureUsage::DATA };
+		Ensure(std::ranges::contains(validUsage, usage), "Invalid usage");
+
 		int w{};
 		int h{};
 		int numChannels{};
@@ -24,7 +29,20 @@ namespace Game {
 
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
-		::glTextureStorage2D(m_Handle, 1, numChannels == 4 ? GL_RGBA8 : GL_RGB8, width, height);
+		::GLenum format{};
+		switch (usage)
+		{
+		case TextureUsage::SRGB:
+			format = numChannels == 4 ? GL_SRGB8_ALPHA8 : GL_SRGB8;
+			break;
+		case TextureUsage::DATA:
+			format = numChannels == 4 ? GL_RGBA8 : GL_RGB8;
+			break;
+		default:
+			break;
+		}
+
+		::glTextureStorage2D(m_Handle, 1, format, width, height);
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
 	}
 
@@ -34,11 +52,13 @@ namespace Game {
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 		switch (usage)
 		{
-		case Game::TextureUsage::FRAMEBUFFER:
-			::glTextureStorage2D(m_Handle, 1, GL_RGB8, width, height);
+		case TextureUsage::FRAMEBUFFER:
+			::glTextureStorage2D(m_Handle, 1, GL_RGB16F, width, height);
 			break;
-		case Game::TextureUsage::DEPTH:
+		case TextureUsage::DEPTH:
 			::glTextureStorage2D(m_Handle, 1, GL_DEPTH_COMPONENT24, width, height);
+			break;
+		default:
 			break;
 		}
 	}

@@ -39,4 +39,9 @@ namespace Game {
 		return m_Handle;
 	}
 
+	const Texture& FrameBuffer::GetColorTexture() const
+	{
+		return m_ColorTexture;
+	}
+
 }

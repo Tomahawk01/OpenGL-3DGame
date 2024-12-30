@@ -10,7 +10,7 @@ namespace Game {
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
 		::glCreateTextures(GL_TEXTURE_CUBE_MAP, 1u, &m_Handle);
-		::glTextureStorage2D(m_Handle, 1, GL_RGBA8, width, height);
+		::glTextureStorage2D(m_Handle, 1, GL_SRGB8, width, height);
 
 		for (const auto& [index, face] : std::views::enumerate(faces))
 		{

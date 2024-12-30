@@ -13,7 +13,7 @@ namespace Game {
 	class DebugUI
 	{
 	public:
-		DebugUI(HWND window, Scene& scene, Camera& camera);
+		DebugUI(HWND window, Scene& scene, Camera& camera, float& gamma);
 		~DebugUI();
 
 		void Render() const;
@@ -22,6 +22,7 @@ namespace Game {
 	private:
 		Scene& m_Scene;
 		Camera& m_Camera;
+		float& m_Gamma;
 	};
 
 }

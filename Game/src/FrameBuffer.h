@@ -20,6 +20,7 @@ namespace Game {
 		std::uint32_t GetHeight() const;
 
 		::GLuint GetNativeHandle() const;
+		const Texture& GetColorTexture() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;

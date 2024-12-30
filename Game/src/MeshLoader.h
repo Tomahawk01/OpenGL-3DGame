@@ -23,6 +23,7 @@ namespace Game {
 		MeshLoader(ResourceLoader& resourceLoader);
 
 		MeshData Cube();
+		MeshData Sprite();
 
 		MeshData Load(std::string_view meshFile, std::string_view meshName);
 

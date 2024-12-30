@@ -34,6 +34,13 @@ namespace {
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
+	Game::Material CreatePostProcessMaterial(Game::ResourceLoader& resourceLoader)
+	{
+		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/postProcess.vert"), Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/postProcess.frag"), Game::ShaderType::FRAGMENT };
+		return Game::Material{ vertexShader, fragmentShader };
+	}
+
 }
 
 namespace Game {
@@ -44,9 +51,11 @@ namespace Game {
 		, m_SkyboxCube(meshLoader.Cube())
 		, m_SkyboxMaterial(CreateSkyboxMaterial(resourceLoader))
 		, m_FB(width, height)
+		, m_PostProcessSprite(meshLoader.Sprite())
+		, m_PostProcessMaterial(CreatePostProcessMaterial(resourceLoader))
 	{}
 
-	void Renderer::Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler) const
+	void Renderer::Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler, float gamma) const
 	{
 		m_FB.Bind();
 
@@ -113,13 +122,14 @@ namespace Game {
 
 		m_FB.UnBind();
 
-		::glBlitNamedFramebuffer(
-			m_FB.GetNativeHandle(),
-			0u,
-			0, 0, m_FB.GetWidth(), m_FB.GetHeight(),
-			0, 0, m_FB.GetWidth(), m_FB.GetHeight(),
-			GL_COLOR_BUFFER_BIT,
-			GL_NEAREST);
+		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_PostProcessMaterial.Use();
+		m_PostProcessSprite.Bind();
+		m_PostProcessMaterial.BindTexture(0, &m_FB.GetColorTexture(), &skyboxSampler);
+		m_PostProcessMaterial.SetUniform("gamma", gamma);
+		::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
+		m_PostProcessSprite.UnBind();
 	}
 
 }

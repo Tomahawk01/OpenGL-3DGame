@@ -17,7 +17,7 @@ namespace Game {
 	public:
 		Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, std::uint32_t width, std::uint32_t height);
 
-		void Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler) const;
+		void Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler, float gamma) const;
 
 	private:
 		Buffer m_CameraBuffer;
@@ -25,6 +25,8 @@ namespace Game {
 		Mesh m_SkyboxCube;
 		Material m_SkyboxMaterial;
 		FrameBuffer m_FB;
+		Mesh m_PostProcessSprite;
+		Material m_PostProcessMaterial;
 	};
 
 }

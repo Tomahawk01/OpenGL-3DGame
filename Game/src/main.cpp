@@ -37,9 +37,9 @@ int main(int argc, char** argv)
 		Game::MeshLoader meshLoader{ resourceLoader };
 
 		Game::Sampler sampler{};
-		Game::Texture albedoTex{ resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
-		Game::Texture specMap{ resourceLoader.LoadBinary("textures/falcon_Specular.png"), 4096, 4096 };
-		Game::Texture normalMap{ resourceLoader.LoadBinary("textures/falcon_Normal.png"), 4096, 4096 };
+		Game::Texture albedoTex{ Game::TextureUsage::SRGB, resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
+		Game::Texture specMap{ Game::TextureUsage::DATA, resourceLoader.LoadBinary("textures/falcon_Specular.png"), 4096, 4096 };
+		Game::Texture normalMap{ Game::TextureUsage::DATA, resourceLoader.LoadBinary("textures/falcon_Normal.png"), 4096, 4096 };
 
 		const Game::Texture* textures[]{ &albedoTex, &specMap, &normalMap };
 		const Game::Sampler* samplers[]{ &sampler, &sampler, &sampler };
@@ -107,8 +107,10 @@ int main(int argc, char** argv)
 
 		std::unordered_map<Game::Key, bool> keyState{};
 
+		float gamma = 2.2f;
+
 		bool showDebug = true;
-		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera };
+		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
 
 		bool running = true;
 		while (running)
@@ -187,7 +189,7 @@ int main(int argc, char** argv)
 			const float speed = 0.4f;
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
 
-			renderer.Render(camera, scene, skybox, skyboxSampler);
+			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 			if (showDebug)
 				debugUI.Render();
 

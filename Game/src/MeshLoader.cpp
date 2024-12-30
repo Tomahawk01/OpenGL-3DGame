@@ -137,6 +137,40 @@ namespace Game {
 		return {.vertices = newItem.first->second.vertices, .indices = newItem.first->second.indices };
 	}
 
+	MeshData MeshLoader::Sprite()
+	{
+		const auto loaded = m_LoadedMeshes.find("sprite");
+		if (loaded != std::ranges::cend(m_LoadedMeshes))
+		{
+			return {
+				.vertices = loaded->second.vertices,
+				.indices = loaded->second.indices
+			};
+		}
+
+		const vec3 positions[] = {
+			{-1.0f, 1.0f, 0.0f},
+			{-1.0f, -1.0f, 0.0f},
+			{1.0f, -1.0f, 0.0f},
+			{1.0f, 1.0f, 0.0f}
+		};
+
+		const UV uvs[] = {
+			{0.0f, 1.0f},
+			{0.0f, 0.0f},
+			{1.0f, 0.0f},
+			{1.0f, 1.0f}			
+		};
+
+		const std::vector<std::uint32_t> indices = {
+			0, 1, 2, 0, 2, 3
+		};
+
+		const auto newItem = m_LoadedMeshes.emplace("sprite", LoadedMeshData{ Vertices(positions, positions, positions, uvs), std::move(indices) });
+
+		return { .vertices = newItem.first->second.vertices, .indices = newItem.first->second.indices };
+	}
+
 	MeshData MeshLoader::Load(std::string_view meshFile, std::string_view modelName)
 	{
 		auto stream = ::aiGetPredefinedLogStream(::aiDefaultLogStream_STDOUT, NULL);

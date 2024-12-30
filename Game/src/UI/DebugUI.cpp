@@ -11,9 +11,10 @@
 
 namespace Game {
 
-	DebugUI::DebugUI(HWND window, Scene& scene, Camera& camera)
+	DebugUI::DebugUI(HWND window, Scene& scene, Camera& camera, float& gamma)
 		: m_Scene(scene)
 		, m_Camera(camera)
+		, m_Gamma(gamma)
 	{
 		IMGUI_CHECKVERSION();
 		::ImGui::CreateContext();
@@ -56,6 +57,7 @@ namespace Game {
 		}
 
 		::ImGui::LabelText("FPS", "%0.1f", io.Framerate);
+		::ImGui::SliderFloat("Gamma", &m_Gamma, 0.0f, 5.0f);
 
 		if (::ImGui::CollapsingHeader("Ambient"))
 		{
