@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{ meshLoader.Load("models/falcon.obj", "Plane_Plane.001")};
-		const Game::Renderer renderer{resourceLoader, meshLoader};
+		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
 		std::vector<Game::Entity> entities{};
 			

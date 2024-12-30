@@ -38,15 +38,18 @@ namespace {
 
 namespace Game {
 
-	Renderer::Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader)
+	Renderer::Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, std::uint32_t width, std::uint32_t height)
 		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3))
 		, m_LightBuffer(10240u)
 		, m_SkyboxCube(meshLoader.Cube())
 		, m_SkyboxMaterial(CreateSkyboxMaterial(resourceLoader))
+		, m_FB(width, height)
 	{}
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler) const
 	{
+		m_FB.Bind();
+
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
@@ -107,6 +110,16 @@ namespace Game {
 			::glDrawElements(GL_TRIANGLES, mesh->IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(mesh->IndexOffset()));
 			mesh->UnBind();
 		}
+
+		m_FB.UnBind();
+
+		::glBlitNamedFramebuffer(
+			m_FB.GetNativeHandle(),
+			0u,
+			0, 0, m_FB.GetWidth(), m_FB.GetHeight(),
+			0, 0, m_FB.GetWidth(), m_FB.GetHeight(),
+			GL_COLOR_BUFFER_BIT,
+			GL_NEAREST);
 	}
 
 }
