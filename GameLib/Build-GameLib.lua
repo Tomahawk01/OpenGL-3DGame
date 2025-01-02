@@ -1,5 +1,5 @@
-project "Game"
-    kind "ConsoleApp"
+project "GameLib"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++23"
     staticruntime "off"
@@ -7,7 +7,9 @@ project "Game"
     files
     {
         "**.h",
-        "**.cpp"
+        "**.cpp",
+
+        "%{wks.location}/vendor/ImGuizmo/ImGuizmo.cpp"
     }
 
     defines
@@ -18,15 +20,23 @@ project "Game"
     includedirs
     {
         "src",
-        "%{wks.location}/GameLib/src",
-
+        
         "%{wks.location}/vendor/OpenGL/include",
-        "%{wks.location}/vendor/ImGui/src"
+        "%{wks.location}/vendor/stb",
+        "%{wks.location}/vendor/ImGui/src",
+        "%{wks.location}/vendor/ImGuizmo",
+        "%{wks.location}/vendor/assimp-5.4.3/include"
+    }
+
+    libdirs
+    {
+        "%{wks.location}/vendor/assimp-5.4.3/lib"
     }
 
     links
     {
-        "GameLib"
+        "OpenGL32.lib",
+        "ImGui"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
@@ -38,12 +48,18 @@ project "Game"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
-        debugargs { "assets" }
         runtime "Debug"
         symbols "On"
+        links
+        {
+            "assimp-vc143-mtd.lib"
+        }
 
     filter "configurations:Release"
         defines { "RELEASE" }
-        debugargs { "assets" }
         runtime "Release"
         optimize "On"
+        links
+        {
+            "assimp-vc143-mt.lib"
+        }
