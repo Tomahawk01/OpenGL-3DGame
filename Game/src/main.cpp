@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "ResourceLoader.h"
 #include "MeshLoader.h"
+#include "TLVReader.h"
 
 #include <iostream>
 #include <print>
