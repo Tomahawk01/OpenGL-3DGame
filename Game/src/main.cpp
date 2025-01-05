@@ -26,8 +26,6 @@
 
 int main(int argc, char** argv)
 {
-	Game::Logger::Info("Hello world");
-
 	try
 	{
 		Game::Ensure(argc == 2, "game.exe <root_path>");
@@ -37,7 +35,13 @@ int main(int argc, char** argv)
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
 
+		//const auto tlvBuffer = resourceLoader.LoadBinary("resource");
+		//const Game::TLVReader reader{ tlvBuffer };
+		//const Game::TLVReader::Iterator entry = std::ranges::begin(reader);
+		//const Game::TextureDescription texDesc{ (*entry).textureDescriptionValue() };
+
 		Game::Sampler sampler{};
+		//Game::Texture albedoTex{ texDesc };
 		Game::Texture albedoTex{ Game::TextureUsage::SRGB, resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
 		Game::Texture specMap{ Game::TextureUsage::DATA, resourceLoader.LoadBinary("textures/falcon_Specular.png"), 4096, 4096 };
 		Game::Texture normalMap{ Game::TextureUsage::DATA, resourceLoader.LoadBinary("textures/falcon_Normal.png"), 4096, 4096 };
