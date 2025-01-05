@@ -1,0 +1,101 @@
+#include "TLVWriter.h"
+
+#include "TLVEntry.h"
+
+#include <ranges>
+
+namespace {
+
+	void WriteBytes(std::vector<std::byte>& buffer, std::span<const std::byte> data)
+	{
+		buffer.insert(std::ranges::end(buffer), std::ranges::cbegin(data), std::ranges::cend(data));
+	}
+
+	void WriteEntry(std::vector<std::byte>& buffer, Game::TLVType type, std::uint32_t length, std::span<const std::byte> value)
+	{
+		WriteBytes(buffer, { reinterpret_cast<const std::byte*>(&type), sizeof(type) });
+		WriteBytes(buffer, { reinterpret_cast<const std::byte*>(&length), sizeof(length) });
+		WriteBytes(buffer, value);
+	}
+
+}
+
+namespace Game {
+
+	std::vector<std::byte> TLVWriter::yield()
+	{
+		std::vector<std::byte> temp{};
+		std::ranges::swap(temp, m_Buffer);
+		return temp;
+	}
+
+	void TLVWriter::Write(std::uint32_t value)
+	{
+		const auto type = TLVType::UINT32;
+		const auto length = sizeof(value);
+		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(&value), length };
+
+		WriteEntry(m_Buffer, type, length, valueBytes);
+	}
+
+	void TLVWriter::Write(std::string_view value)
+	{
+		const auto type = TLVType::STRING;
+		const auto length = static_cast<std::uint32_t>(value.length());
+		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(value.data()), length };
+
+		WriteEntry(m_Buffer, type, length, valueBytes);
+	}
+
+	void TLVWriter::Write(std::span<const std::byte> value)
+	{
+		const auto type = TLVType::BYTE_ARRAY;
+		const auto length = static_cast<std::uint32_t>(value.size());
+		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(value.data()), length };
+
+		WriteEntry(m_Buffer, type, length, valueBytes);
+	}
+
+	void TLVWriter::Write(TextureFormat value)
+	{
+		const auto type = TLVType::TEXTURE_FORMAT;
+		const auto length = sizeof(value);
+		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(&value), length };
+
+		WriteEntry(m_Buffer, type, length, valueBytes);
+	}
+
+	void TLVWriter::Write(TextureUsage value)
+	{
+		const auto type = TLVType::TEXTURE_USAGE;
+		const auto length = sizeof(value);
+		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(&value), length };
+
+		WriteEntry(m_Buffer, type, length, valueBytes);
+	}
+
+	void TLVWriter::Write(
+		std::string_view name,
+		std::uint32_t width,
+		std::uint32_t height,
+		TextureFormat format,
+		TextureUsage usage,
+		std::span<const std::byte> data)
+	{
+		TLVWriter writer{};
+
+		writer.Write(name);
+		writer.Write(width);
+		writer.Write(height);
+		writer.Write(format);
+		writer.Write(usage);
+		writer.Write(data);
+
+		const auto value = writer.yield();
+		const auto type = TLVType::TEXTURE_DESCRIPTION;
+		const auto length = static_cast<std::uint32_t>(value.size());
+
+		WriteEntry(m_Buffer, type, length, value);
+	}
+
+}
