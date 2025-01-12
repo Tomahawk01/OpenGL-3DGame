@@ -22,5 +22,9 @@ group "Dependencies"
     include "vendor/ImGui/Build-ImGui.lua"
 group ""
 
+group "Tools"
+include "Tools/ResourcePacker/Build-ResourcePacker.lua"
+group ""
+
 include "GameLib/Build-GameLib.lua"
 include "Game/Build-Game.lua"
