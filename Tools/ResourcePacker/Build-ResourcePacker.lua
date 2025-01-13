@@ -18,7 +18,9 @@ project "ResourcePacker"
     includedirs
     {
         "src",
-        "%{wks.location}/GameLib/src"
+        "%{wks.location}/GameLib/src",
+
+        "%{wks.location}/vendor/OpenGL/include"
     }
 
     links
@@ -35,12 +37,12 @@ project "ResourcePacker"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
-        debugargs { "assets" }
+        debugargs { "%{wks.location}/Game/assets/textures ./resource" }
         runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines { "RELEASE" }
-        debugargs { "assets" }
+        debugargs { "%{wks.location}/Game/assets/textures ./resource" }
         runtime "Release"
         optimize "On"

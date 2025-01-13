@@ -178,7 +178,8 @@ namespace Game {
 
 		::aiEnableVerboseLogging(true);
 
-		const auto modelFileData = m_ResourceLoader.LoadBinary(meshFile);
+		const MappedFile modelFileMapped{ m_ResourceLoader.Load(meshFile) };
+		const auto modelFileData = modelFileMapped.AsData();
 		Ensure(!modelFileData.empty(), "No loaded data");
 
 		::Assimp::Importer importer{};

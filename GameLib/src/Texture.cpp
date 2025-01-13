@@ -49,22 +49,13 @@ namespace Game {
 	Texture::Texture(const TextureDescription& description)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
-		int w{};
-		int h{};
-		int numChannels{};
-
-		auto rawData = std::unique_ptr<::stbi_uc, void(*)(void*)>(
-			::stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(description.data.data()), static_cast<int>(description.data.size()), &w, &h, &numChannels, 0),
-			::stbi_image_free
-		);
-
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
 		Ensure(description.format == TextureFormat::RGBA, "Please implement the rest");
 		Ensure(description.usage == TextureUsage::SRGB, "Please implement the rest");
 
 		::glTextureStorage2D(m_Handle, 1, GL_SRGB8_ALPHA8, description.width, description.height);
-		::glTextureSubImage2D(m_Handle, 0, 0, 0, description.width, description.height, GL_RGBA, GL_UNSIGNED_BYTE, rawData.get());
+		::glTextureSubImage2D(m_Handle, 0, 0, 0, description.width, description.height, GL_RGBA, GL_UNSIGNED_BYTE, description.data.data());
 	}
 
 	Texture::Texture(TextureUsage usage, std::uint32_t width, std::uint32_t height)

@@ -46,6 +46,14 @@ namespace Game {
 			std::ranges::swap(m_Deleter, other.m_Deleter);
 		}
 
+		void Reset(T obj)
+		{
+			if ((m_Object != Invalid) && m_Deleter)
+				m_Deleter(m_Object);
+
+			m_Object = obj;
+		}
+
 		T Get() const { return m_Object; }
 		operator T() const { return m_Object; }
 		explicit operator bool() const { return m_Object != Invalid; }

@@ -35,23 +35,38 @@ int main(int argc, char** argv)
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
 
-		//const auto tlvBuffer = resourceLoader.LoadBinary("resource");
-		//const Game::TLVReader reader{ tlvBuffer };
-		//const Game::TLVReader::Iterator entry = std::ranges::begin(reader);
-		//const Game::TextureDescription texDesc{ (*entry).textureDescriptionValue() };
+		std::optional<Game::TextureDescription> texDesc{};
+
+		const Game::MappedFile tlvFile{ resourceLoader.Load("resource") };
+
+		const Game::TLVReader reader{ tlvFile.AsData() };
+		for (const auto& entry : reader)
+		{
+			if (entry.IsTexture("falcon_Albedo"))
+			{
+				texDesc = entry.textureDescriptionValue();
+				break;
+			}
+		}
+		Game::Ensure(!!texDesc, "Missing texture");
+
+		const Game::MappedFile carSpecFile{ resourceLoader.Load("textures/falcon_Specular.data.png") };
+		const Game::MappedFile carNormalFile{ resourceLoader.Load("textures/falcon_Normal.data.png") };
 
 		Game::Sampler sampler{};
-		//Game::Texture albedoTex{ texDesc };
-		Game::Texture albedoTex{ Game::TextureUsage::SRGB, resourceLoader.LoadBinary("textures/falcon_Albedo.png"), 4096, 4096 };
-		Game::Texture specMap{ Game::TextureUsage::DATA, resourceLoader.LoadBinary("textures/falcon_Specular.png"), 4096, 4096 };
-		Game::Texture normalMap{ Game::TextureUsage::DATA, resourceLoader.LoadBinary("textures/falcon_Normal.png"), 4096, 4096 };
+		Game::Texture albedoTex{ *texDesc };
+		Game::Texture specMap{ Game::TextureUsage::DATA, carSpecFile.AsData(), 4096, 4096};
+		Game::Texture normalMap{ Game::TextureUsage::DATA, carNormalFile.AsData(), 4096, 4096};
 
 		const Game::Texture* textures[]{ &albedoTex, &specMap, &normalMap };
 		const Game::Sampler* samplers[]{ &sampler, &sampler, &sampler };
 		const auto texSamp = std::views::zip(textures, samplers) | std::ranges::to<std::vector>();
 
-		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/basic.vert"), Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/basic.frag"), Game::ShaderType::FRAGMENT };
+		const Game::MappedFile basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
+		const Game::MappedFile basicFragFile{ resourceLoader.Load("shaders/basic.frag") };
+
+		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX};
+		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT};
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{ meshLoader.Load("models/falcon.obj", "Plane_Plane.001")};
 		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
@@ -99,13 +114,20 @@ int main(int argc, char** argv)
 			0.1f, 1000.0f
 		};
 
+		const Game::MappedFile skyboxRightFile{ resourceLoader.Load("textures/right.srgb.jpg") };
+		const Game::MappedFile skyboxLeftFile{ resourceLoader.Load("textures/left.srgb.jpg") };
+		const Game::MappedFile skyboxTopFile{ resourceLoader.Load("textures/top.srgb.jpg") };
+		const Game::MappedFile skyboxBottomFile{ resourceLoader.Load("textures/bottom.srgb.jpg") };
+		const Game::MappedFile skyboxFrontFile{ resourceLoader.Load("textures/front.srgb.jpg") };
+		const Game::MappedFile skyboxBackFile{ resourceLoader.Load("textures/back.srgb.jpg") };
+
 		Game::CubeMap skybox{
-			{resourceLoader.LoadBinary("textures/right.jpg"),
-			 resourceLoader.LoadBinary("textures/left.jpg"),
-			 resourceLoader.LoadBinary("textures/top.jpg"),
-			 resourceLoader.LoadBinary("textures/bottom.jpg"),
-			 resourceLoader.LoadBinary("textures/front.jpg"),
-			 resourceLoader.LoadBinary("textures/back.jpg")},
+			{skyboxRightFile.AsData(),
+			 skyboxLeftFile.AsData(),
+			 skyboxTopFile.AsData(),
+			 skyboxBottomFile.AsData(),
+			 skyboxFrontFile.AsData(),
+			 skyboxBackFile.AsData()},
 			2048u, 2048u
 		};
 		Game::Sampler skyboxSampler{};

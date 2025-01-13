@@ -29,15 +29,21 @@ namespace {
 
 	Game::Material CreateSkyboxMaterial(Game::ResourceLoader& resourceLoader)
 	{
-		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/cubeMap.vert"), Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/cubeMap.frag"), Game::ShaderType::FRAGMENT };
+		const Game::MappedFile vertFile{ resourceLoader.Load("shaders/cubeMap.vert") };
+		const Game::MappedFile fragFile{ resourceLoader.Load("shaders/cubeMap.frag") };
+
+		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX};
+		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT};
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
 	Game::Material CreatePostProcessMaterial(Game::ResourceLoader& resourceLoader)
 	{
-		const Game::Shader vertexShader{ resourceLoader.LoadStr("shaders/postProcess.vert"), Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ resourceLoader.LoadStr("shaders/postProcess.frag"), Game::ShaderType::FRAGMENT };
+		const Game::MappedFile vertFile{ resourceLoader.Load("shaders/postProcess.vert") };
+		const Game::MappedFile fragFile{ resourceLoader.Load("shaders/postProcess.frag") };
+
+		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT };
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
