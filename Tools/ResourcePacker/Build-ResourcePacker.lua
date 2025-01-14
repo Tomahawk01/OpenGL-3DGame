@@ -20,7 +20,8 @@ project "ResourcePacker"
         "src",
         "%{wks.location}/GameLib/src",
 
-        "%{wks.location}/vendor/OpenGL/include"
+        "%{wks.location}/vendor/OpenGL/include",
+        "%{wks.location}/vendor/stb"
     }
 
     links
