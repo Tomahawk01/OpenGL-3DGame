@@ -35,28 +35,13 @@ int main(int argc, char** argv)
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
 
-		std::optional<Game::TextureDescription> texDesc{};
-
-		const Game::File tlvFile{ resourceLoader.Load("resource") };
-
+		const Game::File tlvFile{ resourceLoader.Load("resources") };
 		const Game::TLVReader reader{ tlvFile.AsData() };
-		for (const auto& entry : reader)
-		{
-			if (entry.IsTexture("falcon_Albedo"))
-			{
-				texDesc = entry.textureDescriptionValue();
-				break;
-			}
-		}
-		Game::Ensure(!!texDesc, "Missing texture");
-
-		const Game::File carSpecFile{ resourceLoader.Load("textures/falcon_Specular.data.png") };
-		const Game::File carNormalFile{ resourceLoader.Load("textures/falcon_Normal.data.png") };
-
+		
 		Game::Sampler sampler{};
-		Game::Texture albedoTex{ *texDesc };
-		Game::Texture specMap{ Game::TextureUsage::DATA, carSpecFile.AsData(), 4096, 4096};
-		Game::Texture normalMap{ Game::TextureUsage::DATA, carNormalFile.AsData(), 4096, 4096};
+		Game::Texture albedoTex{ reader, "falcon_Albedo"};
+		Game::Texture specMap{ reader, "falcon_Specular" };
+		Game::Texture normalMap{ reader, "falcon_Normal" };
 
 		const Game::Texture* textures[]{ &albedoTex, &specMap, &normalMap };
 		const Game::Sampler* samplers[]{ &sampler, &sampler, &sampler };
@@ -114,21 +99,16 @@ int main(int argc, char** argv)
 			0.1f, 1000.0f
 		};
 
-		const Game::File skyboxRightFile{ resourceLoader.Load("textures/right.srgb.jpg") };
-		const Game::File skyboxLeftFile{ resourceLoader.Load("textures/left.srgb.jpg") };
-		const Game::File skyboxTopFile{ resourceLoader.Load("textures/top.srgb.jpg") };
-		const Game::File skyboxBottomFile{ resourceLoader.Load("textures/bottom.srgb.jpg") };
-		const Game::File skyboxFrontFile{ resourceLoader.Load("textures/front.srgb.jpg") };
-		const Game::File skyboxBackFile{ resourceLoader.Load("textures/back.srgb.jpg") };
-
 		Game::CubeMap skybox{
-			{skyboxRightFile.AsData(),
-			 skyboxLeftFile.AsData(),
-			 skyboxTopFile.AsData(),
-			 skyboxBottomFile.AsData(),
-			 skyboxFrontFile.AsData(),
-			 skyboxBackFile.AsData()},
-			2048u, 2048u
+			reader,
+			{{
+				"right",
+				"left",
+				"top",
+				"bottom",
+				"front",
+				"back"
+			}}
 		};
 		Game::Sampler skyboxSampler{};
 

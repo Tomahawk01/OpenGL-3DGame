@@ -1,11 +1,29 @@
 #include "Texture.h"
 
 #include "Utilities/Error.h"
+#include "TLVReader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include <algorithm>
+
+namespace {
+
+	::GLenum toOpenGL(Game::TextureUsage usage, Game::TextureFormat format)
+	{
+		switch (usage)
+		{
+		case Game::TextureUsage::SRGB:
+			return format == Game::TextureFormat::RGBA ? GL_SRGB8_ALPHA8 : GL_SRGB8;
+		case Game::TextureUsage::DATA:
+			return format == Game::TextureFormat::RGBA ? GL_RGBA8 : GL_RGB8;
+		default:
+			throw Game::Exception("Unknown usage");
+		}
+	}
+
+}
 
 namespace Game {
 
@@ -51,11 +69,19 @@ namespace Game {
 	{
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
-		Ensure(description.format == TextureFormat::RGBA, "Please implement the rest");
-		Ensure(description.usage == TextureUsage::SRGB, "Please implement the rest");
+		::glTextureStorage2D(m_Handle, 1, toOpenGL(description.usage, description.format), description.width, description.height);
+		::glTextureSubImage2D(m_Handle, 0, 0, 0, description.width, description.height, description.format == TextureFormat::RGBA ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, description.data.data());
+	}
 
-		::glTextureStorage2D(m_Handle, 1, GL_SRGB8_ALPHA8, description.width, description.height);
-		::glTextureSubImage2D(m_Handle, 0, 0, 0, description.width, description.height, GL_RGBA, GL_UNSIGNED_BYTE, description.data.data());
+	Texture::Texture(const TLVReader& reader, std::string_view name)
+		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+	{
+		auto desc = std::ranges::find_if(reader, [name](const auto& e) { return e.IsTexture(name); });
+		Ensure(desc != std::ranges::end(reader), "Could not find texture");
+
+		Texture tex{ (*desc).textureDescriptionValue() };
+
+		std::ranges::swap(m_Handle, tex.m_Handle);
 	}
 
 	Texture::Texture(TextureUsage usage, std::uint32_t width, std::uint32_t height)
