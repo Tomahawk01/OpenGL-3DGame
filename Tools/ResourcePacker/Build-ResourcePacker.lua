@@ -38,12 +38,12 @@ project "ResourcePacker"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
-        debugargs { "%{wks.location}/Game/assets/textures ./resource" }
+        debugargs { "%{wks.location}/Game/assets/textures resources" }
         runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines { "RELEASE" }
-        debugargs { "%{wks.location}/Game/assets/textures ./resource" }
+        debugargs { "%{wks.location}/Game/assets/textures resources" }
         runtime "Release"
         optimize "On"

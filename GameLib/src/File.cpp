@@ -4,19 +4,19 @@
 
 namespace Game {
 
-	File::File(const std::filesystem::path& path)
+	File::File(const std::filesystem::path& path, CreationMode mode)
 		: m_Handle{ INVALID_HANDLE_VALUE, ::CloseHandle }
 		, m_Mapping{ NULL, ::CloseHandle }
 		, m_MapView{ nullptr, ::UnmapViewOfFile }
 		, m_Size{}
 	{
-		m_Handle.Reset(::CreateFileA(path.string().c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
+		m_Handle.Reset(::CreateFileA(path.string().c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, mode == CreationMode::OPEN ? OPEN_EXISTING : OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
 		Ensure(m_Handle, "Failed to open file");
 
 		m_Mapping.Reset(::CreateFileMappingA(m_Handle, nullptr, PAGE_READWRITE, 0, 0, nullptr));
-		Ensure(m_Mapping, "Failed to map file");
+		Ensure(m_Mapping, std::format("Failed to map file: error code {}", ::GetLastError()));
 
-		m_MapView.reset(::MapViewOfFile(m_Mapping, FILE_MAP_READ, 0, 0, 0));
+		m_MapView.reset(::MapViewOfFile(m_Mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0));
 		Ensure(m_MapView, "Failed to get map view");
 
 		m_Size = ::GetFileSize(m_Handle, nullptr);
