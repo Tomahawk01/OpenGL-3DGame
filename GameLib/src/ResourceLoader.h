@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MappedFile.h"
+#include "File.h"
 
 #include <cstddef>
 #include <filesystem>
@@ -14,7 +14,7 @@ namespace Game {
 	public:
 		ResourceLoader(const std::filesystem::path& root);
 
-		MappedFile Load(std::string_view name) const;
+		File Load(std::string_view name) const;
 
 	private:
 		std::filesystem::path m_Root;

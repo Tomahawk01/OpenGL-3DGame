@@ -11,10 +11,10 @@
 
 namespace Game {
 
-	class MappedFile
+	class File
 	{
 	public:
-		MappedFile(const std::filesystem::path& path);
+		File(const std::filesystem::path& path);
 
 		std::string_view AsString() const;
 		std::span<const std::byte> AsData() const;

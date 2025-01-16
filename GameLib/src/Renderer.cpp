@@ -29,8 +29,8 @@ namespace {
 
 	Game::Material CreateSkyboxMaterial(Game::ResourceLoader& resourceLoader)
 	{
-		const Game::MappedFile vertFile{ resourceLoader.Load("shaders/cubeMap.vert") };
-		const Game::MappedFile fragFile{ resourceLoader.Load("shaders/cubeMap.frag") };
+		const Game::File vertFile{ resourceLoader.Load("shaders/cubeMap.vert") };
+		const Game::File fragFile{ resourceLoader.Load("shaders/cubeMap.frag") };
 
 		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX};
 		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT};
@@ -39,8 +39,8 @@ namespace {
 
 	Game::Material CreatePostProcessMaterial(Game::ResourceLoader& resourceLoader)
 	{
-		const Game::MappedFile vertFile{ resourceLoader.Load("shaders/postProcess.vert") };
-		const Game::MappedFile fragFile{ resourceLoader.Load("shaders/postProcess.frag") };
+		const Game::File vertFile{ resourceLoader.Load("shaders/postProcess.vert") };
+		const Game::File fragFile{ resourceLoader.Load("shaders/postProcess.frag") };
 
 		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT };

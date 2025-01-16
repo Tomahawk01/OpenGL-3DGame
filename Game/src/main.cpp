@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 
 		std::optional<Game::TextureDescription> texDesc{};
 
-		const Game::MappedFile tlvFile{ resourceLoader.Load("resource") };
+		const Game::File tlvFile{ resourceLoader.Load("resource") };
 
 		const Game::TLVReader reader{ tlvFile.AsData() };
 		for (const auto& entry : reader)
@@ -50,8 +50,8 @@ int main(int argc, char** argv)
 		}
 		Game::Ensure(!!texDesc, "Missing texture");
 
-		const Game::MappedFile carSpecFile{ resourceLoader.Load("textures/falcon_Specular.data.png") };
-		const Game::MappedFile carNormalFile{ resourceLoader.Load("textures/falcon_Normal.data.png") };
+		const Game::File carSpecFile{ resourceLoader.Load("textures/falcon_Specular.data.png") };
+		const Game::File carNormalFile{ resourceLoader.Load("textures/falcon_Normal.data.png") };
 
 		Game::Sampler sampler{};
 		Game::Texture albedoTex{ *texDesc };
@@ -62,8 +62,8 @@ int main(int argc, char** argv)
 		const Game::Sampler* samplers[]{ &sampler, &sampler, &sampler };
 		const auto texSamp = std::views::zip(textures, samplers) | std::ranges::to<std::vector>();
 
-		const Game::MappedFile basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
-		const Game::MappedFile basicFragFile{ resourceLoader.Load("shaders/basic.frag") };
+		const Game::File basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
+		const Game::File basicFragFile{ resourceLoader.Load("shaders/basic.frag") };
 
 		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX};
 		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT};
@@ -114,12 +114,12 @@ int main(int argc, char** argv)
 			0.1f, 1000.0f
 		};
 
-		const Game::MappedFile skyboxRightFile{ resourceLoader.Load("textures/right.srgb.jpg") };
-		const Game::MappedFile skyboxLeftFile{ resourceLoader.Load("textures/left.srgb.jpg") };
-		const Game::MappedFile skyboxTopFile{ resourceLoader.Load("textures/top.srgb.jpg") };
-		const Game::MappedFile skyboxBottomFile{ resourceLoader.Load("textures/bottom.srgb.jpg") };
-		const Game::MappedFile skyboxFrontFile{ resourceLoader.Load("textures/front.srgb.jpg") };
-		const Game::MappedFile skyboxBackFile{ resourceLoader.Load("textures/back.srgb.jpg") };
+		const Game::File skyboxRightFile{ resourceLoader.Load("textures/right.srgb.jpg") };
+		const Game::File skyboxLeftFile{ resourceLoader.Load("textures/left.srgb.jpg") };
+		const Game::File skyboxTopFile{ resourceLoader.Load("textures/top.srgb.jpg") };
+		const Game::File skyboxBottomFile{ resourceLoader.Load("textures/bottom.srgb.jpg") };
+		const Game::File skyboxFrontFile{ resourceLoader.Load("textures/front.srgb.jpg") };
+		const Game::File skyboxBackFile{ resourceLoader.Load("textures/back.srgb.jpg") };
 
 		Game::CubeMap skybox{
 			{skyboxRightFile.AsData(),

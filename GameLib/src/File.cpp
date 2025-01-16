@@ -1,10 +1,10 @@
-#include "MappedFile.h"
+#include "File.h"
 
 #include "Utilities/Error.h"
 
 namespace Game {
 
-	MappedFile::MappedFile(const std::filesystem::path& path)
+	File::File(const std::filesystem::path& path)
 		: m_Handle{ INVALID_HANDLE_VALUE, ::CloseHandle }
 		, m_Mapping{ NULL, ::CloseHandle }
 		, m_MapView{ nullptr, ::UnmapViewOfFile }
@@ -22,12 +22,12 @@ namespace Game {
 		m_Size = ::GetFileSize(m_Handle, nullptr);
 	}
 
-	std::string_view MappedFile::AsString() const
+	std::string_view File::AsString() const
 	{
 		return { reinterpret_cast<const char*>(m_MapView.get()), m_Size };
 	}
 
-	std::span<const std::byte> MappedFile::AsData() const
+	std::span<const std::byte> File::AsData() const
 	{
 		return { reinterpret_cast<const std::byte*>(m_MapView.get()), m_Size };
 	}

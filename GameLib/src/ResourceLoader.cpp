@@ -12,7 +12,7 @@ namespace Game {
 		: m_Root(root)
 	{}
 
-	MappedFile ResourceLoader::Load(std::string_view name) const
+	File ResourceLoader::Load(std::string_view name) const
 	{
 		return { m_Root / name };
 	}

@@ -178,7 +178,7 @@ namespace Game {
 
 		::aiEnableVerboseLogging(true);
 
-		const MappedFile modelFileMapped{ m_ResourceLoader.Load(meshFile) };
+		const File modelFileMapped{ m_ResourceLoader.Load(meshFile) };
 		const auto modelFileData = modelFileMapped.AsData();
 		Ensure(!modelFileData.empty(), "No loaded data");
 
