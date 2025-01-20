@@ -4,13 +4,17 @@
 #include "OpenGL.h"
 #include "Buffer.h"
 #include "MeshLoader.h"
+#include "MeshData.h"
 
 namespace Game {
+
+	class TLVReader;
 
 	class Mesh
 	{
 	public:
 		Mesh(const MeshData& data);
+		Mesh(const TLVReader& reader, std::string_view name);
 
 		void Bind() const;
 		void UnBind() const;

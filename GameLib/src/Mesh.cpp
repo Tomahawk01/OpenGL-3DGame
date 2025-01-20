@@ -1,7 +1,9 @@
 #include "Mesh.h"
 
+#include "Utilities/Error.h"
 #include "Math/VertexData.h"
 #include "BufferWriter.h"
+#include "TLVReader.h"
 
 #include <ranges>
 
@@ -37,6 +39,23 @@ namespace Game {
 		::glVertexArrayAttribBinding(m_VAO, 1, 0);
 		::glVertexArrayAttribBinding(m_VAO, 2, 0);
 		::glVertexArrayAttribBinding(m_VAO, 3, 0);
+	}
+
+	Mesh::Mesh(const TLVReader& reader, std::string_view name)
+		: m_VAO{ 0u, [](auto vao) { ::glDeleteVertexArrays(1, &vao); } }
+		, m_VBO{ 1u }
+		, m_IndexCount{}
+		, m_IndexOffset{}
+	{
+		auto meshData = std::ranges::find_if(reader, [name](const auto& e) { return e.IsMesh(name); });
+		Ensure(meshData != std::ranges::end(reader), "Could not find mesh");
+
+		Mesh mesh{ (*meshData).meshValue() };
+
+		std::ranges::swap(m_VAO, mesh.m_VAO);
+		std::ranges::swap(m_VBO, mesh.m_VBO);
+		std::ranges::swap(m_IndexCount, mesh.m_IndexCount);
+		std::ranges::swap(m_IndexOffset, mesh.m_IndexOffset);
 	}
 
 	void Mesh::Bind() const

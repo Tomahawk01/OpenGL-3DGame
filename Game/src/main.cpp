@@ -53,11 +53,11 @@ int main(int argc, char** argv)
 		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX};
 		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT};
 		Game::Material material{ vertexShader, fragmentShader };
-		const Game::Mesh mesh{ meshLoader.Load("models/falcon.obj", "Plane_Plane.001")};
+		const Game::Mesh mesh{ reader, "Plane_Plane.001" };
 		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
 		std::vector<Game::Entity> entities{};
-			
+
 		for (int i = -10; i < 10; i++)
 		{
 			for (int j = -10; j < 10; j++)

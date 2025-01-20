@@ -6,12 +6,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/Logger.hpp>
+#include <assimp/cimport.h>
+
 #include <print>
 #include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <memory>
 #include <set>
+#include <ranges>
 
 namespace {
 
@@ -77,6 +84,49 @@ int main(int argc, char** argv)
 					ToTextureFormat(numChannels),
 					ToTextureUsage(path),
 					{ reinterpret_cast<const std::byte*>(rawData.get()), static_cast<std::size_t>(w * h * numChannels) });
+			}
+			else if (ext == ".obj")
+			{
+				auto stream = ::aiGetPredefinedLogStream(::aiDefaultLogStream_STDOUT, NULL);
+				::aiAttachLogStream(&stream);
+
+				::Assimp::Importer importer{};
+				const auto* scene = importer.ReadFile(path.c_str(), ::aiProcess_Triangulate | ::aiProcess_FlipUVs | ::aiProcess_CalcTangentSpace);
+				Game::Ensure(scene != nullptr, std::format("Failed to load model {}", path));
+
+				const std::span<::aiMesh*> loadedMeshes{ scene->mMeshes, scene->mMeshes + scene->mNumMeshes };
+
+				for (const auto* mesh : loadedMeshes)
+				{
+					const auto toVector3 = [](const ::aiVector3D& v) { return Game::vec3{ v.x, v.y, v.z }; };
+					const auto positions = std::span<::aiVector3D>{ mesh->mVertices, mesh->mVertices + mesh->mNumVertices } | std::views::transform(toVector3);
+					const auto normals = std::span<::aiVector3D>{ mesh->mNormals, mesh->mNormals + mesh->mNumVertices } | std::views::transform(toVector3);
+
+					std::vector<Game::UV> uvs{};
+					std::vector<Game::vec3> tangents{};
+					for (auto i = 0u; i < mesh->mNumVertices; i++)
+					{
+						uvs.push_back({ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y });
+						tangents.push_back({ mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z });
+					}
+
+					std::vector<std::uint32_t> indices{};
+					for (auto i = 0u; i < mesh->mNumFaces; i++)
+					{
+						const auto& face = mesh->mFaces[i];
+						for (auto j = 0u; j < face.mNumIndices; j++)
+						{
+							indices.push_back(face.mIndices[j]);
+						}
+					}
+
+					const auto vertices = std::views::zip_transform(
+						[]<class ...A>(A&& ...a) { return Game::VertexData{ std::forward<A>(a)... }; },
+						positions, normals, tangents, uvs) |
+						std::ranges::to<std::vector>();
+
+					writer.Write(mesh->mName.C_Str(), vertices, indices);
+				}
 			}
 		}
 

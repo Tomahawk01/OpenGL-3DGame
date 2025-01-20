@@ -22,6 +22,16 @@ namespace Game {
 		return value;
 	}
 
+	std::vector<std::uint32_t> TLVEntry::uint32ArrayValue() const
+	{
+		Ensure(m_Type == TLVType::UINT32_ARRAY, "Incorrect type");
+
+		auto value = std::vector<std::uint32_t>(m_Value.size() / sizeof(std::uint32_t));
+		std::memcpy(value.data(), m_Value.data(), m_Value.size());
+
+		return value;
+	}
+
 	std::string TLVEntry::stringValue() const
 	{
 		Ensure(m_Type == TLVType::STRING, "Incorrect type");
@@ -97,7 +107,8 @@ namespace Game {
 
 	bool TLVEntry::IsTexture(std::string_view name) const
 	{
-		Ensure(m_Type == TLVType::TEXTURE_DESCRIPTION, "Incorrect type");
+		if (m_Type != TLVType::TEXTURE_DESCRIPTION)
+			return false;
 
 		TLVReader reader{ m_Value };
 		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
@@ -105,6 +116,63 @@ namespace Game {
 		const auto textureName = (*readerCursor).stringValue();
 
 		return textureName == name;
+	}
+
+	VertexData TLVEntry::vertexDataValue() const
+	{
+		Ensure(m_Type == TLVType::VERTEX_DATA, "Incorrect type");
+		Ensure(m_Value.size() == sizeof(VertexData), "Incorrect size");
+
+		VertexData value{};
+		std::memcpy(&value, m_Value.data(), sizeof(value));
+
+		return value;
+	}
+
+	std::vector<VertexData> TLVEntry::vertexDataArrayValue() const
+	{
+		Ensure(m_Type == TLVType::VERTEX_DATA_ARRAY, "Incorrect type");
+
+		auto value = std::vector<VertexData>(m_Value.size() / sizeof(VertexData));
+		std::memcpy(value.data(), m_Value.data(), m_Value.size());
+
+		return value;
+	}
+
+	MeshData TLVEntry::meshValue() const
+	{
+		Ensure(m_Type == TLVType::MESH_DATA, "Incorrect type");
+
+		const TLVReader reader{ m_Value };
+		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
+
+		Ensure((*readerCursor).Type() == TLVType::STRING, "First member not string");
+		readerCursor++;
+
+		Ensure((*readerCursor).Type() == TLVType::VERTEX_DATA_ARRAY, "Second member not vertex data array");
+		const std::span<const VertexData> vertexData{ reinterpret_cast<const VertexData*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() };
+		readerCursor++;
+
+		Ensure((*readerCursor).Type() == TLVType::UINT32_ARRAY, "Third member not uint32 array");
+		const std::span<const std::uint32_t> indexData{ reinterpret_cast<const std::uint32_t*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() };
+		readerCursor++;
+
+		Ensure(readerCursor == std::ranges::end(reader), "Mesh TLV is too large");
+
+		return { vertexData, indexData };
+	}
+
+	bool TLVEntry::IsMesh(std::string_view name) const
+	{
+		if (m_Type != TLVType::MESH_DATA)
+			return false;
+
+		const TLVReader reader{ m_Value };
+		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
+
+		const std::string meshName = (*readerCursor).stringValue();
+
+		return meshName == name;
 	}
 
 	TLVType TLVEntry::Type() const

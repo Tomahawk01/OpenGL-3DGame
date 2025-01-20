@@ -21,7 +21,13 @@ project "ResourcePacker"
         "%{wks.location}/GameLib/src",
 
         "%{wks.location}/vendor/OpenGL/include",
-        "%{wks.location}/vendor/stb"
+        "%{wks.location}/vendor/stb",
+        "%{wks.location}/vendor/assimp-5.4.3/include"
+    }
+
+    libdirs
+    {
+        "%{wks.location}/vendor/assimp-5.4.3/lib"
     }
 
     links
@@ -38,12 +44,20 @@ project "ResourcePacker"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
-        debugargs { "%{wks.location}/Game/assets/textures resources" }
+        debugargs { "%{wks.location}/Game/assets %{wks.location}/Game/assets/resources" }
         runtime "Debug"
         symbols "On"
+        links
+        {
+            "assimp-vc143-mtd.lib"
+        }
 
     filter "configurations:Release"
         defines { "RELEASE" }
-        debugargs { "%{wks.location}/Game/assets/textures resources" }
+        debugargs { "%{wks.location}/Game/assets %{wks.location}/Game/assets/resources" }
         runtime "Release"
         optimize "On"
+        links
+        {
+            "assimp-vc143-mt.lib"
+        }

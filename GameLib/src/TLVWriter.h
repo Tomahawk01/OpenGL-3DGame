@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Texture.h"
+#include "Math/VertexData.h"
+#include "MeshData.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -16,10 +18,13 @@ namespace Game {
 		std::vector<std::byte> yield();
 
 		void Write(std::uint32_t value);
+		void Write(std::span<const std::uint32_t> value);
 		void Write(std::string_view value);
 		void Write(std::span<const std::byte> value);
 		void Write(TextureFormat value);
 		void Write(TextureUsage value);
+		void Write(const VertexData& value);
+		void Write(std::span<const VertexData> value);
 		void Write(
 			std::string_view name,
 			std::uint32_t width,
@@ -27,6 +32,7 @@ namespace Game {
 			TextureFormat format,
 			TextureUsage usage,
 			std::span<const std::byte> data);
+		void Write(std::string_view name, std::span<const VertexData> vertices, std::span<const std::uint32_t> indices);
 
 	private:
 		std::vector<std::byte> m_Buffer;
