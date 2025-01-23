@@ -19,7 +19,7 @@ namespace Game {
 			Write(spn);
 		}
 
-		template<class T, std::size_t N>
+		template<class T, size_t N>
 		void Write(const T(&data)[N])
 		{
 			m_Buffer.Write({ reinterpret_cast<const std::byte*>(data), sizeof(T) * N }, m_Offset);
@@ -35,7 +35,7 @@ namespace Game {
 
 	private:
 		const Buffer& m_Buffer;
-		std::size_t m_Offset;
+		size_t m_Offset;
 	};
 
 }

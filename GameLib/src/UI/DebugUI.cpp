@@ -48,7 +48,7 @@ namespace Game {
 		::ImGuizmo::Enable(true);
 		::ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 
-		static std::size_t selectedPoint{};
+		static size_t selectedPoint{};
 
 		if (::ImGui::Button("Add Light"))
 		{

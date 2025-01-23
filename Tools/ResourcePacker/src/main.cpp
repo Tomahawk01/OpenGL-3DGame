@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 					w, h,
 					ToTextureFormat(numChannels),
 					ToTextureUsage(path),
-					{ reinterpret_cast<const std::byte*>(rawData.get()), static_cast<std::size_t>(w * h * numChannels) });
+					{ reinterpret_cast<const std::byte*>(rawData.get()), static_cast<size_t>(w * h * numChannels) });
 			}
 			else if (ext == ".obj")
 			{

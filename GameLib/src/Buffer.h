@@ -14,7 +14,7 @@ namespace Game {
 	public:
 		Buffer(uint32_t size);
 
-		void Write(std::span<const std::byte> data, std::size_t offset) const;
+		void Write(std::span<const std::byte> data, size_t offset) const;
 
 		GLuint GetNativeHandle() const;
 

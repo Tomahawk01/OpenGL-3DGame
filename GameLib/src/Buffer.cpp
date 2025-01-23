@@ -9,7 +9,7 @@ namespace Game {
 		::glNamedBufferStorage(m_Buffer, size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 	}
 
-	void Buffer::Write(std::span<const std::byte> data, std::size_t offset) const
+	void Buffer::Write(std::span<const std::byte> data, size_t offset) const
 	{
 		::glNamedBufferSubData(m_Buffer, offset, data.size(), data.data());
 	}

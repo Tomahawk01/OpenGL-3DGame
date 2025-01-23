@@ -36,7 +36,7 @@ namespace Game {
 		AutoRelease<HANDLE, INVALID_HANDLE_VALUE> m_Handle;
 		AutoRelease<HANDLE, reinterpret_cast<HANDLE>(NULL)> m_Mapping;
 		std::unique_ptr<void, decltype(&::UnmapViewOfFile)> m_MapView;
-		std::size_t m_Size;
+		size_t m_Size;
 	};
 
 }
