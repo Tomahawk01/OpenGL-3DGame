@@ -13,7 +13,7 @@ namespace Game {
 	class Window
 	{
 	public:
-		Window(std::uint32_t width, std::uint32_t height);
+		Window(uint32_t width, uint32_t height);
 		~Window() = default;
 
 		Window(const Window&) = delete;
@@ -26,15 +26,15 @@ namespace Game {
 		void Swap() const;
 
 		HWND GetNativeHandle() const;
-		std::uint32_t GetWidth() const;
-		std::uint32_t GetHeight() const;
+		uint32_t GetWidth() const;
+		uint32_t GetHeight() const;
 
 	private:
 		AutoRelease<::HWND, nullptr> m_Window;
 		AutoRelease<::HDC> m_DeviceCtx;
 		::WNDCLASSA m_WndClass;
-		std::uint32_t m_Width;
-		std::uint32_t m_Height;
+		uint32_t m_Width;
+		uint32_t m_Height;
 	};
 
 }

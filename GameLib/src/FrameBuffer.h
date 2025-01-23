@@ -11,21 +11,21 @@ namespace Game {
 	class FrameBuffer
 	{
 	public:
-		FrameBuffer(std::uint32_t width, std::uint32_t height);
+		FrameBuffer(uint32_t width, uint32_t height);
 
 		void Bind() const;
 		void UnBind() const;
 
-		std::uint32_t GetWidth() const;
-		std::uint32_t GetHeight() const;
+		uint32_t GetWidth() const;
+		uint32_t GetHeight() const;
 
 		::GLuint GetNativeHandle() const;
 		const Texture& GetColorTexture() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;
-		std::uint32_t m_Width;
-		std::uint32_t m_Height;
+		uint32_t m_Width;
+		uint32_t m_Height;
 		Texture m_ColorTexture;
 		Texture m_DepthTexture;
 	};

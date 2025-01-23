@@ -12,7 +12,7 @@
 
 namespace Game {
 
-	enum class TLVType : std::uint32_t
+	enum class TLVType : uint32_t
 	{
 		UINT32,
 		UINT32_ARRAY,
@@ -32,8 +32,8 @@ namespace Game {
 	public:
 		TLVEntry(TLVType type, std::span<const std::byte> value);
 
-		std::uint32_t uint32Value() const;
-		std::vector<std::uint32_t> uint32ArrayValue() const;
+		uint32_t uint32Value() const;
+		std::vector<uint32_t> uint32ArrayValue() const;
 		std::string stringValue() const;
 		std::vector<std::byte> byteArrayValue() const;
 		TextureFormat textureFormatValue() const;
@@ -46,7 +46,7 @@ namespace Game {
 		bool IsMesh(std::string_view name) const;
 
 		TLVType Type() const;
-		std::uint32_t Size() const;
+		uint32_t Size() const;
 
 	private:
 		TLVType m_Type;

@@ -17,8 +17,8 @@ namespace Game {
 	public:
 		std::vector<std::byte> yield();
 
-		void Write(std::uint32_t value);
-		void Write(std::span<const std::uint32_t> value);
+		void Write(uint32_t value);
+		void Write(std::span<const uint32_t> value);
 		void Write(std::string_view value);
 		void Write(std::span<const std::byte> value);
 		void Write(TextureFormat value);
@@ -27,12 +27,12 @@ namespace Game {
 		void Write(std::span<const VertexData> value);
 		void Write(
 			std::string_view name,
-			std::uint32_t width,
-			std::uint32_t height,
+			uint32_t width,
+			uint32_t height,
 			TextureFormat format,
 			TextureUsage usage,
 			std::span<const std::byte> data);
-		void Write(std::string_view name, std::span<const VertexData> vertices, std::span<const std::uint32_t> indices);
+		void Write(std::string_view name, std::span<const VertexData> vertices, std::span<const uint32_t> indices);
 
 	private:
 		std::vector<std::byte> m_Buffer;

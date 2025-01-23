@@ -11,7 +11,7 @@ namespace {
 		buffer.insert(std::ranges::end(buffer), std::ranges::cbegin(data), std::ranges::cend(data));
 	}
 
-	void WriteEntry(std::vector<std::byte>& buffer, Game::TLVType type, std::uint32_t length, std::span<const std::byte> value)
+	void WriteEntry(std::vector<std::byte>& buffer, Game::TLVType type, uint32_t length, std::span<const std::byte> value)
 	{
 		WriteBytes(buffer, { reinterpret_cast<const std::byte*>(&type), sizeof(type) });
 		WriteBytes(buffer, { reinterpret_cast<const std::byte*>(&length), sizeof(length) });
@@ -29,7 +29,7 @@ namespace Game {
 		return temp;
 	}
 
-	void TLVWriter::Write(std::uint32_t value)
+	void TLVWriter::Write(uint32_t value)
 	{
 		const auto type = TLVType::UINT32;
 		const auto length = sizeof(value);
@@ -38,10 +38,10 @@ namespace Game {
 		WriteEntry(m_Buffer, type, length, valueBytes);
 	}
 
-	void TLVWriter::Write(std::span<const std::uint32_t> value)
+	void TLVWriter::Write(std::span<const uint32_t> value)
 	{
 		const auto type = TLVType::UINT32_ARRAY;
-		const auto length = static_cast<std::uint32_t>(value.size() * sizeof(std::uint32_t));
+		const auto length = static_cast<uint32_t>(value.size() * sizeof(uint32_t));
 		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(value.data()), length };
 
 		WriteEntry(m_Buffer, type, length, valueBytes);
@@ -50,7 +50,7 @@ namespace Game {
 	void TLVWriter::Write(std::string_view value)
 	{
 		const auto type = TLVType::STRING;
-		const auto length = static_cast<std::uint32_t>(value.length());
+		const auto length = static_cast<uint32_t>(value.length());
 		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(value.data()), length };
 
 		WriteEntry(m_Buffer, type, length, valueBytes);
@@ -59,7 +59,7 @@ namespace Game {
 	void TLVWriter::Write(std::span<const std::byte> value)
 	{
 		const auto type = TLVType::BYTE_ARRAY;
-		const auto length = static_cast<std::uint32_t>(value.size());
+		const auto length = static_cast<uint32_t>(value.size());
 		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(value.data()), length };
 
 		WriteEntry(m_Buffer, type, length, valueBytes);
@@ -95,7 +95,7 @@ namespace Game {
 	void TLVWriter::Write(std::span<const VertexData> value)
 	{
 		const auto type = TLVType::VERTEX_DATA_ARRAY;
-		const auto length = static_cast<std::uint32_t>(value.size() * sizeof(VertexData));
+		const auto length = static_cast<uint32_t>(value.size() * sizeof(VertexData));
 		const std::span<const std::byte> valueBytes{ reinterpret_cast<const std::byte*>(value.data()), length };
 
 		WriteEntry(m_Buffer, type, length, valueBytes);
@@ -103,8 +103,8 @@ namespace Game {
 
 	void TLVWriter::Write(
 		std::string_view name,
-		std::uint32_t width,
-		std::uint32_t height,
+		uint32_t width,
+		uint32_t height,
 		TextureFormat format,
 		TextureUsage usage,
 		std::span<const std::byte> data)
@@ -120,12 +120,12 @@ namespace Game {
 
 		const auto value = writer.yield();
 		const auto type = TLVType::TEXTURE_DESCRIPTION;
-		const auto length = static_cast<std::uint32_t>(value.size());
+		const auto length = static_cast<uint32_t>(value.size());
 
 		WriteEntry(m_Buffer, type, length, value);
 	}
 
-	void TLVWriter::Write(std::string_view name, std::span<const VertexData> vertices, std::span<const std::uint32_t> indices)
+	void TLVWriter::Write(std::string_view name, std::span<const VertexData> vertices, std::span<const uint32_t> indices)
 	{
 		TLVWriter writer{};
 
@@ -135,7 +135,7 @@ namespace Game {
 
 		const auto value = writer.yield();
 		const auto type = TLVType::MESH_DATA;
-		const auto length = static_cast<std::uint32_t>(value.size());
+		const auto length = static_cast<uint32_t>(value.size());
 
 		WriteEntry(m_Buffer, type, length, value);
 	}

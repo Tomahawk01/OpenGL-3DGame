@@ -2,7 +2,7 @@
 
 namespace Game {
 
-	Exception::Exception(const std::string& what, std::uint32_t skip)
+	Exception::Exception(const std::string& what, uint32_t skip)
 		: std::runtime_error(what), m_Trace(std::stacktrace::current(skip))
 	{}
 

@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 						tangents.push_back({ mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z });
 					}
 
-					std::vector<std::uint32_t> indices{};
+					std::vector<uint32_t> indices{};
 					for (auto i = 0u; i < mesh->mNumFaces; i++)
 					{
 						const auto& face = mesh->mFaces[i];

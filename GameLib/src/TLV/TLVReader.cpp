@@ -14,12 +14,12 @@ namespace Game {
 
 	TLVReader::Iterator::value_type TLVReader::Iterator::operator*() const
 	{
-		Ensure(m_Buffer.size() >= sizeof(TLVType) + sizeof(std::uint32_t), "Invalid entry size");
+		Ensure(m_Buffer.size() >= sizeof(TLVType) + sizeof(uint32_t), "Invalid entry size");
 
 		TLVType type{};
 		std::memcpy(&type, m_Buffer.data(), sizeof(type));
 
-		std::uint32_t length{};
+		uint32_t length{};
 		std::memcpy(&length, m_Buffer.data() + sizeof(type), sizeof(length));
 
 		return { type, m_Buffer.subspan(sizeof(type) + sizeof(length), length) };

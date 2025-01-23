@@ -51,7 +51,7 @@ namespace {
 
 namespace Game {
 
-	Renderer::Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, std::uint32_t width, std::uint32_t height)
+	Renderer::Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, uint32_t width, uint32_t height)
 		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3))
 		, m_LightBuffer(10240u)
 		, m_SkyboxCube(meshLoader.Cube())

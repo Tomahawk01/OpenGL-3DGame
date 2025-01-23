@@ -27,7 +27,7 @@ namespace {
 
 namespace Game {
 
-	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, std::uint32_t width, std::uint32_t height)
+	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
 		TextureUsage validUsage[] = { TextureUsage::SRGB, TextureUsage::DATA };
@@ -42,8 +42,8 @@ namespace Game {
 			::stbi_image_free
 		);
 		Ensure(rawData, "Failed to parse texture data");
-		Ensure(static_cast<std::uint32_t>(w) == width, "Width has changed");
-		Ensure(static_cast<std::uint32_t>(h) == height, "Height has changed");
+		Ensure(static_cast<uint32_t>(w) == width, "Width has changed");
+		Ensure(static_cast<uint32_t>(h) == height, "Height has changed");
 
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
@@ -84,7 +84,7 @@ namespace Game {
 		std::ranges::swap(m_Handle, tex.m_Handle);
 	}
 
-	Texture::Texture(TextureUsage usage, std::uint32_t width, std::uint32_t height)
+	Texture::Texture(TextureUsage usage, uint32_t width, uint32_t height)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);

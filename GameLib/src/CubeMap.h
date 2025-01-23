@@ -17,7 +17,7 @@ namespace Game {
 	class CubeMap
 	{
 	public:
-		CubeMap(const std::vector<std::span<const std::byte>>& faces, std::uint32_t width, std::uint32_t height);
+		CubeMap(const std::vector<std::span<const std::byte>>& faces, uint32_t width, uint32_t height);
 		CubeMap(const TLVReader& reader, std::array<std::string_view, 6> imageNames);
 
 		::GLuint GetNativeHandle() const;

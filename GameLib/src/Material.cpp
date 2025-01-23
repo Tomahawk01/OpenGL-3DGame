@@ -101,7 +101,7 @@ namespace Game {
 		SetUniform(uniformName, 0);
 	}
 
-	void Material::BindTexture(std::uint32_t index, const Texture* texture, const Sampler* sampler) const
+	void Material::BindTexture(uint32_t index, const Texture* texture, const Sampler* sampler) const
 	{
 		::glBindTextureUnit(index, texture->GetNativeHandle());
 		::glBindSampler(index, sampler->GetNativeHandle());
@@ -116,7 +116,7 @@ namespace Game {
 		for (const auto& [index, texSamp] : texSamps | std::views::enumerate)
 		{
 			const auto& [texture, sampler] = texSamp;
-			BindTexture(static_cast<std::uint32_t>(index), texture, sampler);
+			BindTexture(static_cast<uint32_t>(index), texture, sampler);
 		}
 	}
 

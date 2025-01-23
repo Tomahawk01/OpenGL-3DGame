@@ -11,8 +11,8 @@ namespace Game {
 
 	Mesh::Mesh(const MeshData& data)
 		: m_VAO{ 0u, [](auto vao) { ::glDeleteVertexArrays(1, &vao); } }
-		, m_VBO{ static_cast<std::uint32_t>(data.vertices.size_bytes() + data.indices.size_bytes()) }
-		, m_IndexCount(static_cast<std::uint32_t>(data.indices.size()))
+		, m_VBO{ static_cast<uint32_t>(data.vertices.size_bytes() + data.indices.size_bytes()) }
+		, m_IndexCount(static_cast<uint32_t>(data.indices.size()))
 		, m_IndexOffset(data.vertices.size_bytes())
 	{
 		{
@@ -68,12 +68,12 @@ namespace Game {
 		::glBindVertexArray(0);
 	}
 
-	std::uint32_t Mesh::IndexCount() const
+	uint32_t Mesh::IndexCount() const
 	{
 		return m_IndexCount;
 	}
 
-	std::uintptr_t Mesh::IndexOffset() const
+	uintptr_t Mesh::IndexOffset() const
 	{
 		return m_IndexOffset;
 	}

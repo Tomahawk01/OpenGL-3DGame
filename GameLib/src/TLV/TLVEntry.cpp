@@ -11,22 +11,22 @@ namespace Game {
 		, m_Value(value)
 	{}
 
-	std::uint32_t TLVEntry::uint32Value() const
+	uint32_t TLVEntry::uint32Value() const
 	{
 		Ensure(m_Type == TLVType::UINT32, "Incorrect type");
-		Ensure(m_Value.size() == sizeof(std::uint32_t), "Incorrect size");
+		Ensure(m_Value.size() == sizeof(uint32_t), "Incorrect size");
 
-		std::uint32_t value{};
+		uint32_t value{};
 		std::memcpy(&value, m_Value.data(), sizeof(value));
 
 		return value;
 	}
 
-	std::vector<std::uint32_t> TLVEntry::uint32ArrayValue() const
+	std::vector<uint32_t> TLVEntry::uint32ArrayValue() const
 	{
 		Ensure(m_Type == TLVType::UINT32_ARRAY, "Incorrect type");
 
-		auto value = std::vector<std::uint32_t>(m_Value.size() / sizeof(std::uint32_t));
+		auto value = std::vector<uint32_t>(m_Value.size() / sizeof(uint32_t));
 		std::memcpy(value.data(), m_Value.data(), m_Value.size());
 
 		return value;
@@ -154,7 +154,7 @@ namespace Game {
 		readerCursor++;
 
 		Ensure((*readerCursor).Type() == TLVType::UINT32_ARRAY, "Third member not uint32 array");
-		const std::span<const std::uint32_t> indexData{ reinterpret_cast<const std::uint32_t*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() };
+		const std::span<const uint32_t> indexData{ reinterpret_cast<const uint32_t*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() };
 		readerCursor++;
 
 		Ensure(readerCursor == std::ranges::end(reader), "Mesh TLV is too large");
@@ -180,9 +180,9 @@ namespace Game {
 		return m_Type;
 	}
 
-	std::uint32_t TLVEntry::Size() const
+	uint32_t TLVEntry::Size() const
 	{
-		return static_cast<std::uint32_t>(sizeof(m_Type) + sizeof(std::uint32_t) + m_Value.size());
+		return static_cast<uint32_t>(sizeof(m_Type) + sizeof(uint32_t) + m_Value.size());
 	}
 
 }

@@ -26,7 +26,7 @@ namespace Game {
 		struct LoadedMeshData
 		{
 			std::vector<VertexData> vertices;
-			std::vector<std::uint32_t> indices;
+			std::vector<uint32_t> indices;
 		};
 
 		StringMap<LoadedMeshData> m_LoadedMeshes;

@@ -10,7 +10,7 @@
 
 namespace Game {
 
-	CubeMap::CubeMap(const std::vector<std::span<const std::byte>>& faces, std::uint32_t width, std::uint32_t height)
+	CubeMap::CubeMap(const std::vector<std::span<const std::byte>>& faces, uint32_t width, uint32_t height)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 	{
 		::glCreateTextures(GL_TEXTURE_CUBE_MAP, 1u, &m_Handle);
@@ -27,8 +27,8 @@ namespace Game {
 				::stbi_image_free
 			);
 			Ensure(rawData, "Failed to parse texture data");
-			Ensure(static_cast<std::uint32_t>(w) == width, "Width has changed");
-			Ensure(static_cast<std::uint32_t>(h) == height, "Height has changed");
+			Ensure(static_cast<uint32_t>(w) == width, "Width has changed");
+			Ensure(static_cast<uint32_t>(h) == height, "Height has changed");
 
 			::glTextureSubImage3D(m_Handle, 0, 0, 0, static_cast<::GLint>(index), width, height, 1, GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
 		}
@@ -43,8 +43,8 @@ namespace Game {
 			return (*desc).textureDescriptionValue();
 		});
 
-		const std::uint32_t width = descs.front().width;
-		const std::uint32_t height = descs.front().height;
+		const uint32_t width = descs.front().width;
+		const uint32_t height = descs.front().height;
 
 		Ensure(std::ranges::all_of(descs |
 			std::views::transform([](const auto& e)

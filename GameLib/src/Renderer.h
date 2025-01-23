@@ -15,7 +15,7 @@ namespace Game {
 	class Renderer
 	{
 	public:
-		Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, std::uint32_t width, std::uint32_t height);
+		Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, uint32_t width, uint32_t height);
 
 		void Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler, float gamma) const;
 

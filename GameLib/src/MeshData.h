@@ -10,7 +10,7 @@ namespace Game {
 	struct MeshData
 	{
 		std::span<const VertexData> vertices;
-		std::span<const std::uint32_t> indices;
+		std::span<const uint32_t> indices;
 	};
 
 }

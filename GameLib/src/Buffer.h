@@ -12,7 +12,7 @@ namespace Game {
 	class Buffer
 	{
 	public:
-		Buffer(std::uint32_t size);
+		Buffer(uint32_t size);
 
 		void Write(std::span<const std::byte> data, std::size_t offset) const;
 

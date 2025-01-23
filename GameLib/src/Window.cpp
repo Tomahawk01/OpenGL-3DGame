@@ -212,7 +212,7 @@ namespace {
 
 namespace Game {
 
-	Window::Window(std::uint32_t width, std::uint32_t height)
+	Window::Window(uint32_t width, uint32_t height)
 		: m_Window({})
 		, m_DeviceCtx({})
 		, m_WndClass({})
@@ -303,12 +303,12 @@ namespace Game {
 		return m_Window;
 	}
 
-	std::uint32_t Window::GetWidth() const
+	uint32_t Window::GetWidth() const
 	{
 		return m_Width;
 	}
 
-	std::uint32_t Window::GetHeight() const
+	uint32_t Window::GetHeight() const
 	{
 		return m_Height;
 	}

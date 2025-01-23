@@ -29,8 +29,8 @@ namespace Game {
 
 	struct TextureDescription
 	{
-		std::uint32_t width;
-		std::uint32_t height;
+		uint32_t width;
+		uint32_t height;
 		TextureFormat format;
 		TextureUsage usage;
 		std::vector<std::byte> data;
@@ -39,10 +39,10 @@ namespace Game {
 	class Texture
 	{
 	public:
-		Texture(TextureUsage usage, std::span<const std::byte> data, std::uint32_t width, std::uint32_t height);
+		Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height);
 		Texture(const TextureDescription& description);
 		Texture(const TLVReader& reader, std::string_view name);
-		Texture(TextureUsage usage, std::uint32_t width, std::uint32_t height);
+		Texture(TextureUsage usage, uint32_t width, uint32_t height);
 
 		::GLuint GetNativeHandle() const;
 

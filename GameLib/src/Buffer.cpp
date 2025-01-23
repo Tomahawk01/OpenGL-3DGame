@@ -2,7 +2,7 @@
 
 namespace Game {
 
-	Buffer::Buffer(std::uint32_t size)
+	Buffer::Buffer(uint32_t size)
 		: m_Buffer{ 0u, [](auto buffer) { ::glDeleteBuffers(1, &buffer); } }
 	{
 		::glCreateBuffers(1, &m_Buffer);

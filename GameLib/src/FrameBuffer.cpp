@@ -2,7 +2,7 @@
 
 namespace Game {
 
-	FrameBuffer::FrameBuffer(std::uint32_t width, std::uint32_t height)
+	FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
 		: m_Handle(0u, [](const auto buffer) { ::glDeleteFramebuffers(1u, &buffer); })
 		, m_Width(width)
 		, m_Height(height)
@@ -24,12 +24,12 @@ namespace Game {
 		::glBindFramebuffer(GL_FRAMEBUFFER, 0u);
 	}
 
-	std::uint32_t FrameBuffer::GetWidth() const
+	uint32_t FrameBuffer::GetWidth() const
 	{
 		return m_Width;
 	}
 
-	std::uint32_t FrameBuffer::GetHeight() const
+	uint32_t FrameBuffer::GetHeight() const
 	{
 		return m_Height;
 	}
