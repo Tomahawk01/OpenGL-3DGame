@@ -1,6 +1,6 @@
 #include "Utilities/Exception.h"
+#include "Utilities/Logger.h"
 #include "UI/DebugUI.h"
-#include "Logger.h"
 #include "Texture.h"
 #include "Sampler.h"
 #include "Material.h"
@@ -13,7 +13,7 @@
 #include "Scene.h"
 #include "ResourceLoader.h"
 #include "MeshLoader.h"
-#include "TLVReader.h"
+#include "TLV/TLVReader.h"
 
 #include <iostream>
 #include <print>
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 		const Game::TLVReader reader{ tlvFile.AsData() };
 		
 		Game::Sampler sampler{};
-		Game::Texture albedoTex{ reader, "falcon_Albedo"};
+		Game::Texture albedoTex{ reader, "falcon_Albedo" };
 		Game::Texture specMap{ reader, "falcon_Specular" };
 		Game::Texture normalMap{ reader, "falcon_Normal" };
 

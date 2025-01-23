@@ -1,7 +1,7 @@
 #include "CubeMap.h"
 
 #include "Utilities/Error.h"
-#include "TLVReader.h"
+#include "TLV/TLVReader.h"
 
 #include <stb_image.h>
 

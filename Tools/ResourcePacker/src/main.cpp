@@ -1,7 +1,7 @@
 #include "Utilities/Error.h"
 #include "Utilities/AutoRelease.h"
-#include "Logger.h"
-#include "TLVWriter.h"
+#include "Utilities/Logger.h"
+#include "TLV/TLVWriter.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

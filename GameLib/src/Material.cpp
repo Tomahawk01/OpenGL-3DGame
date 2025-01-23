@@ -1,6 +1,6 @@
 #include "Material.h"
 
-#include "Logger.h"
+#include "Utilities/Logger.h"
 #include "OpenGL.h"
 
 namespace Game {

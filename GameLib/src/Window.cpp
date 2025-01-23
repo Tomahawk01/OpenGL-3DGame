@@ -1,7 +1,7 @@
 #include "Window.h"
 
 #include "OpenGL.h"
-#include "Logger.h"
+#include "Utilities/Logger.h"
 #include "Utilities/Error.h"
 #include "Events/Event.h"
 

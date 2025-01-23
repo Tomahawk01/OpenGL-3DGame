@@ -2,7 +2,7 @@
 
 #include "Math/Vector3.h"
 #include "Utilities/Error.h"
-#include "Logger.h"
+#include "Utilities/Logger.h"
 
 #include <ranges>
 

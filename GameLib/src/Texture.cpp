@@ -1,7 +1,7 @@
 #include "Texture.h"
 
 #include "Utilities/Error.h"
-#include "TLVReader.h"
+#include "TLV/TLVReader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
