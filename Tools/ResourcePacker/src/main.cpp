@@ -98,6 +98,8 @@ int main(int argc, char** argv)
 
 				for (const auto* mesh : loadedMeshes)
 				{
+					Game::Logger::Info("Packing {}", mesh->mName.C_Str());
+
 					const auto toVector3 = [](const ::aiVector3D& v) { return Game::vec3{ v.x, v.y, v.z }; };
 					const auto positions = std::span<::aiVector3D>{ mesh->mVertices, mesh->mVertices + mesh->mNumVertices } | std::views::transform(toVector3);
 					const auto normals = std::span<::aiVector3D>{ mesh->mNormals, mesh->mNormals + mesh->mNumVertices } | std::views::transform(toVector3);
