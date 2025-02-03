@@ -1,7 +1,7 @@
 project "JoltPhysics"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++20"
+	cppdialect "C++17"
 	staticruntime "off"
 	warnings "off"
 
