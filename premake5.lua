@@ -20,6 +20,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "vendor/ImGui/Build-ImGui.lua"
+    include "vendor/JoltPhysics-5.2.0/Build-JoltPhysics.lua"
 group ""
 
 group "Tools"

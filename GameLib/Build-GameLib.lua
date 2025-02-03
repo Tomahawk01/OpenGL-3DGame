@@ -24,13 +24,15 @@ project "GameLib"
         "%{wks.location}/vendor/OpenGL/include",
         "%{wks.location}/vendor/stb",
         "%{wks.location}/vendor/ImGui/src",
-        "%{wks.location}/vendor/ImGuizmo"
+        "%{wks.location}/vendor/ImGuizmo",
+        "%{wks.location}/vendor/JoltPhysics-5.2.0/JoltPhysics"
     }
 
     links
     {
         "OpenGL32.lib",
-        "ImGui"
+        "ImGui",
+        "JoltPhysics"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
