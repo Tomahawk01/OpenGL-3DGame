@@ -14,6 +14,7 @@
 #include "ResourceLoader.h"
 #include "MeshLoader.h"
 #include "TLV/TLVReader.h"
+#include "Physics/PhysicsSystem.h"
 
 #include <iostream>
 #include <print>
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
 				entities.emplace_back(
 					&mesh,
 					&material,
-					Game::vec3{ static_cast<float>(i) * 15.0f, 0.0f, static_cast<float>(j) * 15.0f },
+					Game::vec3{ static_cast<float>(i) * 10.0f, 0.0f, static_cast<float>(j) * 17.5f },
 					Game::vec3{ 1.0f },
 					texSamp);
 			}
@@ -118,6 +119,8 @@ int main(int argc, char** argv)
 
 		bool showDebug = true;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
+
+		Game::PhysicsSystem physics{};
 
 		bool running = true;
 		while (running)
@@ -195,6 +198,8 @@ int main(int argc, char** argv)
 			
 			const float speed = 0.4f;
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
+
+			physics.Update();
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 			if (showDebug)
