@@ -5,6 +5,12 @@ project "JoltPhysics"
 	staticruntime "off"
 	warnings "off"
 
+	-- TODO: Include only in debug build later
+	defines
+	{
+		"JPH_DEBUG_RENDERER"
+	}
+
 	files
 	{
 		"JoltPhysics/Jolt/**.h",

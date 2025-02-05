@@ -32,6 +32,16 @@ namespace {
 		const Game::File vertFile{ resourceLoader.Load("shaders/cubeMap.vert") };
 		const Game::File fragFile{ resourceLoader.Load("shaders/cubeMap.frag") };
 
+		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT };
+		return Game::Material{ vertexShader, fragmentShader };
+	}
+
+	Game::Material CreateDebugLineMaterial(Game::ResourceLoader& resourceLoader)
+	{
+		const Game::File vertFile{ resourceLoader.Load("shaders/line.vert") };
+		const Game::File fragFile{ resourceLoader.Load("shaders/line.frag") };
+
 		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX};
 		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT};
 		return Game::Material{ vertexShader, fragmentShader };
@@ -56,6 +66,7 @@ namespace Game {
 		, m_LightBuffer(10240u)
 		, m_SkyboxCube(meshLoader.Cube())
 		, m_SkyboxMaterial(CreateSkyboxMaterial(resourceLoader))
+		, m_DebugLineMaterial(CreateDebugLineMaterial(resourceLoader))
 		, m_FB(width, height)
 		, m_PostProcessSprite(meshLoader.Sprite())
 		, m_PostProcessMaterial(CreatePostProcessMaterial(resourceLoader))
@@ -124,6 +135,14 @@ namespace Game {
 			mesh->Bind();
 			::glDrawElements(GL_TRIANGLES, mesh->IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(mesh->IndexOffset()));
 			mesh->UnBind();
+		}
+
+		if (const auto& dbl = scene.debugLines; dbl)
+		{
+			m_DebugLineMaterial.Use();
+			dbl->Bind();
+			::glDrawArrays(GL_LINES, 0u, dbl->Count());
+			dbl->UnBind();
 		}
 
 		m_FB.UnBind();

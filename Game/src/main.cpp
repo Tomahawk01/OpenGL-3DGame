@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 		};
 
 		Game::Camera camera{
-			{0.0f, 0.0f, 5.0f},
+			{-50.0f, 8.0f, 0.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
@@ -200,6 +200,9 @@ int main(int argc, char** argv)
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
 
 			physics.Update();
+			Game::Logger::Trace("Lines: {}", physics.Debug_Renderer().GetLines().size());
+
+			scene.debugLines = { physics.Debug_Renderer().GetLines() };
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 			if (showDebug)

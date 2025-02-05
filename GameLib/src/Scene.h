@@ -2,8 +2,12 @@
 
 #include "Math/Color.h"
 #include "Math/Vector3.h"
+#include "Physics/LineData.h"
+#include "Physics/DebugLines.h"
+#include "Buffer.h"
 
 #include <vector>
+#include <optional>
 
 namespace Game {
 
@@ -30,6 +34,7 @@ namespace Game {
 		Color ambient;
 		DirectionalLight directionalLight;
 		std::vector<PointLight> pointLights;
+		std::optional<DebugLines> debugLines;
 	};
 
 }

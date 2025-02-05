@@ -6,8 +6,6 @@
 
 #include <Windows.h>
 
-#include <imgui.h>
-
 namespace Game {
 
 	class DebugUI

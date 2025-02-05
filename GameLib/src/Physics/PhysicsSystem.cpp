@@ -6,11 +6,14 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Core/Memory.h>
+#include <Jolt/Core/TempAllocator.h>
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterMask.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterMask.h>
+#include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
 
@@ -76,6 +79,7 @@ namespace Game {
 		::JPH::JobSystemThreadPool JobSystem = ::JPH::JobSystemThreadPool(::JPH::cMaxPhysicsJobs, ::JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1u);
 		::JPH::PhysicsSystem PhysicsSystem;
 		::JPH::BodyID Sphere;
+		DebugRenderer Debug_Renderer;
 	};
 
 	PhysicsSystem::PhysicsSystem()
@@ -122,7 +126,7 @@ namespace Game {
 
 		bodyInterface.AddBody(floor->GetID(), ::JPH::EActivation::DontActivate);
 
-		auto sphereSettings = ::JPH::BodyCreationSettings(new ::JPH::SphereShape(0.5f), ::JPH::RVec3(0.0_r, 2.0_r, 0.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Dynamic, 0);
+		auto sphereSettings = ::JPH::BodyCreationSettings(new ::JPH::SphereShape(5.0f), ::JPH::RVec3(0.0_r, 100.0_r, -10.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Dynamic, 0);
 		m_Impl->Sphere = bodyInterface.CreateAndAddBody(sphereSettings, ::JPH::EActivation::Activate);
 
 		bodyInterface.SetLinearVelocity(m_Impl->Sphere, ::JPH::Vec3(0.0f, -5.0f, 0.0f));
@@ -134,10 +138,17 @@ namespace Game {
 
 	void PhysicsSystem::Update()
 	{
+		m_Impl->Debug_Renderer.Clear();
+
 		m_Impl->PhysicsSystem.Update(1.0f / 60.0f, 1, &m_Impl->TempAllocator, &m_Impl->JobSystem);
 
-		const auto position = m_Impl->PhysicsSystem.GetBodyInterface().GetCenterOfMassPosition(m_Impl->Sphere);
-		Logger::Info("{} {} {}", position.GetX(), position.GetY(), position.GetZ());
+		static const ::JPH::BodyManager::DrawSettings settings{};
+		m_Impl->PhysicsSystem.DrawBodies(settings, &m_Impl->Debug_Renderer);
+	}
+
+	const DebugRenderer& PhysicsSystem::Debug_Renderer() const
+	{
+		return m_Impl->Debug_Renderer;
 	}
 
 }

@@ -21,7 +21,7 @@ project "Game"
         "%{wks.location}/GameLib/src",
 
         "%{wks.location}/vendor/OpenGL/include",
-        "%{wks.location}/vendor/ImGui/src"
+        "%{wks.location}/vendor/JoltPhysics-5.2.0/JoltPhysics"
     }
 
     links

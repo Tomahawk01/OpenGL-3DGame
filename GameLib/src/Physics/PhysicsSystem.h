@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DebugRenderer.h"
+
 #include <memory>
 
 namespace Game {
@@ -11,6 +13,8 @@ namespace Game {
 		~PhysicsSystem();
 
 		void Update();
+
+		const DebugRenderer& Debug_Renderer() const;
 
 	private:
 		struct Implementation;
