@@ -1,30 +1,19 @@
 #include "DebugRenderer.h"
 
 #include "Utilities/Logger.h"
+#include "JoltUtils.h"
 
 #include <limits>
 
-namespace {
-
-	Game::vec3 toNative(::JPH::RVec3Arg v)
-	{
-		return { v.GetX(), v.GetY(), v.GetZ() };
-	}
-
-	Game::Color toNative(::JPH::ColorArg c)
-	{
-		const auto toFloat = []<std::integral T>(T b) { return static_cast<float>(b) / static_cast<float>(std::numeric_limits<T>::max()); };
-		return { toFloat(c.r), toFloat(c.g), toFloat(c.b) };
-	}
-
-}
-
 namespace Game {
+
+	DebugRenderer::DebugRenderer(PassKey<PhysicsSystem>)
+	{}
 
 	void DebugRenderer::DrawLine(::JPH::RVec3Arg from, ::JPH::RVec3Arg to, ::JPH::ColorArg color)
 	{
-		m_Lines.push_back({ toNative(from), toNative(color) });
-		m_Lines.push_back({ toNative(to), toNative(color) });
+		m_Lines.push_back({ ToNative(from), ToNative(color) });
+		m_Lines.push_back({ ToNative(to), ToNative(color) });
 	}
 
 	void DebugRenderer::DrawTriangle(::JPH::RVec3Arg v1, ::JPH::RVec3Arg v2, ::JPH::RVec3Arg v3, ::JPH::ColorArg color, ECastShadow)

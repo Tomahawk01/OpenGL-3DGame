@@ -2,6 +2,8 @@
 
 #include "Utilities/Logger.h"
 #include "Utilities/Error.h"
+#include "BoxShape.h"
+#include "SphereShape.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Factory.h>
@@ -11,8 +13,6 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterMask.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
@@ -79,7 +79,7 @@ namespace Game {
 		::JPH::JobSystemThreadPool JobSystem = ::JPH::JobSystemThreadPool(::JPH::cMaxPhysicsJobs, ::JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1u);
 		::JPH::PhysicsSystem PhysicsSystem;
 		::JPH::BodyID Sphere;
-		DebugRenderer Debug_Renderer;
+		DebugRenderer Debug_Renderer = { {} };
 	};
 
 	PhysicsSystem::PhysicsSystem()
@@ -116,19 +116,14 @@ namespace Game {
 
 		auto& bodyInterface = m_Impl->PhysicsSystem.GetBodyInterface();
 
-		auto floorShapeSetting = ::JPH::BoxShapeSettings{ ::JPH::Vec3{100.0f, 1.0f, 100.0f} };
-		floorShapeSetting.SetEmbedded();
-		auto floorShapeResult = floorShapeSetting.Create();
-		Ensure(floorShapeResult.IsValid(), "Invalid shape");
-		auto floorShape = floorShapeResult.Get();
-		auto floorSettings = ::JPH::BodyCreationSettings{ floorShape, ::JPH::RVec3(0.0_r, -1.0_r, 0.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Static, 1 };
+		BoxShape floorShape{ {100.0f, 1.0f, 100.0f}, {} };
+		::JPH::BodyCreationSettings floorSettings{ floorShape.GetNativeHandle(), ::JPH::RVec3(0.0_r, -1.0_r, 0.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Static, 1};
 		auto* floor = bodyInterface.CreateBody(floorSettings);
-
 		bodyInterface.AddBody(floor->GetID(), ::JPH::EActivation::DontActivate);
 
-		auto sphereSettings = ::JPH::BodyCreationSettings(new ::JPH::SphereShape(5.0f), ::JPH::RVec3(0.0_r, 100.0_r, -10.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Dynamic, 0);
+		SphereShape sphereShape{ 5.0f, {} };
+		::JPH::BodyCreationSettings sphereSettings{ sphereShape.GetNativeHandle(), ::JPH::RVec3(0.0_r, 100.0_r, -10.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Dynamic, 0 };
 		m_Impl->Sphere = bodyInterface.CreateAndAddBody(sphereSettings, ::JPH::EActivation::Activate);
-
 		bodyInterface.SetLinearVelocity(m_Impl->Sphere, ::JPH::Vec3(0.0f, -5.0f, 0.0f));
 
 		m_Impl->PhysicsSystem.OptimizeBroadPhase();

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utilities/PassKey.h"
 #include "LineData.h"
 
 #if !defined(JPH_DEBUG_RENDERER)
@@ -16,9 +17,13 @@
 
 namespace Game {
 
+	class PhysicsSystem;
+
 	class DebugRenderer : public ::JPH::DebugRendererSimple
 	{
 	public:
+		DebugRenderer(PassKey<PhysicsSystem>);
+
 		virtual void DrawLine(::JPH::RVec3Arg from, ::JPH::RVec3Arg to, ::JPH::ColorArg color) override;
 		virtual void DrawTriangle(::JPH::RVec3Arg v1, ::JPH::RVec3Arg v2, ::JPH::RVec3Arg v3, ::JPH::ColorArg color, ECastShadow) override;
 		virtual void DrawText3D(::JPH::RVec3Arg, const std::string_view& str, ::JPH::ColorArg, float) override;
