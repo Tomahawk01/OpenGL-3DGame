@@ -4,6 +4,7 @@
 #include "Utilities/Error.h"
 #include "BoxShape.h"
 #include "SphereShape.h"
+#include "RigidBody.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Factory.h>
@@ -114,19 +115,7 @@ namespace Game {
 			m_Impl->ObjectVsBroadPhaseLayerFilter,
 			m_Impl->ObjectLayerPairFilter);
 
-		auto& bodyInterface = m_Impl->PhysicsSystem.GetBodyInterface();
-
-		BoxShape floorShape{ {100.0f, 1.0f, 100.0f}, {} };
-		::JPH::BodyCreationSettings floorSettings{ floorShape.GetNativeHandle(), ::JPH::RVec3(0.0_r, -1.0_r, 0.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Static, 1};
-		auto* floor = bodyInterface.CreateBody(floorSettings);
-		bodyInterface.AddBody(floor->GetID(), ::JPH::EActivation::DontActivate);
-
-		SphereShape sphereShape{ 5.0f, {} };
-		::JPH::BodyCreationSettings sphereSettings{ sphereShape.GetNativeHandle(), ::JPH::RVec3(0.0_r, 100.0_r, -10.0_r), ::JPH::Quat::sIdentity(), ::JPH::EMotionType::Dynamic, 0 };
-		m_Impl->Sphere = bodyInterface.CreateAndAddBody(sphereSettings, ::JPH::EActivation::Activate);
-		bodyInterface.SetLinearVelocity(m_Impl->Sphere, ::JPH::Vec3(0.0f, -5.0f, 0.0f));
-
-		m_Impl->PhysicsSystem.OptimizeBroadPhase();
+		m_Impl->PhysicsSystem.SetGravity({ 0.0f, -9.8f, 0.0f });
 	}
 
 	PhysicsSystem::~PhysicsSystem() = default;
@@ -144,6 +133,12 @@ namespace Game {
 	const DebugRenderer& PhysicsSystem::Debug_Renderer() const
 	{
 		return m_Impl->Debug_Renderer;
+	}
+
+	RigidBody PhysicsSystem::CreateRigidBody(const Shape& shape, const vec3& position, RigidBodyType type) const
+	{
+		auto& bodyInterface = m_Impl->PhysicsSystem.GetBodyInterface();
+		return { shape, position, type, bodyInterface, {} };
 	}
 
 }

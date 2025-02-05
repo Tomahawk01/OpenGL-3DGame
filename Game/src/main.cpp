@@ -15,6 +15,8 @@
 #include "MeshLoader.h"
 #include "TLV/TLVReader.h"
 #include "Physics/PhysicsSystem.h"
+#include "Physics/BoxShape.h"
+#include "Physics/SphereShape.h"
 
 #include <iostream>
 #include <print>
@@ -121,6 +123,12 @@ int main(int argc, char** argv)
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
 
 		Game::PhysicsSystem physics{};
+
+		const Game::BoxShape floorShape = physics.CreateShape<Game::BoxShape>(Game::vec3({ 100.0f, 1.0f, 100.0f }));
+		physics.CreateRigidBody(floorShape, { 0.0f, -1.0f, 0.0f }, Game::RigidBodyType::STATIC);
+
+		const Game::SphereShape sphereShape = physics.CreateShape<Game::SphereShape>(5.0f);
+		physics.CreateRigidBody(sphereShape, { 0.0f, 100.0f, 0.0f }, Game::RigidBodyType::DYNAMIC);
 
 		bool running = true;
 		while (running)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DebugRenderer.h"
+#include "RigidBody.h"
 
 #include <memory>
 
@@ -15,6 +16,14 @@ namespace Game {
 		void Update();
 
 		const DebugRenderer& Debug_Renderer() const;
+
+		template<class T, class ...Args>
+		T CreateShape(Args&& ...args) const
+		{
+			return T{ std::forward<Args>(args)..., PassKey<PhysicsSystem>{} };
+		}
+
+		RigidBody CreateRigidBody(const Shape& shape, const vec3& position, RigidBodyType type) const;
 
 	private:
 		struct Implementation;
