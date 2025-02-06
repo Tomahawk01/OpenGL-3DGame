@@ -150,11 +150,11 @@ namespace Game {
 		readerCursor++;
 
 		Ensure((*readerCursor).Type() == TLVType::VERTEX_DATA_ARRAY, "Second member not vertex data array");
-		const std::span<const VertexData> vertexData{ reinterpret_cast<const VertexData*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() };
+		const std::span<const VertexData> vertexData{ reinterpret_cast<const VertexData*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() / sizeof(VertexData) };
 		readerCursor++;
 
 		Ensure((*readerCursor).Type() == TLVType::UINT32_ARRAY, "Third member not uint32 array");
-		const std::span<const uint32_t> indexData{ reinterpret_cast<const uint32_t*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() };
+		const std::span<const uint32_t> indexData{ reinterpret_cast<const uint32_t*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() / sizeof(uint32_t) };
 		readerCursor++;
 
 		Ensure(readerCursor == std::ranges::end(reader), "Mesh TLV is too large");

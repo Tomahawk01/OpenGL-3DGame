@@ -22,6 +22,8 @@ namespace Game {
 		uint32_t length{};
 		std::memcpy(&length, m_Buffer.data() + sizeof(type), sizeof(length));
 
+		Ensure(m_Buffer.size() >= sizeof(TLVType) + sizeof(uint32_t) + length, "Invalid length");
+
 		return { type, m_Buffer.subspan(sizeof(type) + sizeof(length), length) };
 	}
 
