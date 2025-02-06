@@ -1,9 +1,9 @@
 #include "Mesh.h"
 
 #include "Utilities/Error.h"
-#include "Math/VertexData.h"
-#include "BufferWriter.h"
 #include "TLV/TLVReader.h"
+#include "VertexData.h"
+#include "BufferWriter.h"
 
 #include <ranges>
 

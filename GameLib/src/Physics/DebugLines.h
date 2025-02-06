@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Utilities/AutoRelease.h"
-#include "LineData.h"
-#include "Buffer.h"
+#include "Renderer/LineData.h"
+#include "Renderer/Buffer.h"
 
 #include <span>
 

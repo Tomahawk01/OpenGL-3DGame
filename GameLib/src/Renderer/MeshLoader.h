@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Math/VertexData.h"
+#include "Renderer/VertexData.h"
 #include "Utilities/StringMap.h"
-#include "MeshData.h"
-#include "ResourceLoader.h"
+#include "Renderer/MeshData.h"
+#include "Core/ResourceLoader.h"
 
 #include <cstdint>
 #include <span>

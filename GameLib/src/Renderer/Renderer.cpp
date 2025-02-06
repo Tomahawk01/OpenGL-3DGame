@@ -1,13 +1,13 @@
 #include "Renderer.h"
 
+#include "Core/Entity.h"
+#include "Core/Scene.h"
 #include "BufferWriter.h"
 #include "Camera.h"
-#include "Entity.h"
 #include "Material.h"
 #include "Texture.h"
 #include "Sampler.h"
 #include "Mesh.h"
-#include "Scene.h"
 #include "OpenGL.h"
 
 namespace {

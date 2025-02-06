@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utilities/AutoRelease.h"
-#include "OpenGL.h"
+#include "Renderer/OpenGL.h"
 
 namespace Game {
 

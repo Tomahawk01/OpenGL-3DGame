@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Texture.h"
-#include "Math/VertexData.h"
-#include "MeshData.h"
+#include "Renderer/Texture.h"
+#include "Renderer/VertexData.h"
+#include "Renderer/MeshData.h"
 
 #include <cstddef>
 #include <cstdint>

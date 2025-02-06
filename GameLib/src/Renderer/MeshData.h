@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/VertexData.h"
+#include "Renderer/VertexData.h"
 
 #include <cstdint>
 #include <span>

@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Core/Scene.h"
+#include "Core/ResourceLoader.h"
+#include "Renderer/Buffer.h"
+#include "Renderer/FrameBuffer.h"
+#include "Renderer/CubeMap.h"
+#include "Renderer/Material.h"
+#include "Renderer/Mesh.h"
 #include "Camera.h"
-#include "Scene.h"
-#include "Buffer.h"
-#include "FrameBuffer.h"
-#include "CubeMap.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "ResourceLoader.h"
 #include "MeshLoader.h"
 
 namespace Game {

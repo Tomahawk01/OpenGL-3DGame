@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utilities/PassKey.h"
-#include "LineData.h"
+#include "Renderer/LineData.h"
 
 #if !defined(JPH_DEBUG_RENDERER)
 #define JPH_DEBUG_RENDERER

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Events/MouseButtonEvent.h"
-#include "Scene.h"
-#include "Camera.h"
+#include "Core/Scene.h"
+#include "Renderer/Camera.h"
 
 #include <Windows.h>
 

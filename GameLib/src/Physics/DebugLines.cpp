@@ -1,6 +1,6 @@
 #include "DebugLines.h"
 
-#include "BufferWriter.h"
+#include "Renderer/BufferWriter.h"
 
 namespace Game {
 

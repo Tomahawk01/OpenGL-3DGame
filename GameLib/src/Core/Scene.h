@@ -2,9 +2,9 @@
 
 #include "Math/Color.h"
 #include "Math/Vector3.h"
-#include "Physics/LineData.h"
+#include "Renderer/LineData.h"
+#include "Renderer/Buffer.h"
 #include "Physics/DebugLines.h"
-#include "Buffer.h"
 
 #include <vector>
 #include <optional>
