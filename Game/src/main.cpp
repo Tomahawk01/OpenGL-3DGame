@@ -29,6 +29,8 @@
 
 int main(int argc, char** argv)
 {
+	Game::Logger::Info("Starting Game");
+
 	try
 	{
 		Game::Ensure(argc == 2, "game.exe <root_path>");
@@ -208,7 +210,6 @@ int main(int argc, char** argv)
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
 
 			physics.Update();
-			Game::Logger::Trace("Lines: {}", physics.Debug_Renderer().GetLines().size());
 
 			scene.debugLines = { physics.Debug_Renderer().GetLines() };
 
