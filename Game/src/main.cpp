@@ -17,6 +17,7 @@
 #include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
 #include "Physics/SphereShape.h"
+#include "Physics/CylinderShape.h"
 
 #include <iostream>
 #include <print>
@@ -26,6 +27,12 @@
 #include <ranges>
 #include <unordered_map>
 #include <random>
+
+struct GameEntity
+{
+	Game::Entity renderEntity;
+	Game::RigidBody physicsEntity;
+};
 
 int main(int argc, char** argv)
 {
@@ -37,6 +44,11 @@ int main(int argc, char** argv)
 
 		Game::Window window{ 1280u, 720u };
 
+		Game::PhysicsSystem physics{};
+
+		const Game::BoxShape floorShape = physics.CreateShape<Game::BoxShape>(Game::vec3({ 100.0f, 1.0f, 100.0f }));
+		physics.CreateRigidBody(floorShape, { 0.0f, -1.0f, 0.0f }, Game::RigidBodyType::STATIC);
+
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
 
@@ -44,9 +56,11 @@ int main(int argc, char** argv)
 		const Game::TLVReader reader{ tlvFile.AsData() };
 		
 		Game::Sampler sampler{};
-		Game::Texture albedoTex{ reader, "falcon_Albedo" };
-		Game::Texture specMap{ reader, "falcon_Specular" };
-		Game::Texture normalMap{ reader, "falcon_Normal" };
+		Game::Texture albedoTex{ reader, "barrel_Albedo" };
+		Game::Texture specMap{ reader, "barrel_Specular" };
+		Game::Texture normalMap{ reader, "barrel_Normal" };
+
+		Game::Logger::Info("Textures loaded successfully");
 
 		const Game::Texture* textures[]{ &albedoTex, &specMap, &normalMap };
 		const Game::Sampler* samplers[]{ &sampler, &sampler, &sampler };
@@ -55,29 +69,34 @@ int main(int argc, char** argv)
 		const Game::File basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
 		const Game::File basicFragFile{ resourceLoader.Load("shaders/basic.frag") };
 
-		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX};
-		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT};
+		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
-		const Game::Mesh mesh{ reader, "Plane_Plane.001" };
+		const Game::Mesh mesh{ reader, "Barrel" };
 		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		std::vector<Game::Entity> entities{};
+		const Game::CylinderShape cylinderShape = physics.CreateShape<Game::CylinderShape>(0.9f, 0.61f);
 
-		for (int i = -10; i < 10; i++)
+		std::vector<GameEntity> entities{};
+
+		for (int i = 0; i < 1; i++)
 		{
-			for (int j = -10; j < 10; j++)
+			for (int j = 0; j < 1; j++)
 			{
-				entities.emplace_back(
-					&mesh,
-					&material,
-					Game::vec3{ static_cast<float>(i) * 10.0f, 0.0f, static_cast<float>(j) * 17.5f },
-					Game::vec3{ 1.0f },
-					texSamp);
+				const auto x = static_cast<float>(i) * 3.5f;
+				const auto z = static_cast<float>(j) * 3.5f;
+				const auto startPos = Game::vec3{ x, 50.0f, z };
+
+				entities.push_back({
+					{ &mesh, &material,
+					  startPos, Game::vec3{ 0.05f },
+					  texSamp },
+				physics.CreateRigidBody(cylinderShape, startPos, Game::RigidBodyType::DYNAMIC) });
 			}
 		}
 
 		Game::Scene scene{
-			.entities = entities | std::views::transform([](const auto& e) { return &e; }) | std::ranges::to<std::vector>(),
+			.entities = entities | std::views::transform([](const auto& e) { return &e.renderEntity; }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
 			.pointLights = {
@@ -92,7 +111,8 @@ int main(int argc, char** argv)
 				.constAttenuation = 1.0f,
 				.linearAttenuation = 0.07f,
 				.quadAttenuation = 0.007f }
-			}
+			},
+			.debugLines = {}
 		};
 
 		Game::Camera camera{
@@ -123,14 +143,6 @@ int main(int argc, char** argv)
 
 		bool showDebug = true;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
-
-		Game::PhysicsSystem physics{};
-
-		const Game::BoxShape floorShape = physics.CreateShape<Game::BoxShape>(Game::vec3({ 100.0f, 1.0f, 100.0f }));
-		physics.CreateRigidBody(floorShape, { 0.0f, -1.0f, 0.0f }, Game::RigidBodyType::STATIC);
-
-		const Game::SphereShape sphereShape = physics.CreateShape<Game::SphereShape>(5.0f);
-		physics.CreateRigidBody(sphereShape, { 0.0f, 100.0f, 0.0f }, Game::RigidBodyType::DYNAMIC);
 
 		bool running = true;
 		while (running)
@@ -212,6 +224,12 @@ int main(int argc, char** argv)
 			physics.Update();
 
 			scene.debugLines = { physics.Debug_Renderer().GetLines() };
+
+			for (auto &[render, physics] : entities)
+			{
+				const auto position = physics.GetPosition();
+				render.SetPosition(position);
+			}
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 			if (showDebug)

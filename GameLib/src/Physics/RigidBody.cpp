@@ -48,6 +48,7 @@ namespace Game {
 	RigidBody::RigidBody(const Shape& shape, const vec3& position, RigidBodyType type, ::JPH::BodyInterface& bodyInterface, PassKey<PhysicsSystem>)
 		: m_Body{}
 		, m_Type{ type }
+		, m_BodyInterface{ std::addressof(bodyInterface) }
 	{
 		const ::JPH::BodyCreationSettings bodySettings{ 
 			shape.GetNativeHandle(),
@@ -58,6 +59,12 @@ namespace Game {
 		};
 		m_Body = bodyInterface.CreateBody(bodySettings);
 		bodyInterface.AddBody(m_Body->GetID(), ToActivation(m_Type));
+	}
+
+	vec3 RigidBody::GetPosition() const
+	{
+		const auto position = m_BodyInterface->GetCenterOfMassPosition(m_Body->GetID());
+		return ToNative(position);
 	}
 
 	RigidBodyType RigidBody::GetType() const

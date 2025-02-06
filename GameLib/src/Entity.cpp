@@ -34,4 +34,11 @@ namespace Game {
 		return m_Model;
 	}
 
+	void Entity::SetPosition(const vec3& position)
+	{
+		m_Model[12] = position.x;
+		m_Model[13] = position.y;
+		m_Model[14] = position.z;
+	}
+
 }

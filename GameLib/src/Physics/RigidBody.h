@@ -23,12 +23,19 @@ namespace Game {
 	public:
 		RigidBody(const Shape& shape, const vec3& position, RigidBodyType type, ::JPH::BodyInterface& bodyInterface, PassKey<PhysicsSystem>);
 
+		RigidBody(const RigidBody&) = delete;
+		RigidBody& operator=(const RigidBody&) = delete;
+		RigidBody(RigidBody&&) = default;
+		RigidBody& operator=(RigidBody&&) = default;
+
+		vec3 GetPosition() const;
 		RigidBodyType GetType() const;
 		::JPH::Body* GetNativeHandle() const;
 
 	private:
 		::JPH::Body* m_Body;
 		RigidBodyType m_Type;
+		::JPH::BodyInterface* m_BodyInterface;
 	};
 
 }

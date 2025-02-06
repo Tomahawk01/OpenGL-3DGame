@@ -28,12 +28,13 @@ namespace Game {
 		const Sampler* GetSampler() const;
 		const mat4& GetModel() const;
 
+		void SetPosition(const vec3& position);
+
 	private:
 		const Mesh* m_Mesh;
 		const Material* m_Material;
 		std::vector<std::tuple<const Texture*, const Sampler*>> m_Textures;
 		const Sampler* m_Sampler;
-
 		mat4 m_Model;
 	};
 

@@ -20,6 +20,7 @@ namespace Game {
 
 	private:
 		AutoRelease<::GLuint> m_Buffer;
+		uint32_t m_Size;
 	};
 
 }
