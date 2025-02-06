@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include <numbers>
+
 namespace {
 
 	Game::vec3 CreateDirection(float pitch, float yaw)
@@ -27,7 +29,7 @@ namespace Game {
 		, m_Direction(lookAt)
 		, m_Up(up)
 		, m_Pitch{}
-		, m_Yaw{}
+		, m_Yaw{ -std::numbers::pi_v<float> / 2.0f }
 	{}
 
 	void Camera::Translate(const vec3& translation)

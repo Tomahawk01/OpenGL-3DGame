@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 		{
 			for (int j = 0; j < 1; j++)
 			{
-				const auto x = static_cast<float>(i) * 3.5f;
+				const auto x = static_cast<float>(i) * 3.5f + 10.0f;
 				const auto z = static_cast<float>(j) * 3.5f;
 				const auto startPos = Game::vec3{ x, 50.0f, z };
 
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
 		};
 
 		Game::Camera camera{
-			{-50.0f, 8.0f, 0.0f},
+			{0.0f, 8.0f, 40.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
