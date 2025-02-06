@@ -47,6 +47,8 @@ namespace Game {
 
 		constexpr std::span<const float> data() const { return m_Elements; }
 
+		constexpr float& operator[](this auto&& self, size_t index) { return self.m_Elements[index]; }
+
 		friend constexpr mat4& operator*=(mat4& m1, const mat4& m2);
 
 		constexpr bool operator==(const mat4&) const = default;
