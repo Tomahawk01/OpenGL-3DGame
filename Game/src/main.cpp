@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
 		for (int i = 0; i < 1; i++)
 		{
-			for (int j = 0; j < 5; j++)
+			for (int j = 0; j < 100; j++)
 			{
 				const auto x = static_cast<float>(i) * 3.5f;
 				const auto z = static_cast<float>(j) * 0.5f;
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
 				entities.push_back({
 					{ &mesh, &material,
-					  startPos, Game::vec3{ 0.05f },
+					  startPos, Game::vec3{ 1.0f },
 					  texSamp },
 				physics.CreateRigidBody(cylinderShape, startPos, Game::RigidBodyType::DYNAMIC) });
 			}
@@ -227,8 +227,8 @@ int main(int argc, char** argv)
 
 			for (auto &[render, physics] : entities)
 			{
-				const auto position = physics.GetPosition();
-				render.SetPosition(position);
+				render.SetPosition(physics.GetPosition());
+				render.SetRotation(physics.GetRotation());
 			}
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);

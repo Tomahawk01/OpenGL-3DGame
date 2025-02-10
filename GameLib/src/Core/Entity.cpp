@@ -6,7 +6,7 @@ namespace Game {
 		: m_Mesh(mesh)
 		, m_Material(material)
 		, m_Textures(textures)
-		, m_Model(position * scale)
+		, m_Transform(position, scale, {})
 	{}
 
 	const Mesh* Entity::GetMesh() const
@@ -29,16 +29,19 @@ namespace Game {
 		return m_Sampler;
 	}
 
-	const mat4& Entity::GetModel() const
+	const Transform& Entity::GetTransform() const
 	{
-		return m_Model;
+		return m_Transform;
 	}
 
 	void Entity::SetPosition(const vec3& position)
 	{
-		m_Model[12] = position.x;
-		m_Model[13] = position.y;
-		m_Model[14] = position.z;
+		m_Transform.Position = position;
+	}
+
+	void Entity::SetRotation(const quat& rotation)
+	{
+		m_Transform.Rotation = rotation;
 	}
 
 }

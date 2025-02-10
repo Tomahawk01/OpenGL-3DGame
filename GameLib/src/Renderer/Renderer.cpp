@@ -129,7 +129,8 @@ namespace Game {
 			const Material* material = entity->GetMaterial();
 
 			material->Use();
-			material->SetUniform("model", entity->GetModel());
+			const mat4 model{ entity->GetTransform() };
+			material->SetUniform("model", model);
 			material->BindTextures(entity->GetTextures());
 
 			mesh->Bind();

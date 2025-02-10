@@ -2,6 +2,8 @@
 
 #include "Math/Matrix4.h"
 #include "Math/Vector3.h"
+#include "Math/Transform.h"
+#include "Math/Quaternion.h"
 
 #include <vector>
 #include <tuple>
@@ -26,16 +28,17 @@ namespace Game {
 		const Material* GetMaterial() const;
 		std::span<const std::tuple<const Texture*, const Sampler*>> GetTextures() const;
 		const Sampler* GetSampler() const;
-		const mat4& GetModel() const;
+		const Transform& GetTransform() const;
 
 		void SetPosition(const vec3& position);
+		void SetRotation(const quat& rotation);
 
 	private:
 		const Mesh* m_Mesh;
 		const Material* m_Material;
 		std::vector<std::tuple<const Texture*, const Sampler*>> m_Textures;
 		const Sampler* m_Sampler;
-		mat4 m_Model;
+		Transform m_Transform;
 	};
 
 }
