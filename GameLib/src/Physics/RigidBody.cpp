@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 
 #include "Utilities/Exception.h"
+#include "PhysicsSystem.h"
 #include "JoltUtils.h"
 
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
@@ -19,12 +20,12 @@ namespace {
 		throw Game::Exception("Unknown type");
 	}
 
-	::JPH::ObjectLayer ToLayer(Game::RigidBodyType type)
+	Game::PhysicsLayer ToLayer(Game::RigidBodyType type)
 	{
 		switch (type)
 		{
-		case Game::RigidBodyType::STATIC: return 1u;
-		case Game::RigidBodyType::DYNAMIC: return 0u;
+		case Game::RigidBodyType::STATIC: return Game::PhysicsLayer::NON_MOVING;
+		case Game::RigidBodyType::DYNAMIC: return Game::PhysicsLayer::MOVING;
 		}
 
 		throw Game::Exception("Unknown type");
@@ -50,12 +51,12 @@ namespace Game {
 		, m_Type{ type }
 		, m_BodyInterface{ std::addressof(bodyInterface) }
 	{
-		const ::JPH::BodyCreationSettings bodySettings{ 
+		const ::JPH::BodyCreationSettings bodySettings{
 			shape.GetNativeHandle(),
 			ToJolt(position),
 			::JPH::Quat::sIdentity(),
 			ToJoltType(m_Type),
-			ToLayer(m_Type)
+			static_cast<uint16_t>(std::to_underlying(ToLayer(m_Type)))
 		};
 		m_Body = bodyInterface.CreateBody(bodySettings);
 		bodyInterface.AddBody(m_Body->GetID(), ToActivation(m_Type));

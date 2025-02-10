@@ -19,6 +19,7 @@
 #include <Jolt/RegisterTypes.h>
 
 #include <cstdarg>
+#include <set>
 #include <thread>
 
 using namespace JPH::literals;
@@ -28,16 +29,18 @@ namespace {
 	class SimpleBroadPhaseLayer : public ::JPH::BroadPhaseLayerInterface
 	{
 	public:
-		virtual ::JPH::uint GetNumBroadPhaseLayers() const override { return 2; }
+		virtual ::JPH::uint GetNumBroadPhaseLayers() const override { return std::to_underlying(Game::PhysicsLayer::MAX_LAYER); }
 		virtual ::JPH::BroadPhaseLayer GetBroadPhaseLayer(::JPH::ObjectLayer layer) const override { return ::JPH::BroadPhaseLayer(static_cast<::JPH::BroadPhaseLayer::Type>(layer)); }
 
 #if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
 		virtual const char* GetBroadPhaseLayerName(::JPH::BroadPhaseLayer layer) const override
 		{
-			switch (layer.GetValue())
+			Game::PhysicsLayer nativeLayer{ layer.GetValue() };
+
+			switch (nativeLayer)
 			{
-			case 0: return "NON_MOVING";
-			case 1: return "MOVING";
+			case Game::PhysicsLayer::NON_MOVING: return "NON_MOVING";
+			case Game::PhysicsLayer::MOVING: return "MOVING";
 			default: throw Game::Exception("Unknown broad phase layer");
 			}
 		}
@@ -47,13 +50,23 @@ namespace {
 	class SimpleObjectVsBroadPhaseLayerFilter : public ::JPH::ObjectVsBroadPhaseLayerFilter
 	{
 	public:
-		virtual bool ShouldCollide(::JPH::ObjectLayer layer1, ::JPH::BroadPhaseLayer layer2) const override { return layer1 == 1 || layer2.GetValue() == 1; }
+		virtual bool ShouldCollide(::JPH::ObjectLayer layer1, ::JPH::BroadPhaseLayer layer2) const override
+		{
+			return std::ranges::any_of(
+				std::set{ Game::PhysicsLayer{layer1}, Game::PhysicsLayer{layer2.GetValue()} },
+				[](const auto& e) { return e == Game::PhysicsLayer::MOVING; });
+		}
 	};
 
 	class SimpleObjectLayerPairFilter : public ::JPH::ObjectLayerPairFilter
 	{
 	public:
-		virtual bool ShouldCollide(::JPH::ObjectLayer layer1, ::JPH::ObjectLayer layer2) const override { return layer1 == 1 || layer2 == 1; }
+		virtual bool ShouldCollide(::JPH::ObjectLayer layer1, ::JPH::ObjectLayer layer2) const override
+		{
+			return std::ranges::any_of(
+				std::set{ Game::PhysicsLayer{layer1}, Game::PhysicsLayer{layer2} },
+				[](const auto& e) { return e == Game::PhysicsLayer::MOVING; });
+		}
 	};
 
 	void JoltTrace(const char* fmt, ...)

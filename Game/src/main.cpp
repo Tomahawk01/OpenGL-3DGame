@@ -81,11 +81,11 @@ int main(int argc, char** argv)
 
 		for (int i = 0; i < 1; i++)
 		{
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < 5; j++)
 			{
-				const auto x = static_cast<float>(i) * 3.5f + 10.0f;
-				const auto z = static_cast<float>(j) * 3.5f;
-				const auto startPos = Game::vec3{ x, 50.0f, z };
+				const auto x = static_cast<float>(i) * 3.5f;
+				const auto z = static_cast<float>(j) * 0.5f;
+				const auto startPos = Game::vec3{ x, 20.0f + (j * 10.0f), z};
 
 				entities.push_back({
 					{ &mesh, &material,
