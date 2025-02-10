@@ -29,6 +29,8 @@ namespace Game {
 		RigidBody(RigidBody&&) = default;
 		RigidBody& operator=(RigidBody&&) = default;
 
+		void SetLinearVelocity(const vec3& impulse) const;
+
 		vec3 GetPosition() const;
 		quat GetRotation() const;
 		RigidBodyType GetType() const;

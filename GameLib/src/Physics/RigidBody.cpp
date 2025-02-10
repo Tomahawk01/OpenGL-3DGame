@@ -58,8 +58,14 @@ namespace Game {
 			ToJoltType(m_Type),
 			static_cast<uint16_t>(std::to_underlying(ToLayer(m_Type)))
 		};
+
 		m_Body = bodyInterface.CreateBody(bodySettings);
-		bodyInterface.AddBody(m_Body->GetID(), ToActivation(m_Type));
+		m_BodyInterface->AddBody(m_Body->GetID(), ToActivation(m_Type));
+	}
+
+	void RigidBody::SetLinearVelocity(const vec3& impulse) const
+	{
+		m_BodyInterface->SetLinearVelocity(m_Body->GetID(), ToJolt(impulse));
 	}
 
 	vec3 RigidBody::GetPosition() const
