@@ -2,6 +2,7 @@
 
 #include "Utilities/PassKey.h"
 #include "Math/Vector3.h"
+#include "Math/Quaternion.h"
 #include "Shape.h"
 
 #include <Jolt/Jolt.h>
@@ -29,6 +30,7 @@ namespace Game {
 		RigidBody& operator=(RigidBody&&) = default;
 
 		vec3 GetPosition() const;
+		quat GetRotation() const;
 		RigidBodyType GetType() const;
 		::JPH::Body* GetNativeHandle() const;
 

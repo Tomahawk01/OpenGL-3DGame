@@ -9,6 +9,11 @@ namespace Game {
 		return { v.GetX(), v.GetY(), v.GetZ() };
 	}
 
+	quat ToNative(::JPH::QuatArg& q)
+	{
+		return { q.GetX(), q.GetY(), q.GetZ(), q.GetW() };
+	}
+
 	Color ToNative(::JPH::ColorArg c)
 	{
 		const auto toFloat = []<std::integral T>(T b) { return static_cast<float>(b) / static_cast<float>(std::numeric_limits<T>::max()); };

@@ -64,8 +64,14 @@ namespace Game {
 
 	vec3 RigidBody::GetPosition() const
 	{
-		const auto position = m_BodyInterface->GetCenterOfMassPosition(m_Body->GetID());
+		const auto position = m_BodyInterface->GetPosition(m_Body->GetID());
 		return ToNative(position);
+	}
+
+	quat RigidBody::GetRotation() const
+	{
+		const auto rotation = m_BodyInterface->GetRotation(m_Body->GetID());
+		return ToNative(rotation);
 	}
 
 	RigidBodyType RigidBody::GetType() const
