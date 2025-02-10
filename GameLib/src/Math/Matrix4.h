@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Quaternion.h"
 
 #include <array>
 #include <format>
@@ -11,6 +12,8 @@ namespace Game {
 	class mat4
 	{
 	public:
+		struct Scale {};
+
 		constexpr mat4()
 			: m_Elements({
 				1.0f, 0.0f, 0.0f, 0.0f,
@@ -33,14 +36,40 @@ namespace Game {
 			})
 		{}
 
+		constexpr mat4(const vec3& scale, Scale)
+			: m_Elements({
+				scale.x, 0.0f, 0.0f, 0.0f,
+				0.0f, scale.y, 0.0f, 0.0f,
+				0.0f, 0.0f, scale.z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f
+			})
+		{}
+
 		constexpr mat4(const vec3& translation, const vec3& scale)
 			: m_Elements({
 				scale.x, 0.0f, 0.0f, 0.0f,
 				0.0f, scale.y, 0.0f, 0.0f,
 				0.0f, 0.0f, scale.z, 0.0f,
 				translation.x, translation.y, translation.z, 1.0f
-			})
-		{}	
+				})
+		{
+		}
+
+		constexpr mat4(const quat& rotation)
+			: mat4{}
+		{
+			m_Elements[0] = 1.0f - 2.0f * rotation.Y * rotation.Y - 2.0f * rotation.Z * rotation.Z;
+			m_Elements[1] = 2.0f * rotation.X * rotation.Y + 2.0f * rotation.Z * rotation.W;
+			m_Elements[2] = 2.0f * rotation.X * rotation.Z - 2.0f * rotation.Y * rotation.W;
+
+			m_Elements[4] = 2.0f * rotation.X * rotation.Y - 2.0f * rotation.Z * rotation.W;
+			m_Elements[5] = 1.0f - 2.0f * rotation.X * rotation.X - 2.0f * rotation.Z * rotation.Z;
+			m_Elements[6] = 2.0f * rotation.Y * rotation.Z + 2.0f * rotation.X * rotation.W;
+
+			m_Elements[8] = 2.0f * rotation.X * rotation.Z + 2.0f * rotation.Y * rotation.W;
+			m_Elements[9] = 2.0f * rotation.Y * rotation.Z - 2.0f * rotation.X * rotation.W;
+			m_Elements[10] = 1.0f - 2.0f * rotation.X * rotation.X - 2.0f * rotation.Y * rotation.Y;
+		}
 
 		static mat4 LookAt(const vec3& eye, const vec3& lookAt, const vec3& up);
 		static mat4 Perspective(float fov, float width, float height, float nearPlane, float farPlane);
