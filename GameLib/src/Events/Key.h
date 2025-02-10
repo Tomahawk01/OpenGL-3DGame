@@ -40,6 +40,8 @@ namespace Game {
 		Y =     0x59,
 		Z =     0x5A,
 
+		SPACE = VK_SPACE,
+
 		F1 =	VK_F1,
 	};
 
