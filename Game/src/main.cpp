@@ -45,6 +45,7 @@ int main(int argc, char** argv)
 		Game::Window window{ 1280u, 720u };
 
 		Game::PhysicsSystem physics{};
+		std::vector<Game::RigidBody> balls{};
 
 		const Game::BoxShape floorShape = physics.CreateShape<Game::BoxShape>(Game::vec3({ 100.0f, 1.0f, 100.0f }));
 		physics.CreateRigidBody(floorShape, { 0.0f, -1.0f, 0.0f }, Game::RigidBodyType::STATIC);
@@ -144,9 +145,12 @@ int main(int argc, char** argv)
 		bool showDebug = true;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
 
+		bool canSpawn = true;
+
 		bool running = true;
 		while (running)
 		{
+
 			auto event = window.PollEvent();
 			while (event && running)
 			{
@@ -169,6 +173,11 @@ int main(int argc, char** argv)
 						if (arg.GetKey() == Game::Key::F1 && arg.GetState() == Game::KeyState::UP)
 						{
 							showDebug = !showDebug;
+						}
+
+						if (arg.GetKey() == Game::Key::SPACE && arg.GetState() == Game::KeyState::UP)
+						{
+							canSpawn = true;
 						}
 					}
 					else if constexpr (std::same_as<T, Game::MouseEvent>)
@@ -220,6 +229,13 @@ int main(int argc, char** argv)
 			
 			const float speed = 0.4f;
 			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
+
+			if (keyState[Game::Key::SPACE] && canSpawn)
+			{
+				canSpawn = false;
+				const Game::RigidBody rb = physics.CreateRigidBody(cylinderShape, camera.GetPosition(), Game::RigidBodyType::DYNAMIC);
+				rb.SetLinearVelocity(camera.GetDirection() * 100.0f);
+			}
 
 			physics.Update();
 
