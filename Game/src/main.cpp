@@ -239,6 +239,8 @@ int main(int argc, char** argv)
 
 			physics.Update();
 
+			Game::Logger::Trace("cc {}", physics.GetCharacterController().GetPosition());
+
 			scene.debugLines = { physics.Debug_Renderer().GetLines() };
 
 			for (auto &[render, physics] : entities)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DebugRenderer.h"
+#include "CharacterController.h"
 #include "RigidBody.h"
 
 #include <memory>
@@ -32,6 +33,8 @@ namespace Game {
 		}
 
 		RigidBody CreateRigidBody(const Shape& shape, const vec3& position, RigidBodyType type) const;
+
+		CharacterController& GetCharacterController() const;
 
 	private:
 		struct Implementation;

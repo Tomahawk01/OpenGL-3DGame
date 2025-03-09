@@ -4,6 +4,7 @@
 #include "Utilities/Error.h"
 #include "BoxShape.h"
 #include "SphereShape.h"
+#include "CharacterController.h"
 #include "RigidBody.h"
 
 #include <Jolt/Jolt.h>
@@ -94,6 +95,7 @@ namespace Game {
 		::JPH::PhysicsSystem PhysicsSystem;
 		::JPH::BodyID Sphere;
 		DebugRenderer Debug_Renderer = { {} };
+		std::unique_ptr<CharacterController> Character_Controller;
 	};
 
 	PhysicsSystem::PhysicsSystem()
@@ -129,6 +131,8 @@ namespace Game {
 			m_Impl->ObjectLayerPairFilter);
 
 		m_Impl->PhysicsSystem.SetGravity({ 0.0f, -9.8f, 0.0f });
+
+		m_Impl->Character_Controller = std::make_unique<CharacterController>(std::addressof(m_Impl->PhysicsSystem), PassKey<PhysicsSystem>());
 	}
 
 	PhysicsSystem::~PhysicsSystem() = default;
@@ -141,6 +145,7 @@ namespace Game {
 
 		static const ::JPH::BodyManager::DrawSettings settings{};
 		m_Impl->PhysicsSystem.DrawBodies(settings, &m_Impl->Debug_Renderer);
+		m_Impl->Character_Controller->DebugDraw(&m_Impl->Debug_Renderer, {});
 	}
 
 	const DebugRenderer& PhysicsSystem::Debug_Renderer() const
@@ -152,6 +157,11 @@ namespace Game {
 	{
 		auto& bodyInterface = m_Impl->PhysicsSystem.GetBodyInterface();
 		return { shape, position, type, bodyInterface, {} };
+	}
+
+	CharacterController& PhysicsSystem::GetCharacterController() const
+	{
+		return *m_Impl->Character_Controller;
 	}
 
 }
