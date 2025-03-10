@@ -59,6 +59,12 @@ namespace Game {
 		return m_Position;
 	}
 
+	void Camera::SetPosition(const vec3& position)
+	{
+		m_Position = position;
+		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
+	}
+
 	vec3 Camera::GetDirection() const
 	{
 		return m_Direction;
