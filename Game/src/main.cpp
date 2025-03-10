@@ -227,8 +227,10 @@ int main(int argc, char** argv)
 				walkDirection += Game::vec3{ 0.0f, 1.0f, 0.0f };
 			}
 			
-			const float speed = 0.4f;
-			camera.Translate(Game::vec3::Normalize(walkDirection) * speed);
+			const float speed = 20.0f;
+			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
+			physics.GetCharacterController().SetLinearVelocity(velocity);
+			camera.SetPosition(physics.GetCharacterController().GetPosition() + Game::vec3{ 0.0f, 1.25f, 0.0f });
 
 			if (keyState[Game::Key::SPACE] && canSpawn)
 			{
@@ -238,8 +240,6 @@ int main(int argc, char** argv)
 			}
 
 			physics.Update();
-
-			Game::Logger::Trace("cc {}", physics.GetCharacterController().GetPosition());
 
 			scene.debugLines = { physics.Debug_Renderer().GetLines() };
 
