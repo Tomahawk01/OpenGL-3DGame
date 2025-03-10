@@ -3,19 +3,20 @@
 #include "Utilities/PassKey.h"
 #include "Math/Vector3.h"
 
-#if !defined(JPH_DEBUG_RENDERER)
-#define JPH_DEBUG_RENDERER
-#endif
 #include <Jolt/Jolt.h>
+#include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Physics/Character/CharacterVirtual.h>
 #include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/Collision/ContactListener.h>
 #include <Jolt/Renderer/DebugRenderer.h>
+
+#include <memory>
 
 namespace Game {
 
 	class PhysicsSystem;
 
-	class CharacterController
+	class CharacterController : public JPH::CharacterContactListener
 	{
 	public:
 		CharacterController(::JPH::PhysicsSystem* physicsSystem, PassKey<PhysicsSystem>);
@@ -24,8 +25,21 @@ namespace Game {
 
 		void DebugDraw(::JPH::DebugRenderer* debugRenderer, PassKey<PhysicsSystem>) const;
 
+		void Update(float delta, const ::JPH::BroadPhaseLayerFilter& broadPhaseLayerFilter, const ::JPH::ObjectLayerFilter& objectLayerFilter, PassKey<PhysicsSystem>);
+
+		void SetLinearVelocity(const vec3& velocity);
+
+		void OnContactAdded(
+			const ::JPH::CharacterVirtual* inCharacter,
+			const ::JPH::BodyID& inBodyID2,
+			const ::JPH::SubShapeID& inSubShapeID2,
+			::JPH::RVec3Arg inContactPosition,
+			::JPH::Vec3Arg inContactNormal,
+			::JPH::CharacterContactSettings& ioSettings) override;
+
 	private:
 		::JPH::Ref<::JPH::CharacterVirtual> m_Character;
+		std::unique_ptr<::JPH::TempAllocator> m_TempAlloc;
 	};
 
 }

@@ -6,6 +6,7 @@
 #include "SphereShape.h"
 #include "CharacterController.h"
 #include "RigidBody.h"
+#include "JoltUtils.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Factory.h>
@@ -95,7 +96,7 @@ namespace Game {
 		::JPH::PhysicsSystem PhysicsSystem;
 		::JPH::BodyID Sphere;
 		DebugRenderer Debug_Renderer = { {} };
-		std::unique_ptr<CharacterController> Character_Controller;
+		std::unique_ptr<CharacterController> CharacterController;
 	};
 
 	PhysicsSystem::PhysicsSystem()
@@ -132,7 +133,7 @@ namespace Game {
 
 		m_Impl->PhysicsSystem.SetGravity({ 0.0f, -9.8f, 0.0f });
 
-		m_Impl->Character_Controller = std::make_unique<CharacterController>(std::addressof(m_Impl->PhysicsSystem), PassKey<PhysicsSystem>());
+		m_Impl->CharacterController = std::make_unique<CharacterController>(std::addressof(m_Impl->PhysicsSystem), PassKey<PhysicsSystem>());
 	}
 
 	PhysicsSystem::~PhysicsSystem() = default;
@@ -141,11 +142,13 @@ namespace Game {
 	{
 		m_Impl->Debug_Renderer.Clear();
 
+		m_Impl->CharacterController->Update(1.0f / 60.0f, m_Impl->PhysicsSystem.GetDefaultBroadPhaseLayerFilter(ToJolt(RigidBodyType::DYNAMIC)), m_Impl->PhysicsSystem.GetDefaultLayerFilter(ToJolt(RigidBodyType::DYNAMIC)), {});
+
 		m_Impl->PhysicsSystem.Update(1.0f / 60.0f, 1, &m_Impl->TempAllocator, &m_Impl->JobSystem);
 
 		static const ::JPH::BodyManager::DrawSettings settings{};
 		m_Impl->PhysicsSystem.DrawBodies(settings, &m_Impl->Debug_Renderer);
-		m_Impl->Character_Controller->DebugDraw(&m_Impl->Debug_Renderer, {});
+		m_Impl->CharacterController->DebugDraw(&m_Impl->Debug_Renderer, {});
 	}
 
 	const DebugRenderer& PhysicsSystem::Debug_Renderer() const
@@ -161,7 +164,7 @@ namespace Game {
 
 	CharacterController& PhysicsSystem::GetCharacterController() const
 	{
-		return *m_Impl->Character_Controller;
+		return *m_Impl->CharacterController;
 	}
 
 }

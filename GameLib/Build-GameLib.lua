@@ -14,7 +14,9 @@ project "GameLib"
 
     defines
     {
-        "NOMINMAX"
+        "NOMINMAX",
+        -- TODO: Include only in debug build later
+        "JPH_DEBUG_RENDERER"
     }
 
     includedirs
