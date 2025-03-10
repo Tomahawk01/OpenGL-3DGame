@@ -25,4 +25,9 @@ namespace Game {
 		return { v.x, v.y, v.z };
 	}
 
+	::JPH::ObjectLayer ToJolt(RigidBodyType type)
+	{
+		return static_cast<::JPH::ObjectLayer>(std::to_underlying(type));
+	}
+
 }

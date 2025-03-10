@@ -56,7 +56,7 @@ namespace Game {
 			ToJolt(position),
 			::JPH::Quat::sIdentity(),
 			ToJoltType(m_Type),
-			static_cast<uint16_t>(std::to_underlying(ToLayer(m_Type)))
+			ToJolt(type)
 		};
 
 		m_Body = bodyInterface.CreateBody(bodySettings);
