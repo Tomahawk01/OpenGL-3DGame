@@ -13,10 +13,6 @@
 #include "Renderer/Mesh.h"
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
-#include "Physics/PhysicsSystem.h"
-#include "Physics/BoxShape.h"
-#include "Physics/SphereShape.h"
-#include "Physics/CylinderShape.h"
 #include "TLV/TLVReader.h"
 
 #include <iostream>
@@ -28,27 +24,15 @@
 #include <unordered_map>
 #include <random>
 
-struct GameEntity
-{
-	Game::Entity renderEntity;
-	Game::RigidBody physicsEntity;
-};
-
 int main(int argc, char** argv)
 {
-	Game::Logger::Info("Starting Game");
+	Game::Logger::Info("Starting Game...");
 
 	try
 	{
 		Game::Ensure(argc == 2, "game.exe <root_path>");
 
-		Game::Window window{ 1280u, 720u };
-
-		Game::PhysicsSystem physics{};
-		std::vector<Game::RigidBody> balls{};
-
-		const Game::BoxShape floorShape = physics.CreateShape<Game::BoxShape>(Game::vec3({ 100.0f, 1.0f, 100.0f }));
-		physics.CreateRigidBody(floorShape, { 0.0f, -1.0f, 0.0f }, Game::RigidBodyType::STATIC);
+		Game::Window window{ 1280u, 720u, 640u, 360u };
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
@@ -74,30 +58,15 @@ int main(int argc, char** argv)
 		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
 		const Game::Mesh mesh{ reader, "Barrel" };
+
 		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		const Game::CylinderShape cylinderShape = physics.CreateShape<Game::CylinderShape>(0.9f, 0.61f);
-
-		std::vector<GameEntity> entities{};
-
-		for (int i = 0; i < 1; i++)
-		{
-			for (int j = 0; j < 100; j++)
-			{
-				const auto x = static_cast<float>(i) * 3.5f;
-				const auto z = static_cast<float>(j) * 0.5f;
-				const auto startPos = Game::vec3{ x, 20.0f + (j * 10.0f), z};
-
-				entities.push_back({
-					{ &mesh, &material,
-					  startPos, Game::vec3{ 1.0f },
-					  texSamp },
-				physics.CreateRigidBody(cylinderShape, startPos, Game::RigidBodyType::DYNAMIC) });
-			}
-		}
+		std::vector<Game::Entity> entities{
+			{ &mesh, &material, {}, {1.0f}, texSamp }
+		};
 
 		Game::Scene scene{
-			.entities = entities | std::views::transform([](const auto& e) { return &e.renderEntity; }) | std::ranges::to<std::vector>(),
+			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
 			.pointLights = {
@@ -142,15 +111,12 @@ int main(int argc, char** argv)
 
 		float gamma = 2.2f;
 
-		bool showDebug = true;
+		bool showDebug = false;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
-
-		bool canSpawn = true;
 
 		bool running = true;
 		while (running)
 		{
-
 			auto event = window.PollEvent();
 			while (event && running)
 			{
@@ -173,11 +139,6 @@ int main(int argc, char** argv)
 						if (arg.GetKey() == Game::Key::F1 && arg.GetState() == Game::KeyState::UP)
 						{
 							showDebug = !showDebug;
-						}
-
-						if (arg.GetKey() == Game::Key::SPACE && arg.GetState() == Game::KeyState::UP)
-						{
-							canSpawn = true;
 						}
 					}
 					else if constexpr (std::same_as<T, Game::MouseEvent>)
@@ -218,38 +179,15 @@ int main(int argc, char** argv)
 			{
 				walkDirection -= camera.GetDirection();
 			}
-			if (keyState[Game::Key::Q])
-			{
-				walkDirection -= Game::vec3{ 0.0f, 1.0f, 0.0f };
-			}
-			if (keyState[Game::Key::E])
-			{
-				walkDirection += Game::vec3{ 0.0f, 1.0f, 0.0f };
-			}
+
+			walkDirection.y = 0.0f;
 			
-			const float speed = 20.0f;
+			const float speed = 0.5f;
 			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
-			physics.GetCharacterController().SetLinearVelocity(velocity);
-			camera.SetPosition(physics.GetCharacterController().GetPosition() + Game::vec3{ 0.0f, 1.25f, 0.0f });
-
-			if (keyState[Game::Key::SPACE] && canSpawn)
-			{
-				canSpawn = false;
-				const Game::RigidBody rb = physics.CreateRigidBody(cylinderShape, camera.GetPosition(), Game::RigidBodyType::DYNAMIC);
-				rb.SetLinearVelocity(camera.GetDirection() * 100.0f);
-			}
-
-			physics.Update();
-
-			scene.debugLines = { physics.Debug_Renderer().GetLines() };
-
-			for (auto &[render, physics] : entities)
-			{
-				render.SetPosition(physics.GetPosition());
-				render.SetRotation(physics.GetRotation());
-			}
+			camera.Translate(velocity);
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
+
 			if (showDebug)
 				debugUI.Render();
 

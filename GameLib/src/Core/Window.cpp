@@ -209,7 +209,7 @@ namespace {
 
 namespace Game {
 
-	Window::Window(uint32_t width, uint32_t height)
+	Window::Window(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 		: m_Window({})
 		, m_DeviceCtx({})
 		, m_WndClass({})
@@ -237,8 +237,8 @@ namespace Game {
 			m_WndClass.lpszClassName,
 			"game window",
 			WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
+			x,
+			y,
 			rect.right - rect.left,
 			rect.bottom - rect.top,
 			nullptr,
