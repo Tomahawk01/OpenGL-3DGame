@@ -15,6 +15,9 @@
 #include "Renderer/Camera.h"
 #include "TLV/TLVReader.h"
 
+#include "Game/StaticObjectTransformer.h"
+#include "Game/CameraObjectTransformer.h"
+
 #include <iostream>
 #include <print>
 #include <numbers>
@@ -23,6 +26,12 @@
 #include <ranges>
 #include <unordered_map>
 #include <random>
+
+struct TransformedEntity
+{
+	Game::Entity entity;
+	std::unique_ptr<Game::ObjectTransformer> transformer;
+};
 
 int main(int argc, char** argv)
 {
@@ -33,6 +42,16 @@ int main(int argc, char** argv)
 		Game::Ensure(argc == 2, "game.exe <root_path>");
 
 		Game::Window window{ 1280u, 720u, 640u, 360u };
+
+		Game::Camera camera{
+			{0.0f, 8.0f, 40.0f},
+			{0.0f, 0.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f},
+			std::numbers::pi_v<float> / 4.0f,
+			static_cast<float>(window.GetWidth()),
+			static_cast<float>(window.GetHeight()),
+			0.1f, 1000.0f
+		};
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
@@ -61,12 +80,18 @@ int main(int argc, char** argv)
 
 		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		std::vector<Game::Entity> entities{
-			{ &mesh, &material, {}, {1.0f}, texSamp }
-		};
+		std::vector<TransformedEntity> entities{};
+		entities.emplace_back(
+			Game::Entity{ &mesh, &material, {}, {1.0f}, texSamp },
+			std::make_unique<Game::StaticObjectTransformer>(Game::vec3{})
+		);
+		entities.emplace_back(
+			Game::Entity{ &mesh, &material, {5.0f, 0.0f, 0.0f}, {1.0f}, texSamp },
+			std::make_unique<Game::CameraObjectTransformer>(Game::vec3{5.0f, 0.0f, 0.0f}, camera)
+		);
 
 		Game::Scene scene{
-			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
+			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
 			.pointLights = {
@@ -83,15 +108,6 @@ int main(int argc, char** argv)
 				.quadAttenuation = 0.007f }
 			},
 			.debugLines = {}
-		};
-
-		Game::Camera camera{
-			{0.0f, 8.0f, 40.0f},
-			{0.0f, 0.0f, 0.0f},
-			{0.0f, 1.0f, 0.0f},
-			std::numbers::pi_v<float> / 4.0f,
-			static_cast<float>(window.GetWidth()), static_cast<float>(window.GetHeight()),
-			0.1f, 1000.0f
 		};
 
 		Game::CubeMap skybox{
@@ -185,6 +201,12 @@ int main(int argc, char** argv)
 			const float speed = 0.5f;
 			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
 			camera.Translate(velocity);
+
+			for (auto& [entity, transformer] : entities)
+			{
+				transformer->Update();
+				entity.SetPosition(transformer->Position());
+			}
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 
