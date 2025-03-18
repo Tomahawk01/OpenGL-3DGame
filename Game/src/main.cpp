@@ -17,6 +17,7 @@
 
 #include "Game/StaticObjectTransformer.h"
 #include "Game/CameraObjectTransformer.h"
+#include "Game/InverseCameraObjectTransformer.h"
 
 #include <iostream>
 #include <print>
@@ -72,23 +73,39 @@ int main(int argc, char** argv)
 
 		const Game::File basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
 		const Game::File basicFragFile{ resourceLoader.Load("shaders/basic.frag") };
+		const Game::File checkerboardFragFile{ resourceLoader.Load("shaders/checkerboard.frag") };
 
 		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT };
+		const Game::Shader checkerboardShader{ checkerboardFragFile.AsString(), Game::ShaderType::FRAGMENT };
 		Game::Material material{ vertexShader, fragmentShader };
+		Game::Material checkerboardMaterial{ vertexShader, checkerboardShader };
 		const Game::Mesh mesh{ reader, "Barrel" };
 
 		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
+		const Game::Sampler floorSampler{};
+		const Game::Texture floorTexture{
+			Game::TextureDescription{
+				.width = 1u,
+				.height = 1u,
+				.format = Game::TextureFormat::RGB,
+				.usage = Game::TextureUsage::SRGB,
+				.data = { static_cast<std::byte>(0xff), static_cast<std::byte>(0xff), static_cast<std::byte>(0xff) }
+		}};
+		const Game::Mesh floorMesh{ meshLoader.Cube() };
+		Game::Entity floorEntity{ &floorMesh, &checkerboardMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, {std::make_tuple(&floorTexture, &floorSampler)} };
+
 		std::vector<TransformedEntity> entities{};
 		entities.emplace_back(
+			Game::Entity{ &mesh, &material, {-5.0f, 0.0f, 0.0f}, {1.0f}, texSamp },
+			std::make_unique<Game::InverseCameraObjectTransformer>(Game::vec3{ -5.0f, 0.0f, 0.0f }, camera));
+		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {}, {1.0f}, texSamp },
-			std::make_unique<Game::StaticObjectTransformer>(Game::vec3{})
-		);
+			std::make_unique<Game::StaticObjectTransformer>(Game::vec3{}));
 		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {5.0f, 0.0f, 0.0f}, {1.0f}, texSamp },
-			std::make_unique<Game::CameraObjectTransformer>(Game::vec3{5.0f, 0.0f, 0.0f}, camera)
-		);
+			std::make_unique<Game::CameraObjectTransformer>(Game::vec3{ 5.0f, 0.0f, 0.0f }, camera));
 
 		Game::Scene scene{
 			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
@@ -96,19 +113,27 @@ int main(int argc, char** argv)
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
 			.pointLights = {
 				{.position = {5.0f, 5.0f, 0.0f},
+				.color = {1.0f, 0.0f, 0.0f},
+				.constAttenuation = 1.0f,
+				.linearAttenuation = 0.07f,
+				.quadAttenuation = 0.007f },
+
+				{.position = {-5.0f, 5.0f, 0.0f},
 				.color = {0.0f, 1.0f, 0.0f},
 				.constAttenuation = 1.0f,
 				.linearAttenuation = 0.07f,
 				.quadAttenuation = 0.007f },
 
 				{.position = {-5.0f, 5.0f, 0.0f},
-				.color = {1.0f, 0.0f, 0.0f},
+				.color = {0.0f, 0.0f, 1.0f},
 				.constAttenuation = 1.0f,
 				.linearAttenuation = 0.07f,
 				.quadAttenuation = 0.007f }
 			},
 			.debugLines = {}
 		};
+
+		scene.entities.push_back(&floorEntity);
 
 		Game::CubeMap skybox{
 			reader,
@@ -202,10 +227,16 @@ int main(int argc, char** argv)
 			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
 			camera.Translate(velocity);
 
-			for (auto& [entity, transformer] : entities)
+			for (const auto& [transformedEntity, light] : std::views::zip(entities, scene.pointLights))
 			{
+				auto& [entity, transformer] = transformedEntity;
+
 				transformer->Update();
-				entity.SetPosition(transformer->Position());
+
+				const Game::vec3 position = transformer->Position();
+
+				entity.SetPosition(position);
+				light.position = { position.x, 5.0f, position.z };
 			}
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
