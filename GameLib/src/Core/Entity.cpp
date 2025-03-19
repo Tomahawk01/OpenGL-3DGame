@@ -2,10 +2,10 @@
 
 namespace Game {
 
-	Entity::Entity(const Mesh* mesh, const Material* material, const vec3& position, const vec3& scale, const std::vector<std::tuple<const Texture*, const Sampler*>>& textures)
+	Entity::Entity(const Mesh* mesh, const Material* material, const vec3& position, const vec3& scale, const std::span<const Texture*>& textures)
 		: m_Mesh(mesh)
 		, m_Material(material)
-		, m_Textures(textures)
+		, m_Textures(std::ranges::cbegin(textures), std::ranges::cend(textures))
 		, m_Transform(position, scale, {})
 	{}
 
@@ -19,7 +19,7 @@ namespace Game {
 		return m_Material;
 	}
 
-	std::span<const std::tuple<const Texture*, const Sampler*>> Entity::GetTextures() const
+	std::span<const Texture* const> Entity::GetTextures() const
 	{
 		return m_Textures;
 	}

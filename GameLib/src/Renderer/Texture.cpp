@@ -2,6 +2,7 @@
 
 #include "Utilities/Error.h"
 #include "TLV/TLVReader.h"
+#include "Sampler.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -27,8 +28,9 @@ namespace {
 
 namespace Game {
 
-	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height)
+	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height, const Sampler* sampler)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+		, m_Sampler(sampler)
 	{
 		TextureUsage validUsage[] = { TextureUsage::SRGB, TextureUsage::DATA };
 		Ensure(std::ranges::contains(validUsage, usage), "Invalid usage");
@@ -64,8 +66,9 @@ namespace Game {
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
 	}
 
-	Texture::Texture(const TextureDescription& description)
+	Texture::Texture(const TextureDescription& description, const Sampler* sampler)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+		, m_Sampler(sampler)
 	{
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
@@ -73,13 +76,14 @@ namespace Game {
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, description.width, description.height, description.format == TextureFormat::RGBA ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, description.data.data());
 	}
 
-	Texture::Texture(const TLVReader& reader, std::string_view name)
+	Texture::Texture(const TLVReader& reader, std::string_view name, const Sampler* sampler)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+		, m_Sampler(sampler)
 	{
 		auto desc = std::ranges::find_if(reader, [name](const auto& e) { return e.IsTexture(name); });
 		Ensure(desc != std::ranges::end(reader), "Could not find texture");
 
-		Texture tex{ (*desc).textureDescriptionValue() };
+		Texture tex{ (*desc).textureDescriptionValue(), m_Sampler };
 
 		std::ranges::swap(m_Handle, tex.m_Handle);
 	}
@@ -104,6 +108,11 @@ namespace Game {
 	::GLuint Texture::GetNativeHandle() const
 	{
 		return m_Handle;
+	}
+
+	const Sampler* Texture::GetSampler() const
+	{
+		return m_Sampler;
 	}
 
 }

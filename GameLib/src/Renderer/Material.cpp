@@ -111,12 +111,16 @@ namespace Game {
 		SetUniform(uniformName, static_cast<int>(index));
 	}
 
-	void Material::BindTextures(std::span<const std::tuple<const Texture*, const Sampler*>> texSamps) const
+	void Material::BindTexture(uint32_t index, const Texture* texture) const
 	{
-		for (const auto& [index, texSamp] : texSamps | std::views::enumerate)
+		BindTexture(index, texture, texture->GetSampler());
+	}
+
+	void Material::BindTextures(std::span<const Texture* const> texSamps) const
+	{
+		for (const auto& [index, texture] : texSamps | std::views::enumerate)
 		{
-			const auto& [texture, sampler] = texSamp;
-			BindTexture(static_cast<uint32_t>(index), texture, sampler);
+			BindTexture(static_cast<uint32_t>(index), texture);
 		}
 	}
 

@@ -22,11 +22,11 @@ namespace Game {
 			   const Material* material,
 			   const vec3& position,
 			   const vec3& scale,
-			   const std::vector<std::tuple<const Texture*, const Sampler*>>& textures);
+			   const std::span<const Texture*>& textures);
 
 		const Mesh* GetMesh() const;
 		const Material* GetMaterial() const;
-		std::span<const std::tuple<const Texture*, const Sampler*>> GetTextures() const;
+		std::span<const Texture* const> GetTextures() const;
 		const Sampler* GetSampler() const;
 		const Transform& GetTransform() const;
 
@@ -36,7 +36,7 @@ namespace Game {
 	private:
 		const Mesh* m_Mesh;
 		const Material* m_Material;
-		std::vector<std::tuple<const Texture*, const Sampler*>> m_Textures;
+		std::vector<const Texture*> m_Textures;
 		const Sampler* m_Sampler;
 		Transform m_Transform;
 	};

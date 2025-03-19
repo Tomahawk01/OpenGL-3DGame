@@ -12,6 +12,7 @@
 namespace Game {
 
 	class TLVReader;
+	class Sampler;
 
 	enum class TextureUsage
 	{
@@ -39,15 +40,17 @@ namespace Game {
 	class Texture
 	{
 	public:
-		Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height);
-		Texture(const TextureDescription& description);
-		Texture(const TLVReader& reader, std::string_view name);
+		Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height, const Sampler* sampler);
+		Texture(const TextureDescription& description, const Sampler* sampler);
+		Texture(const TLVReader& reader, std::string_view name, const Sampler* sampler);
 		Texture(TextureUsage usage, uint32_t width, uint32_t height);
 
 		::GLuint GetNativeHandle() const;
+		const Sampler* GetSampler() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;
+		const Sampler* m_Sampler;
 	};
 
 }
