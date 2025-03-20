@@ -34,6 +34,11 @@ namespace Game {
 		return m_Transform;
 	}
 
+	vec3 Entity::GetPosition() const
+	{
+		return m_Transform.Position;
+	}
+
 	void Entity::SetPosition(const vec3& position)
 	{
 		m_Transform.Position = position;
@@ -42,6 +47,11 @@ namespace Game {
 	void Entity::SetRotation(const quat& rotation)
 	{
 		m_Transform.Rotation = rotation;
+	}
+
+	void Entity::Translate(const vec3& translation)
+	{
+		m_Transform.Position += translation;
 	}
 
 }

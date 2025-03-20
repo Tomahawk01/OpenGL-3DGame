@@ -30,8 +30,10 @@ namespace Game {
 		const Sampler* GetSampler() const;
 		const Transform& GetTransform() const;
 
+		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
 		void SetRotation(const quat& rotation);
+		void Translate(const vec3& translation);
 
 	private:
 		const Mesh* m_Mesh;

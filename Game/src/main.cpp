@@ -15,6 +15,7 @@
 #include "Renderer/Camera.h"
 #include "TLV/TLVReader.h"
 
+#include "Game/Transforms.h"
 #include "Game/StaticObjectTransformer.h"
 #include "Game/CameraObjectTransformer.h"
 #include "Game/InverseCameraObjectTransformer.h"
@@ -28,10 +29,26 @@
 #include <unordered_map>
 #include <random>
 
+struct GameTransformState
+{
+	const Game::Camera& camera;
+	Game::vec3 lastCameraPos;
+};
+
+constexpr auto CameraDelta = [](const Game::vec3& in, const Game::State<GameTransformState>& state) -> Game::TransformerResult
+{
+	return { in + (state.state.camera.GetPosition() - state.state.lastCameraPos) };
+};
+
+constexpr auto Invert = [](const Game::vec3& in, const Game::State<GameTransformState>&) -> Game::TransformerResult
+{
+	return { -in };
+};
+
 struct TransformedEntity
 {
 	Game::Entity entity;
-	std::unique_ptr<Game::ObjectTransformer> transformer;
+	std::unique_ptr<Game::ChainBase<GameTransformState>> transformerChain;
 };
 
 int main(int argc, char** argv)
@@ -96,14 +113,14 @@ int main(int argc, char** argv)
 
 		std::vector<TransformedEntity> entities{};
 		entities.emplace_back(
-			Game::Entity{ &mesh, &material, {-5.0f, 0.0f, 0.0f}, {1.0f}, textures },
-			std::make_unique<Game::InverseCameraObjectTransformer>(Game::vec3{ -5.0f, 0.0f, 0.0f }, camera));
-		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {}, {1.0f}, textures },
-			std::make_unique<Game::StaticObjectTransformer>(Game::vec3{}));
+			std::make_unique<Game::Chain<GameTransformState>>());
 		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {5.0f, 0.0f, 0.0f}, {1.0f}, textures },
-			std::make_unique<Game::CameraObjectTransformer>(Game::vec3{ 5.0f, 0.0f, 0.0f }, camera));
+			std::make_unique<Game::Chain<GameTransformState, CameraDelta>>());
+		entities.emplace_back(
+			Game::Entity{ &mesh, &material, {-5.0f, 0.0f, 0.0f}, {1.0f}, textures },
+			std::make_unique<Game::Chain<GameTransformState, CameraDelta, Invert>>());
 
 		Game::Scene scene{
 			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
@@ -152,6 +169,8 @@ int main(int argc, char** argv)
 
 		bool showDebug = false;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
+
+		Game::State<GameTransformState> state{ .state = {camera, camera.GetPosition()} };
 
 		bool running = true;
 		while (running)
@@ -229,11 +248,10 @@ int main(int argc, char** argv)
 			{
 				auto& [entity, transformer] = transformedEntity;
 
-				transformer->Update();
-
-				const Game::vec3 position = transformer->Position();
-
-				entity.SetPosition(position);
+				const Game::vec3 entityDelta = transformer->Go({}, state);
+				entity.Translate(entityDelta);
+				
+				const auto position = entity.GetPosition();
 				light.position = { position.x, 5.0f, position.z };
 			}
 
@@ -243,6 +261,8 @@ int main(int argc, char** argv)
 				debugUI.Render();
 
 			window.Swap();
+
+			state.state.lastCameraPos = camera.GetPosition();
 		}
 	}
 	catch (const Game::Exception& err)
