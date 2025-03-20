@@ -9,7 +9,6 @@ out vec4 frag_color;
 
 uniform sampler2D tex0;
 uniform sampler2D tex1;
-uniform sampler2D tex2;
 
 layout(std140, binding = 0) uniform camera
 {
@@ -52,7 +51,7 @@ vec3 calc_point(int index)
 	vec3 point_color = points[index].point_color;
 	vec3 attenuation = points[index].attenuation;
 
-	vec3 n = texture(tex2, tex_coord).xyz;
+	vec3 n = texture(tex1, tex_coord).xyz;
 	n = n * 2.0 - 1.0;
 	n = normalize(tbn * n);
 
@@ -63,7 +62,7 @@ vec3 calc_point(int index)
 	float diff = max(dot(n, light_dir), 0.0);
 
 	vec3 reflect_dir = reflect(-light_dir, n);
-	float spec = pow(max(dot(normalize(eye - frag_position.xyz), reflect_dir), 0.0), 32) * texture(tex1, tex_coord).r;
+	float spec = pow(max(dot(normalize(eye - frag_position.xyz), reflect_dir), 0.0), 32) * texture(tex0, tex_coord).r;
 
 	return ((diff + spec) * att) * point_color;
 }
