@@ -15,10 +15,7 @@
 #include "Renderer/Camera.h"
 #include "TLV/TLVReader.h"
 
-#include "Game/Transforms.h"
-#include "Game/StaticObjectTransformer.h"
-#include "Game/CameraObjectTransformer.h"
-#include "Game/InverseCameraObjectTransformer.h"
+#include "Game/Chain.h"
 
 #include <iostream>
 #include <print>
@@ -35,12 +32,12 @@ struct GameTransformState
 	Game::vec3 lastCameraPos;
 };
 
-constexpr auto CameraDelta = [](const Game::vec3& in, const Game::State<GameTransformState>& state) -> Game::TransformerResult
+constexpr auto CameraDelta = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
 {
-	return { in + (state.state.camera.GetPosition() - state.state.lastCameraPos) };
+	return { in + (state.camera.GetPosition() - state.lastCameraPos) };
 };
 
-constexpr auto Invert = [](const Game::vec3& in, const Game::State<GameTransformState>&) -> Game::TransformerResult
+constexpr auto Invert = [](const Game::vec3& in, const GameTransformState&) -> Game::TransformerResult
 {
 	return { -in };
 };
@@ -170,7 +167,7 @@ int main(int argc, char** argv)
 		bool showDebug = false;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
 
-		Game::State<GameTransformState> state{ .state = {camera, camera.GetPosition()} };
+		GameTransformState state{ camera, camera.GetPosition() };
 
 		bool running = true;
 		while (running)
@@ -262,7 +259,7 @@ int main(int argc, char** argv)
 
 			window.Swap();
 
-			state.state.lastCameraPos = camera.GetPosition();
+			state.lastCameraPos = camera.GetPosition();
 		}
 	}
 	catch (const Game::Exception& err)
