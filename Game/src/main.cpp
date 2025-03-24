@@ -16,6 +16,8 @@
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
+#include "Game/AABB.h"
+#include "Game/FrustumPlane.h"
 
 #include <iostream>
 #include <print>
@@ -26,26 +28,109 @@
 #include <unordered_map>
 #include <random>
 
-struct GameTransformState
-{
-	const Game::Camera& camera;
-	Game::vec3 lastCameraPos;
-};
+namespace {
 
-constexpr auto CameraDelta = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
-{
-	return { in + (state.camera.GetPosition() - state.lastCameraPos) };
-};
+	std::array<Game::FrustumPlane, 6u> CalculateFrustumPlanes(const Game::Camera& camera)
+	{
+		std::array<Game::FrustumPlane, 6u> planes{};
 
-constexpr auto Invert = [](const Game::vec3& in, const GameTransformState&) -> Game::TransformerResult
-{
-	return { -in };
-};
+		const Game::mat4 viewProj = Game::mat4{ camera.GetProjection() } * Game::mat4{ camera.GetView() };
 
-struct TransformedEntity
-{
-	Game::Entity entity;
-	std::unique_ptr<Game::ChainBase<GameTransformState>> transformerChain;
+		for (const auto& [index, plane] : planes | std::views::enumerate)
+		{
+			auto row = viewProj.Row(3u);
+
+			if (index % 2 == 0)
+				row += viewProj.Row(index / 2);
+			else
+				row -= viewProj.Row(index / 2);
+
+			const Game::vec3 normal{ row };
+			const float distance = normal.Length();
+
+			plane = Game::FrustumPlane{ normal, distance };
+		}
+
+		return planes;
+	}
+
+	bool IntersectsFrustum(const Game::AABB& aabb, const std::array<Game::FrustumPlane, 6u>& planes)
+	{
+		for (const auto& plane : planes)
+		{
+			Game::vec3 posVec = aabb.min;
+			Game::vec3 negVec = aabb.max;
+
+			if (plane.normal.x >= 0.0f)
+			{
+				posVec.x = aabb.max.x;
+				negVec.x = aabb.min.x;
+			}
+			else
+			{
+				posVec.x = aabb.min.x;
+				negVec.x = aabb.max.x;
+			}
+			if (plane.normal.y >= 0.0f)
+			{
+				posVec.y = aabb.max.y;
+				negVec.y = aabb.min.y;
+			}
+			else
+			{
+				posVec.y = aabb.min.y;
+				negVec.y = aabb.max.y;
+			}
+			if (plane.normal.z >= 0.0f)
+			{
+				posVec.z = aabb.max.z;
+				negVec.z = aabb.min.z;
+			}
+			else
+			{
+				posVec.z = aabb.min.z;
+				negVec.z = aabb.max.z;
+			}
+
+			if (Game::vec3::Dot(plane.normal, negVec) + plane.distance > 0.0f)
+				return false;
+			if (Game::vec3::Dot(plane.normal, posVec) + plane.distance > 0.0f)
+				return true;
+		}
+
+		return true;
+	}
+
+	struct GameTransformState
+	{
+		const Game::Camera& camera;
+		Game::AABB aabb;
+		Game::vec3 lastCameraPos;
+	};
+
+	constexpr auto CameraDelta = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
+	{
+		return { in + (state.camera.GetPosition() - state.lastCameraPos) };
+	};
+
+	constexpr auto Invert = [](const Game::vec3& in, const GameTransformState&) -> Game::TransformerResult
+	{
+		return { -in };
+	};
+
+	constexpr auto CheckVisible = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
+	{
+		const auto planes = CalculateFrustumPlanes(state.camera);
+		return { in, !IntersectsFrustum(state.aabb, planes) };
+	};
+
+	struct TransformedEntity
+	{
+		Game::Entity entity;
+		Game::AABB boundingBox;
+		std::unique_ptr<Game::ChainBase<GameTransformState>> transformerChain;
+	};
+
 };
 
 int main(int argc, char** argv)
@@ -111,13 +196,16 @@ int main(int argc, char** argv)
 		std::vector<TransformedEntity> entities{};
 		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {}, {1.0f}, textures },
+			Game::AABB{ {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f} },
 			std::make_unique<Game::Chain<GameTransformState>>());
 		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {5.0f, 0.0f, 0.0f}, {1.0f}, textures },
-			std::make_unique<Game::Chain<GameTransformState, CameraDelta>>());
+			Game::AABB{ {3.0f, -1.0f, -1.0f}, {5.0f, 1.0f, 1.0f} },
+			std::make_unique<Game::Chain<GameTransformState, CheckVisible, CameraDelta>>());
 		entities.emplace_back(
 			Game::Entity{ &mesh, &material, {-5.0f, 0.0f, 0.0f}, {1.0f}, textures },
-			std::make_unique<Game::Chain<GameTransformState, CameraDelta, Invert>>());
+			Game::AABB{ {-6.0f, -1.0f, -1.0f}, {-4.0f, 1.0f, 1.0f} },
+			std::make_unique<Game::Chain<GameTransformState, CheckVisible, CameraDelta, Invert>>());
 
 		Game::Scene scene{
 			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
@@ -167,7 +255,7 @@ int main(int argc, char** argv)
 		bool showDebug = false;
 		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
 
-		GameTransformState state{ camera, camera.GetPosition() };
+		GameTransformState state{ camera, {}, camera.GetPosition() };
 
 		bool running = true;
 		while (running)
@@ -241,16 +329,50 @@ int main(int argc, char** argv)
 			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
 			camera.Translate(velocity);
 
+			std::vector<Game::LineData> debugLineData{};
+
 			for (const auto& [transformedEntity, light] : std::views::zip(entities, scene.pointLights))
 			{
-				auto& [entity, transformer] = transformedEntity;
+				auto& [entity, aabb, transformer] = transformedEntity;
 
+				state.aabb = aabb;
 				const Game::vec3 entityDelta = transformer->Go({}, state);
 				entity.Translate(entityDelta);
+				aabb.min += entityDelta;
+				aabb.max += entityDelta;
 				
 				const auto position = entity.GetPosition();
 				light.position = { position.x, 5.0f, position.z };
+
+				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+
+				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+
+				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
 			}
+
+			scene.debugLines = Game::DebugLines{ debugLineData };
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 
