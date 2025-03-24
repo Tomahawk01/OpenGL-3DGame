@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vector4.h"
+
 #include <cmath>
 #include <format>
 
@@ -19,13 +21,22 @@ namespace Game {
 			: x(x), y(y), z(z)
 		{}
 
+		constexpr vec3(const vec4& v)
+			: vec3(v.x, v.y, v.z)
+		{}
+
+		float Length() const
+		{
+			return std::hypot(x, y, z);
+		}
+
 		static vec3 Normalize(const vec3& v)
 		{
-			const float length = std::hypot(v.x, v.y, v.z);
-			if (length == 0.0f)
+			const float l = v.Length();
+			if (l == 0.0f)
 				return {};
 
-			return { v.x / length, v.y / length, v.z / length };
+			return { v.x / l, v.y / l, v.z / l };
 		}
 
 		static constexpr vec3 Cross(const vec3& v1, const vec3& v2)
@@ -35,6 +46,11 @@ namespace Game {
 			const float k = (v1.x * v2.y) - (v1.y * v2.x);
 
 			return { i, -j, k };
+		}
+
+		static constexpr float Dot(const vec3& v1, const vec3& v2)
+		{
+			return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 		}
 
 		constexpr bool operator==(const vec3&) const = default;

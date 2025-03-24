@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Vector4.h"
 #include "Quaternion.h"
+#include "Utilities/Error.h"
 
 #include <array>
 #include <format>
@@ -23,9 +25,12 @@ namespace Game {
 			})
 		{}
 
-		constexpr mat4(const std::array<float, 16u>& elements)
-			: m_Elements(elements)
-		{}
+		mat4(const std::span<const float>& elements)
+			: mat4{}
+		{
+			Ensure(elements.size() == 16u, "Not enough elements");
+			std::memcpy(m_Elements.data(), elements.data(), elements.size_bytes());
+		}
 
 		constexpr mat4(const vec3& translation)
 			: m_Elements({
@@ -77,6 +82,13 @@ namespace Game {
 		constexpr std::span<const float> data() const { return m_Elements; }
 
 		constexpr float& operator[](this auto&& self, size_t index) { return self.m_Elements[index]; }
+
+		vec4 Row(size_t index) const
+		{
+			Ensure(index <= 3, "Index out of range");
+
+			return { m_Elements[index], m_Elements[index + 4u], m_Elements[index + 8u], m_Elements[index + 12u] };
+		}
 
 		friend constexpr mat4& operator*=(mat4& m1, const mat4& m2);
 
