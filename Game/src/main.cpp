@@ -30,72 +30,20 @@
 
 namespace {
 
-	std::array<Game::FrustumPlane, 6u> CalculateFrustumPlanes(const Game::Camera& camera)
-	{
-		std::array<Game::FrustumPlane, 6u> planes{};
-
-		const Game::mat4 viewProj = Game::mat4{ camera.GetProjection() } * Game::mat4{ camera.GetView() };
-
-		for (const auto& [index, plane] : planes | std::views::enumerate)
-		{
-			auto row = viewProj.Row(3u);
-
-			if (index % 2 == 0)
-				row += viewProj.Row(index / 2);
-			else
-				row -= viewProj.Row(index / 2);
-
-			const Game::vec3 normal{ row };
-			const float distance = normal.Length();
-
-			plane = Game::FrustumPlane{ normal, distance };
-		}
-
-		return planes;
-	}
-
 	bool IntersectsFrustum(const Game::AABB& aabb, const std::array<Game::FrustumPlane, 6u>& planes)
 	{
 		for (const auto& plane : planes)
 		{
-			Game::vec3 posVec = aabb.min;
-			Game::vec3 negVec = aabb.max;
+			Game::vec3 positiveVertex = aabb.min;
+			if (plane.normal.x >= 0)
+				positiveVertex.x = aabb.max.x;
+			if (plane.normal.y >= 0)
+				positiveVertex.y = aabb.max.y;
+			if (plane.normal.z >= 0)
+				positiveVertex.z = aabb.max.z;
 
-			if (plane.normal.x >= 0.0f)
-			{
-				posVec.x = aabb.max.x;
-				negVec.x = aabb.min.x;
-			}
-			else
-			{
-				posVec.x = aabb.min.x;
-				negVec.x = aabb.max.x;
-			}
-			if (plane.normal.y >= 0.0f)
-			{
-				posVec.y = aabb.max.y;
-				negVec.y = aabb.min.y;
-			}
-			else
-			{
-				posVec.y = aabb.min.y;
-				negVec.y = aabb.max.y;
-			}
-			if (plane.normal.z >= 0.0f)
-			{
-				posVec.z = aabb.max.z;
-				negVec.z = aabb.min.z;
-			}
-			else
-			{
-				posVec.z = aabb.min.z;
-				negVec.z = aabb.max.z;
-			}
-
-			if (Game::vec3::Dot(plane.normal, negVec) + plane.distance > 0.0f)
+			if (Game::vec3::Dot(plane.normal, positiveVertex) + plane.distance > 0.0f)
 				return false;
-			if (Game::vec3::Dot(plane.normal, posVec) + plane.distance > 0.0f)
-				return true;
 		}
 
 		return true;
@@ -120,7 +68,7 @@ namespace {
 
 	constexpr auto CheckVisible = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
 	{
-		const auto planes = CalculateFrustumPlanes(state.camera);
+		const auto planes = state.camera.FrustumPlanes();
 		return { in, !IntersectsFrustum(state.aabb, planes) };
 	};
 

@@ -3,6 +3,9 @@
 #include "Math/Matrix4.h"
 #include "Math/Vector3.h"
 
+#include "Game/FrustumPlane.h"
+
+#include <array>
 #include <span>
 
 namespace Game {
@@ -20,14 +23,21 @@ namespace Game {
 		void Translate(const vec3& translation);
 		vec3 RightVector() const;
 
+		void AddYaw(float value);
+		void AddPitch(float value);
+
+		std::array<Game::FrustumPlane, 6u> FrustumPlanes() const;
+
 		std::span<const float> GetView() const;
 		std::span<const float> GetProjection() const;
 		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
 		vec3 GetDirection() const;
-
-		void AddYaw(float value);
-		void AddPitch(float value);
+		float GetFOV() const;
+		float GetWidth() const;
+		float GetHeight() const;
+		float GetNearPlane() const;
+		float GetFarPlane() const;
 
 	private:
 		mat4 m_View;
@@ -39,6 +49,12 @@ namespace Game {
 
 		float m_Pitch;
 		float m_Yaw;
+
+		float m_Fov;
+		float m_Width;
+		float m_Height;
+		float m_NearPlane;
+		float m_FarPlane;
 	};
 
 }
