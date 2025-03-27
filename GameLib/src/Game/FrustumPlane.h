@@ -2,6 +2,8 @@
 
 #include "Math/Vector3.h"
 
+#include <format>
+
 namespace Game {
 
 	struct FrustumPlane
@@ -11,3 +13,17 @@ namespace Game {
 	};
 
 }
+
+template<>
+struct std::formatter<Game::FrustumPlane>
+{
+	constexpr auto parse(std::format_parse_context& ctx)
+	{
+		return std::begin(ctx);
+	}
+
+	auto format(const Game::FrustumPlane& obj, std::format_context& ctx) const
+	{
+		return std::format_to(ctx.out(), "normal={} distance={}", obj.normal, obj.distance);
+	}
+};
