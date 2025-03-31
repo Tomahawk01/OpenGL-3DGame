@@ -13,6 +13,7 @@
 #include "Renderer/Mesh.h"
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
+#include "Renderer/WireframeRenderer.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
@@ -205,6 +206,8 @@ int main(int argc, char** argv)
 
 		GameTransformState state{ camera, {}, camera.GetPosition() };
 
+		Game::WireframeRenderer wireframeRenderer{};
+
 		bool running = true;
 		while (running)
 		{
@@ -277,8 +280,6 @@ int main(int argc, char** argv)
 			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
 			camera.Translate(velocity);
 
-			std::vector<Game::LineData> debugLineData{};
-
 			for (const auto& [transformedEntity, light] : std::views::zip(entities, scene.pointLights))
 			{
 				auto& [entity, aabb, transformer] = transformedEntity;
@@ -289,38 +290,13 @@ int main(int argc, char** argv)
 				aabb.min += entityDelta;
 				aabb.max += entityDelta;
 				
+				wireframeRenderer.Draw(aabb);
+
 				const auto position = entity.GetPosition();
 				light.position = { position.x, 5.0f, position.z };
-
-				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-
-				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-
-				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-				debugLineData.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
 			}
 
-			scene.debugLines = Game::DebugLines{ debugLineData };
+			scene.debugLines = { wireframeRenderer.yield() };
 
 			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
 
