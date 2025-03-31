@@ -1,0 +1,24 @@
+#pragma once
+
+#include "Camera.h"
+#include "LineData.h"
+
+#include "Game/AABB.h"
+
+#include <vector>
+
+namespace Game {
+
+	class WireframeRenderer
+	{
+	public:
+		void Draw(const Camera& camera);
+		void Draw(const AABB& aabb);
+
+		std::vector<LineData> yield();
+
+	private:
+		std::vector<LineData> m_Lines;
+	};
+
+}
