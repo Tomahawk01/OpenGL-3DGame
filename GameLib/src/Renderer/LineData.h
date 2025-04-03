@@ -25,6 +25,6 @@ struct std::formatter<Game::LineData>
 
 	auto format(const Game::LineData& obj, std::format_context& ctx) const
 	{
-		return std::format_to(ctx.out(), "p={} c={}", obj.position, obj.color);
+		return std::format_to(ctx.out(), "p=[{}] c=[{}]", obj.position, obj.color);
 	}
 };
