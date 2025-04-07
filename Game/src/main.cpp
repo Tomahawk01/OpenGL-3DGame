@@ -296,14 +296,6 @@ int main(int argc, char** argv)
 				light.position = { position.x, 5.0f, position.z };
 			}
 
-			/*const std::array<Game::FrustumPlane, 6u> planes{{
-				{ .normal = {0.0f, 0.0f, -1.0f}, .distance = 1.0f },
-				{ .normal = {0.0f, 0.0f, 1.0f}, .distance = 1.0f },
-				{ .normal = {1.0f, 0.0f, 0.0f}, .distance = 1.0f },
-				{ .normal = {-1.0f, 0.0f, 0.0f}, .distance = 1.0f },
-				{ .normal = {0.0f, 1.0f, 0.0f}, .distance = 1.0f },
-				{ .normal = {0.0f, -1.0f, 0.0f}, .distance = 1.0f }
-			}};*/
 			wireframeRenderer.Draw(camera);
 
 			scene.debugLines = { wireframeRenderer.yield() };

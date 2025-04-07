@@ -40,52 +40,6 @@ namespace Game {
 		Draw(corners[3], corners[7], connectColor);
 	}
 
-	void WireframeRenderer::Draw(const std::array<FrustumPlane, 6u>& planes)
-	{
-		const FrustumPlane& near = planes[0];
-		const FrustumPlane& far = planes[1];
-		const FrustumPlane& left = planes[2];
-		const FrustumPlane& right = planes[3];
-		const FrustumPlane& bottom = planes[4];
-		const FrustumPlane& top = planes[5];
-
-		const vec3 near_left_top = Intersection(near, left, top);
-		const vec3 near_right_top = Intersection(near, right, top);
-		const vec3 near_left_bottom = Intersection(near, left, bottom);
-		const vec3 near_right_bottom = Intersection(near, right, bottom);
-		const vec3 far_left_top = Intersection(far, left, top);
-		const vec3 far_right_top = Intersection(far, right, top);
-		const vec3 far_left_bottom = Intersection(far, left, bottom);
-		const vec3 far_right_bottom = Intersection(far, right, bottom);
-
-		m_Lines.push_back({ near_left_top, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_right_top, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_right_top, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_right_bottom, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_right_bottom, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_left_bottom, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_left_bottom, { 1.0f, 0.0f, 1.0f } });
-		m_Lines.push_back({ near_left_top, { 1.0f, 0.0f, 1.0f } });
-
-		m_Lines.push_back({ near_left_top, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ far_left_top, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ near_right_top, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ far_right_top, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ near_right_bottom, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ far_right_bottom, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ near_left_bottom, { 1.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ far_left_bottom, { 1.0f, 1.0f, 0.0f } });
-
-		m_Lines.push_back({ far_left_top, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_right_top, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_right_top, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_right_bottom, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_right_bottom, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_left_bottom, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_left_bottom, { 1.0f, 0.0f, 0.0f } });
-		m_Lines.push_back({ far_left_top, { 1.0f, 0.0f, 0.0f } });
-	}
-
 	void WireframeRenderer::Draw(const AABB& aabb)
 	{
 		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
