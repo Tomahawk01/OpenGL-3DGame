@@ -1,9 +1,5 @@
 #include "WireframeRenderer.h"
 
-#include "Math/Matrix3.h"
-#include "Math/Matrix4.h"
-#include "Math/Vector3.h"
-
 #include "FrustumPlane.h"
 
 #include <ranges>
@@ -42,32 +38,20 @@ namespace Game {
 
 	void WireframeRenderer::Draw(const AABB& aabb)
 	{
-		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+		Draw({ aabb.max.x, aabb.max.y, aabb.max.z }, { aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.min.x, aabb.max.y, aabb.max.z }, { aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.min.x, aabb.max.y, aabb.min.z }, { aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.max.x, aabb.max.y, aabb.min.z }, { aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
 
-		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
+		Draw({ aabb.max.x, aabb.max.y, aabb.max.z }, { aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.min.x, aabb.max.y, aabb.max.z }, { aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.min.x, aabb.max.y, aabb.min.z }, { aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.max.x, aabb.max.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
 
-		m_Lines.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f } });
-		m_Lines.push_back({ {aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f } });
+		Draw({ aabb.max.x, aabb.min.y, aabb.max.z }, { aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.min.x, aabb.min.y, aabb.max.z }, { aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.min.x, aabb.min.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
+		Draw({ aabb.max.x, aabb.min.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
 	}
 
 	std::vector<LineData> WireframeRenderer::yield()
