@@ -81,7 +81,7 @@ namespace Game {
 
 		constexpr std::span<const float> data() const { return m_Elements; }
 
-		constexpr float& operator[](this auto&& self, size_t index) { return self.m_Elements[index]; }
+		constexpr auto& operator[](this auto&& self, size_t index) { return self.m_Elements[index]; }
 
 		vec4 Row(size_t index) const
 		{
@@ -106,11 +106,12 @@ namespace Game {
 		{
 			for (auto j = 0u; j < 4u; j++)
 			{
-				result.m_Elements[i + j * 4] = 0.0f;
+				auto sum = 0.0f;
 				for (auto k = 0u; k < 4u; k++)
 				{
-					result.m_Elements[i + j * 4] += m1.m_Elements[i + k * 4] * m2.m_Elements[k + j * 4];
+					sum += m1.m_Elements[i + k * 4] * m2.m_Elements[k + j * 4];
 				}
+				result.m_Elements[i + j * 4] = sum;
 			}
 		}
 

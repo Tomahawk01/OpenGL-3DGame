@@ -43,7 +43,7 @@ namespace {
 			if (plane.normal.z >= 0)
 				positiveVertex.z = aabb.max.z;
 
-			if (Game::vec3::Dot(plane.normal, positiveVertex) + plane.distance > 0.0f)
+			if (Game::vec3::Dot(plane.normal, positiveVertex) + plane.distance < 0.0f)
 				return false;
 		}
 

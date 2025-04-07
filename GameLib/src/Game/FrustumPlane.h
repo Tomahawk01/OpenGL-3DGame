@@ -9,6 +9,15 @@ namespace Game {
 
 	struct FrustumPlane
 	{
+		FrustumPlane() = default;
+
+		FrustumPlane(float a, float b, float c, float d)
+		{
+			const float invLength = 1.0f / std::hypot(a, b, c);
+			normal = vec3(a * invLength, b * invLength, c * invLength);
+			distance = d * invLength;
+		}
+
 		vec3 normal;
 		float distance;
 	};

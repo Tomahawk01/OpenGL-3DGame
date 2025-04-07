@@ -13,12 +13,6 @@ namespace {
 		});
 	}
 
-	Game::FrustumPlane ToPlane(const Game::vec3& p, const Game::vec3& n)
-	{
-		const auto normal = Game::vec3::Normalize(n);
-		return { normal, Game::vec3::Dot(normal, p)};
-	}
-
 }
 
 namespace Game {
@@ -77,19 +71,18 @@ namespace Game {
 
 	std::array<FrustumPlane, 6u> Camera::FrustumPlanes() const
 	{
-		const float halfVSide{ GetFarPlane() * std::tan(GetFOV() * 0.5f) };
-		const float halfHSide{ halfVSide * (GetWidth() / GetHeight()) };
-		const vec3 frontMultFar{ GetDirection() * GetFarPlane() };
-		const vec3 up{ 0.0f, 1.0f, 0.0f };
+		std::array<FrustumPlane, 6u> planes{};
 
-		return {
-			ToPlane(GetPosition() + GetNearPlane() * GetDirection(), GetDirection()),
-			ToPlane(GetPosition() + frontMultFar, -GetDirection()),
-			ToPlane(GetPosition(), vec3::Cross(frontMultFar - Right() * halfHSide, up)),
-			ToPlane(GetPosition(), vec3::Cross(up, frontMultFar + Right() * halfHSide)),
-			ToPlane(GetPosition(), vec3::Cross(Right(), frontMultFar - up * halfVSide)),
-			ToPlane(GetPosition(), vec3::Cross(frontMultFar + up * halfVSide, Right()))
-		};
+		const mat4 viewProj{ m_Projection * m_View };
+
+		return {{
+			{viewProj[3] - viewProj[2], viewProj[7] - viewProj[6], viewProj[11] - viewProj[10], viewProj[15] - viewProj[14]},
+			{viewProj[3] + viewProj[2], viewProj[7] + viewProj[6], viewProj[11] + viewProj[10], viewProj[15] + viewProj[14]},
+			{viewProj[3] + viewProj[0], viewProj[7] + viewProj[4], viewProj[11] + viewProj[8], viewProj[15] + viewProj[12]},
+			{viewProj[3] - viewProj[0], viewProj[7] - viewProj[4], viewProj[11] - viewProj[8], viewProj[15] - viewProj[12]},
+			{viewProj[3] + viewProj[1], viewProj[7] + viewProj[5], viewProj[11] + viewProj[9], viewProj[15] + viewProj[13]},
+			{viewProj[3] - viewProj[1], viewProj[7] - viewProj[5], viewProj[11] - viewProj[9], viewProj[15] - viewProj[13]}
+		}};
 	}
 
 	std::array<vec3, 8u> Camera::FrustumCorners() const
