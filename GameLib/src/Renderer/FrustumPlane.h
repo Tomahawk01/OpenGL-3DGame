@@ -10,25 +10,11 @@ namespace Game {
 	struct FrustumPlane
 	{
 		FrustumPlane() = default;
-
-		FrustumPlane(float a, float b, float c, float d)
-		{
-			const float invLength = 1.0f / std::hypot(a, b, c);
-			normal = vec3(a * invLength, b * invLength, c * invLength);
-			distance = d * invLength;
-		}
+		FrustumPlane(float a, float b, float c, float d);
 
 		vec3 normal;
 		float distance;
 	};
-
-	inline vec3 Intersection(const FrustumPlane& p1, const FrustumPlane& p2, const FrustumPlane& p3)
-	{
-		const mat3 a{ p1.normal, p2.normal, p3.normal };
-		const vec3 b{ -p1.distance, -p2.distance, -p3.distance };
-
-		return mat3::Invert(a) * b;
-	}
 
 }
 

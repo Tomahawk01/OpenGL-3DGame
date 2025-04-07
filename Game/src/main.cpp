@@ -14,11 +14,11 @@
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/WireframeRenderer.h"
+#include "Renderer/FrustumPlane.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
 #include "Game/AABB.h"
-#include "Game/FrustumPlane.h"
 
 #include <iostream>
 #include <print>
