@@ -34,6 +34,7 @@ namespace Game {
 		, m_Position(position)
 		, m_Direction(lookAt)
 		, m_Up(up)
+		, m_Right(vec3::Normalize(vec3::Cross(m_Direction, m_Up)))
 		, m_Pitch{}
 		, m_Yaw{ -std::numbers::pi_v<float> / 2.0f }
 		, m_Fov(fov)
@@ -50,15 +51,15 @@ namespace Game {
 		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
 	}
 
-	vec3 Camera::RightVector() const
-	{
-		return vec3::Normalize(vec3::Cross(m_Direction, m_Up));
-	}
-
 	void Camera::AddYaw(float value)
 	{
 		m_Yaw += value;
 		m_Direction = CreateDirection(m_Pitch, m_Yaw);
+
+		const vec3 worldUp{ 0.0f, 1.0f, 0.0f };
+		m_Right = vec3::Normalize(vec3::Cross(m_Direction, worldUp));
+		m_Up = vec3::Normalize(vec3::Cross(m_Right, m_Direction));
+
 		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
 	}
 
@@ -66,24 +67,61 @@ namespace Game {
 	{
 		m_Pitch += value;
 		m_Direction = CreateDirection(m_Pitch, m_Yaw);
+
+		const vec3 worldUp{ 0.0f, 1.0f, 0.0f };
+		m_Right = vec3::Normalize(vec3::Cross(m_Direction, worldUp));
+		m_Up = vec3::Normalize(vec3::Cross(m_Right, m_Direction));
+
 		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
 	}
 
-	std::array<Game::FrustumPlane, 6u> Camera::FrustumPlanes() const
+	std::array<FrustumPlane, 6u> Camera::FrustumPlanes() const
 	{
 		const float halfVSide{ GetFarPlane() * std::tan(GetFOV() * 0.5f) };
 		const float halfHSide{ halfVSide * (GetWidth() / GetHeight()) };
-		const Game::vec3 frontMultFar{ GetDirection() * GetFarPlane() };
-		const Game::vec3 up{ 0.0f, 1.0f, 0.0f };
+		const vec3 frontMultFar{ GetDirection() * GetFarPlane() };
+		const vec3 up{ 0.0f, 1.0f, 0.0f };
 
 		return {
 			ToPlane(GetPosition() + GetNearPlane() * GetDirection(), GetDirection()),
 			ToPlane(GetPosition() + frontMultFar, -GetDirection()),
-			ToPlane(GetPosition(), Game::vec3::Cross(frontMultFar - RightVector() * halfHSide, up)),
-			ToPlane(GetPosition(), Game::vec3::Cross(up, frontMultFar + RightVector() * halfHSide)),
-			ToPlane(GetPosition(), Game::vec3::Cross(RightVector(), frontMultFar - up * halfVSide)),
-			ToPlane(GetPosition(), Game::vec3::Cross(frontMultFar + up * halfVSide, RightVector()))
+			ToPlane(GetPosition(), vec3::Cross(frontMultFar - Right() * halfHSide, up)),
+			ToPlane(GetPosition(), vec3::Cross(up, frontMultFar + Right() * halfHSide)),
+			ToPlane(GetPosition(), vec3::Cross(Right(), frontMultFar - up * halfVSide)),
+			ToPlane(GetPosition(), vec3::Cross(frontMultFar + up * halfVSide, Right()))
 		};
+	}
+
+	std::array<vec3, 8u> Camera::FrustumCorners() const
+	{
+		std::array<vec3, 8u> corners{};
+
+		const float tanHalfFOV{ std::tan(m_Fov / 2.0f) };
+		const float aspect{ m_Width / m_Height };
+
+		const float nearHeight{ 2.0f * tanHalfFOV * m_NearPlane };
+		const float nearWidth{ nearHeight * aspect };
+
+		const float farHeight{ 2.0f * tanHalfFOV * m_FarPlane };
+		const float farWidth{ farHeight * aspect };
+
+		const vec3 forward{ vec3::Normalize(m_Direction) };
+		const vec3 right{ vec3::Normalize(vec3::Cross(forward, m_Up)) };
+		const vec3 up{ vec3::Normalize(vec3::Cross(right, forward)) };
+
+		const vec3 nearCenter{ m_Position + m_Direction * m_NearPlane };
+		corners[0] = nearCenter + up * (nearHeight / 2.0f) - right * (nearWidth / 2.0f);
+		corners[1] = nearCenter + up * (nearHeight / 2.0f) + right * (nearWidth / 2.0f);
+		corners[2] = nearCenter - up * (nearHeight / 2.0f) + right * (nearWidth / 2.0f);
+		corners[3] = nearCenter - up * (nearHeight / 2.0f) - right * (nearWidth / 2.0f);
+
+		const vec3 farCenter{ m_Position + m_Direction * m_FarPlane };
+		corners[4] = farCenter + up * (farHeight / 2.0f) - right * (farWidth / 2.0f);
+		corners[5] = farCenter + up * (farHeight / 2.0f) + right * (farWidth / 2.0f);
+		corners[6] = farCenter - up * (farHeight / 2.0f) + right * (farWidth / 2.0f);
+		corners[7] = farCenter - up * (farHeight / 2.0f) - right * (farWidth / 2.0f);
+
+		return corners;
 	}
 
 	std::span<const float> Camera::GetView() const
@@ -110,6 +148,16 @@ namespace Game {
 	vec3 Camera::GetDirection() const
 	{
 		return m_Direction;
+	}
+
+	vec3 Camera::Up() const
+	{
+		return m_Up;
+	}
+
+	vec3 Camera::Right() const
+	{
+		return m_Right;
 	}
 
 	float Camera::GetFOV() const

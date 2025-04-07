@@ -259,11 +259,11 @@ int main(int argc, char** argv)
 
 			if (keyState[Game::Key::D])
 			{
-				walkDirection += camera.RightVector();
+				walkDirection += camera.Right();
 			}
 			if (keyState[Game::Key::A])
 			{
-				walkDirection -= camera.RightVector();
+				walkDirection -= camera.Right();
 			}
 			if (keyState[Game::Key::W])
 			{
@@ -296,15 +296,15 @@ int main(int argc, char** argv)
 				light.position = { position.x, 5.0f, position.z };
 			}
 
-			const std::array<Game::FrustumPlane, 6u> planes{{
+			/*const std::array<Game::FrustumPlane, 6u> planes{{
 				{ .normal = {0.0f, 0.0f, -1.0f}, .distance = 1.0f },
 				{ .normal = {0.0f, 0.0f, 1.0f}, .distance = 1.0f },
 				{ .normal = {1.0f, 0.0f, 0.0f}, .distance = 1.0f },
 				{ .normal = {-1.0f, 0.0f, 0.0f}, .distance = 1.0f },
 				{ .normal = {0.0f, 1.0f, 0.0f}, .distance = 1.0f },
 				{ .normal = {0.0f, -1.0f, 0.0f}, .distance = 1.0f }
-			}};
-			wireframeRenderer.Draw(planes);
+			}};*/
+			wireframeRenderer.Draw(camera);
 
 			scene.debugLines = { wireframeRenderer.yield() };
 

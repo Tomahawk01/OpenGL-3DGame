@@ -21,18 +21,20 @@ namespace Game {
 			   float nearPlane, float farPlane);
 
 		void Translate(const vec3& translation);
-		vec3 RightVector() const;
 
 		void AddYaw(float value);
 		void AddPitch(float value);
 
-		std::array<Game::FrustumPlane, 6u> FrustumPlanes() const;
+		std::array<FrustumPlane, 6u> FrustumPlanes() const;
+		std::array<vec3, 8u> FrustumCorners() const;
 
 		std::span<const float> GetView() const;
 		std::span<const float> GetProjection() const;
 		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
 		vec3 GetDirection() const;
+		vec3 Up() const;
+		vec3 Right() const;
 		float GetFOV() const;
 		float GetWidth() const;
 		float GetHeight() const;
@@ -46,6 +48,7 @@ namespace Game {
 		vec3 m_Position;
 		vec3 m_Direction;
 		vec3 m_Up;
+		vec3 m_Right;
 
 		float m_Pitch;
 		float m_Yaw;
