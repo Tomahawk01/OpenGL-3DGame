@@ -6,6 +6,7 @@
 #include "Utilities/Error.h"
 
 #include <array>
+#include <ranges>
 #include <format>
 #include <span>
 
@@ -25,11 +26,15 @@ namespace Game {
 			})
 		{}
 
+		mat4(const std::array<float, 16u>& elements)
+			: mat4{ std::span<const float>{elements} }
+		{}
+
 		mat4(const std::span<const float>& elements)
 			: mat4{}
 		{
 			Ensure(elements.size() == 16u, "Not enough elements");
-			std::memcpy(m_Elements.data(), elements.data(), elements.size_bytes());
+			std::ranges::copy(elements, std::ranges::begin(m_Elements));
 		}
 
 		constexpr mat4(const vec3& translation)
@@ -57,8 +62,7 @@ namespace Game {
 				0.0f, 0.0f, scale.z, 0.0f,
 				translation.x, translation.y, translation.z, 1.0f
 				})
-		{
-		}
+		{}
 
 		constexpr mat4(const quat& rotation)
 			: mat4{}
