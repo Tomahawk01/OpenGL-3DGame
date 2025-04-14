@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <format>
 #include <print>
 #include <source_location>
@@ -30,7 +31,9 @@ namespace Game::Logger {
 			else if constexpr (L == Level::ERR)
 				c = 'E';
 
-			std::println("[{}] {}:{} {}", c, loc.file_name(), loc.line(), std::format(msg, std::forward<Args>(args)...));
+			const std::filesystem::path path{ loc.file_name() };
+
+			std::println("[{}] {}:{} {}", c, path.filename().string(), loc.line(), std::format(msg, std::forward<Args>(args)...));
 		}
 	};
 
