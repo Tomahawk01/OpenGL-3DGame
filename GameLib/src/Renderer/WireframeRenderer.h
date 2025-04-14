@@ -4,8 +4,7 @@
 #include "LineData.h"
 #include "Math/Vector3.h"
 #include "Math/Color.h"
-
-#include "Game/AABB.h"
+#include "Math/AABB.h"
 
 #include <vector>
 

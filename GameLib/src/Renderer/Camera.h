@@ -2,8 +2,7 @@
 
 #include "Math/Matrix4.h"
 #include "Math/Vector3.h"
-
-#include "FrustumPlane.h"
+#include "Math/FrustumPlane.h"
 
 #include <array>
 #include <span>

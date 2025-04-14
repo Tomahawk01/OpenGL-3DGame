@@ -1,6 +1,6 @@
 #include "WireframeRenderer.h"
 
-#include "FrustumPlane.h"
+#include "Math/FrustumPlane.h"
 
 #include <ranges>
 

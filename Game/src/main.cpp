@@ -5,6 +5,8 @@
 #include "Core/Entity.h"
 #include "Core/Scene.h"
 #include "Core/ResourceLoader.h"
+#include "Math/AABB.h"
+#include "Math/FrustumPlane.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Sampler.h"
 #include "Renderer/Material.h"
@@ -14,11 +16,9 @@
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/WireframeRenderer.h"
-#include "Renderer/FrustumPlane.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
-#include "Game/AABB.h"
 
 #include <iostream>
 #include <print>
