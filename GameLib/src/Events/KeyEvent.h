@@ -14,6 +14,8 @@ namespace Game {
 		Key GetKey() const;
 		KeyState GetState() const;
 
+		bool operator==(const KeyEvent&) const = default;
+
 	private:
 		Key m_Key;
 		KeyState m_State;
