@@ -19,6 +19,7 @@
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
+#include "Game/Player.h"
 
 #include <iostream>
 #include <print>
@@ -90,10 +91,10 @@ int main(int argc, char** argv)
 	{
 		Game::Ensure(argc == 2, "game.exe <root_path>");
 
+		Game::MessageBus bus{};
 		Game::Window window{ 1280u, 720u, 640u, 360u };
-
 		Game::Camera camera{
-			{0.0f, 8.0f, 40.0f},
+			{0.0f, 5.0f, 30.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
@@ -101,6 +102,7 @@ int main(int argc, char** argv)
 			static_cast<float>(window.GetHeight()),
 			0.1f, 1000.0f
 		};
+		Game::Player player{ bus, std::move(camera) };
 
 		Game::ResourceLoader resourceLoader{ argv[1] };
 		Game::MeshLoader meshLoader{ resourceLoader };
@@ -202,9 +204,9 @@ int main(int argc, char** argv)
 		float gamma = 2.2f;
 
 		bool showDebug = false;
-		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, camera, gamma };
+		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, player.GetCamera(), gamma };
 
-		GameTransformState state{ camera, {}, camera.GetPosition() };
+		GameTransformState state{ player.GetCamera(), {}, player.GetCamera().GetPosition() };
 
 		Game::WireframeRenderer wireframeRenderer{};
 
@@ -223,7 +225,9 @@ int main(int argc, char** argv)
 					}
 					else if constexpr (std::same_as<T, Game::KeyEvent>)
 					{
-						if (arg.GetKey() == Game::Key::ESC)
+						bus.PostKeyPress(arg);
+
+						/*if (arg.GetKey() == Game::Key::ESC)
 						{
 							running = false;
 						}
@@ -233,18 +237,18 @@ int main(int argc, char** argv)
 						if (arg.GetKey() == Game::Key::F1 && arg.GetState() == Game::KeyState::UP)
 						{
 							showDebug = !showDebug;
-						}
+						}*/
 					}
 					else if constexpr (std::same_as<T, Game::MouseEvent>)
 					{
 						if (!showDebug)
 						{
-							static constexpr float sensitivity{ 0.002f };
-							const float deltaX = arg.GetDeltaX() * sensitivity;
-							const float deltaY = arg.GetDeltaY() * sensitivity;
-
-							camera.AddYaw(deltaX);
-							camera.AddPitch(-deltaY);
+							//static constexpr float sensitivity{ 0.002f };
+							//const float deltaX = arg.GetDeltaX() * sensitivity;
+							//const float deltaY = arg.GetDeltaY() * sensitivity;
+							//
+							//camera.AddYaw(deltaX);
+							//camera.AddPitch(-deltaY);
 						}
 					}
 					else if constexpr (std::same_as<T, Game::MouseButtonEvent>)
@@ -257,7 +261,7 @@ int main(int argc, char** argv)
 
 			Game::vec3 walkDirection{ 0.0f, 0.0f, 0.0f };
 
-			if (keyState[Game::Key::D])
+			/*if (keyState[Game::Key::D])
 			{
 				walkDirection += camera.Right();
 			}
@@ -294,7 +298,7 @@ int main(int argc, char** argv)
 
 				const auto position = entity.GetPosition();
 				light.position = { position.x, 5.0f, position.z };
-			}
+			}*/
 
 			wireframeRenderer.Draw(camera);
 
