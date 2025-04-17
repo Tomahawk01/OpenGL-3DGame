@@ -2,10 +2,21 @@
 
 #include "AutoRelease.h"
 #include "Exception.h"
+#include "Logger.h"
 
 #include <memory>
 
 namespace Game {
+
+	template<class ...Args>
+	void Expect(bool predicate, std::string_view msg, Args&&... args)
+	{
+		if (!predicate)
+		{
+			Logger::Error("{}", std::vformat(msg, std::make_format_args(std::forward<Args>(args)...)));
+			std::terminate();
+		}
+	}
 
 	template<class ...Args>
 	void Ensure(bool predicate, std::string_view msg, Args&&... args)
