@@ -11,7 +11,7 @@
 
 namespace Game {
 
-	DebugUI::DebugUI(HWND window, Scene& scene, Camera& camera, float& gamma)
+	DebugUI::DebugUI(HWND window, Scene& scene, const Camera& camera, float& gamma)
 		: m_Scene(scene)
 		, m_Camera(camera)
 		, m_Gamma(gamma)
