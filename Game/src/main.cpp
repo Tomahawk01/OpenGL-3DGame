@@ -216,7 +216,8 @@ int main(int argc, char** argv)
 			auto event = window.PollEvent();
 			while (event && running)
 			{
-				std::visit([&](auto&& arg) {
+				std::visit([&](auto&& arg)
+				{
 					using T = std::decay_t<decltype(arg)>;
 
 					if constexpr (std::same_as<T, Game::StopEvent>)
@@ -225,16 +226,14 @@ int main(int argc, char** argv)
 					}
 					else if constexpr (std::same_as<T, Game::KeyEvent>)
 					{
-						bus.PostKeyPress(arg);
-
-						/*if (arg.GetKey() == Game::Key::ESC)
+						if (arg.GetKey() == Game::Key::ESC)
 						{
 							running = false;
 						}
-						
-						keyState[arg.GetKey()] = arg.GetState() == Game::KeyState::DOWN;
 
-						if (arg.GetKey() == Game::Key::F1 && arg.GetState() == Game::KeyState::UP)
+						bus.PostKeyPress(arg);
+						
+						/*if (arg.GetKey() == Game::Key::F1 && arg.GetState() == Game::KeyState::UP)
 						{
 							showDebug = !showDebug;
 						}*/
@@ -259,32 +258,7 @@ int main(int argc, char** argv)
 				event = window.PollEvent();
 			}
 
-			Game::vec3 walkDirection{ 0.0f, 0.0f, 0.0f };
-
-			/*if (keyState[Game::Key::D])
-			{
-				walkDirection += camera.Right();
-			}
-			if (keyState[Game::Key::A])
-			{
-				walkDirection -= camera.Right();
-			}
-			if (keyState[Game::Key::W])
-			{
-				walkDirection += camera.GetDirection();
-			}
-			if (keyState[Game::Key::S])
-			{
-				walkDirection -= camera.GetDirection();
-			}
-
-			walkDirection.y = 0.0f;
-			
-			const float speed = 0.5f;
-			const Game::vec3 velocity = Game::vec3::Normalize(walkDirection) * speed;
-			camera.Translate(velocity);
-
-			for (const auto& [transformedEntity, light] : std::views::zip(entities, scene.pointLights))
+			/*for (const auto& [transformedEntity, light] : std::views::zip(entities, scene.pointLights))
 			{
 				auto& [entity, aabb, transformer] = transformedEntity;
 
@@ -299,19 +273,20 @@ int main(int argc, char** argv)
 				const auto position = entity.GetPosition();
 				light.position = { position.x, 5.0f, position.z };
 			}*/
+			player.Update();
 
-			wireframeRenderer.Draw(camera);
+			wireframeRenderer.Draw(player.GetCamera());
 
 			scene.debugLines = { wireframeRenderer.yield() };
 
-			renderer.Render(camera, scene, skybox, skyboxSampler, gamma);
+			renderer.Render(player.GetCamera(), scene, skybox, skyboxSampler, gamma);
 
 			if (showDebug)
 				debugUI.Render();
 
 			window.Swap();
 
-			state.lastCameraPos = camera.GetPosition();
+			state.lastCameraPos = player.GetPosition();
 		}
 	}
 	catch (const Game::Exception& err)
