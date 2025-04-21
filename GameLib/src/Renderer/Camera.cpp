@@ -36,7 +36,11 @@ namespace Game {
 		, m_Height(height)
 		, m_NearPlane(nearPlane)
 		, m_FarPlane(farPlane)
-	{}
+	{
+		m_Direction = CreateDirection(m_Pitch, m_Yaw);
+		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
+		AddPitch(0.0f);
+	}
 
 	void Camera::Translate(const vec3& translation)
 	{
