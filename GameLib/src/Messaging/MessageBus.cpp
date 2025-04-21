@@ -5,6 +5,19 @@
 
 #include <ranges>
 
+namespace {
+
+	template <class... Args>
+	auto _PostMessage(Game::MessageType type, auto& subscribers, auto func, Args&&... args)
+	{
+		for (auto* subscriber : subscribers[type])
+		{
+			func(subscriber, std::forward<Args>(args)...);
+		}
+	}
+
+}
+
 namespace Game {
 
 	void MessageBus::Subscribe(MessageType type, Subscriber* subscriber)
@@ -18,10 +31,12 @@ namespace Game {
 
 	void MessageBus::PostKeyPress(const KeyEvent& event)
 	{
-		for (auto* subscriber : m_Subscribers[MessageType::KEY_PRESS])
-		{
-			subscriber->HandleKeyPress(event);
-		}
+		_PostMessage(MessageType::KEY_PRESS, m_Subscribers, [](auto* sub, const auto& event) { sub->HandleKeyPress(event); }, event);
+	}
+
+	void MessageBus::PostMouseMove(const MouseEvent& event)
+	{
+		_PostMessage(MessageType::MOUSE_MOVE, m_Subscribers, [](auto* sub, const auto& event) { sub->HandleMouseMove(event); }, event);
 	}
 
 }

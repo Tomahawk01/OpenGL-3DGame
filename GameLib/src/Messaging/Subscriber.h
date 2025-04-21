@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Utilities/Logger.h"
-#include "Events/KeyEvent.h"
 #include "MessageBus.h"
 
 namespace Game {
@@ -10,6 +9,11 @@ namespace Game {
 	{
 	public:
 		virtual void HandleKeyPress(const KeyEvent&)
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleMouseMove(const MouseEvent&)
 		{
 			Logger::Warn("Unhandled message!");
 		}
