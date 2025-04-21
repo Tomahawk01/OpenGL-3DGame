@@ -8,14 +8,12 @@ namespace Game {
 		: m_Camera{ std::move(camera) }
 		, m_KeyState{}
 	{
-		bus.Subscribe(MessageType::KEY_PRESS, this);
-		bus.Subscribe(MessageType::MOUSE_MOVE, this);
+		Subscriber::Subscribe(this, bus);
 	}
 
 	void Player::Update()
 	{
 		vec3 walkDirection{ 0.0f, 0.0f, 0.0f };
-		walkDirection.y = 0.0f;
 
 		if (m_KeyState[Key::W])
 		{
