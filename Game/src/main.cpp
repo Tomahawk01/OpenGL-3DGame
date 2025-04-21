@@ -240,15 +240,7 @@ int main(int argc, char** argv)
 					}
 					else if constexpr (std::same_as<T, Game::MouseEvent>)
 					{
-						if (!showDebug)
-						{
-							//static constexpr float sensitivity{ 0.002f };
-							//const float deltaX = arg.GetDeltaX() * sensitivity;
-							//const float deltaY = arg.GetDeltaY() * sensitivity;
-							//
-							//camera.AddYaw(deltaX);
-							//camera.AddPitch(-deltaY);
-						}
+						bus.PostMouseMove(arg);
 					}
 					else if constexpr (std::same_as<T, Game::MouseButtonEvent>)
 					{

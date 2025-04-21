@@ -16,6 +16,7 @@ namespace Game {
 		void Update();
 
 		void HandleKeyPress(const KeyEvent& event) override;
+		void HandleMouseMove(const MouseEvent& event) override;
 
 		const Camera& GetCamera() const;
 		vec3 GetPosition() const;
