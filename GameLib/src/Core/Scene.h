@@ -4,6 +4,8 @@
 #include "Math/Vector3.h"
 #include "Renderer/LineData.h"
 #include "Renderer/Buffer.h"
+#include "Renderer/CubeMap.h"
+#include "Renderer/Sampler.h"
 #include "Physics/DebugLines.h"
 
 #include <vector>
@@ -35,6 +37,8 @@ namespace Game {
 		DirectionalLight directionalLight;
 		std::vector<PointLight> pointLights;
 		std::optional<DebugLines> debugLines;
+		const CubeMap* skybox;
+		const Sampler* skyboxSampler;
 	};
 
 }

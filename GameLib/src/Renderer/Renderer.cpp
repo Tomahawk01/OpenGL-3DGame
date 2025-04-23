@@ -72,7 +72,7 @@ namespace Game {
 		, m_PostProcessMaterial(CreatePostProcessMaterial(resourceLoader))
 	{}
 
-	void Renderer::Render(const Camera& camera, const Scene& scene, const CubeMap& skybox, const Sampler& skyboxSampler, float gamma) const
+	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
 	{
 		m_FB.Bind();
 
@@ -116,7 +116,7 @@ namespace Game {
 		m_SkyboxMaterial.Use();
 		m_SkyboxCube.Bind();
 
-		m_SkyboxMaterial.BindCubeMap(&skybox, &skyboxSampler);
+		m_SkyboxMaterial.BindCubeMap(scene.skybox, scene.skyboxSampler);
 		::glDrawElements(GL_TRIANGLES, m_SkyboxCube.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_SkyboxCube.IndexOffset()));
 
 		m_SkyboxCube.UnBind();
@@ -152,7 +152,7 @@ namespace Game {
 
 		m_PostProcessMaterial.Use();
 		m_PostProcessSprite.Bind();
-		m_PostProcessMaterial.BindTexture(0, &m_FB.GetColorTexture(), &skyboxSampler);
+		m_PostProcessMaterial.BindTexture(0, &m_FB.GetColorTexture(), scene.skyboxSampler);
 		m_PostProcessMaterial.SetUniform("gamma", gamma);
 		::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
 		m_PostProcessSprite.UnBind();

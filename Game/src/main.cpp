@@ -20,6 +20,7 @@
 
 #include "Game/Chain.h"
 #include "Game/Player.h"
+#include "Game/Levels/LevelAlpha.h"
 
 #include <iostream>
 #include <print>
@@ -29,59 +30,6 @@
 #include <ranges>
 #include <unordered_map>
 #include <random>
-
-namespace {
-
-	bool IntersectsFrustum(const Game::AABB& aabb, const std::array<Game::FrustumPlane, 6u>& planes)
-	{
-		for (const auto& plane : planes)
-		{
-			Game::vec3 positiveVertex = aabb.min;
-			if (plane.normal.x >= 0)
-				positiveVertex.x = aabb.max.x;
-			if (plane.normal.y >= 0)
-				positiveVertex.y = aabb.max.y;
-			if (plane.normal.z >= 0)
-				positiveVertex.z = aabb.max.z;
-
-			if (Game::vec3::Dot(plane.normal, positiveVertex) + plane.distance < 0.0f)
-				return false;
-		}
-
-		return true;
-	}
-
-	struct GameTransformState
-	{
-		const Game::Camera& camera;
-		Game::AABB aabb;
-		Game::vec3 lastCameraPos;
-	};
-
-	constexpr auto CameraDelta = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
-	{
-		return { in + (state.camera.GetPosition() - state.lastCameraPos) };
-	};
-
-	constexpr auto Invert = [](const Game::vec3& in, const GameTransformState&) -> Game::TransformerResult
-	{
-		return { -in };
-	};
-
-	constexpr auto CheckVisible = [](const Game::vec3& in, const GameTransformState& state) -> Game::TransformerResult
-	{
-		const auto planes = state.camera.FrustumPlanes();
-		return { in, !IntersectsFrustum(state.aabb, planes) };
-	};
-
-	struct TransformedEntity
-	{
-		Game::Entity entity;
-		Game::AABB boundingBox;
-		std::unique_ptr<Game::ChainBase<GameTransformState>> transformerChain;
-	};
-
-};
 
 int main(int argc, char** argv)
 {
@@ -130,8 +78,6 @@ int main(int argc, char** argv)
 		Game::Material checkerboardMaterial{ vertexShader, checkerboardShader };
 		const Game::Mesh mesh{ reader, "Barrel" };
 
-		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
-
 		const Game::Texture floorTexture{
 			Game::TextureDescription{
 				.width = 1u,
@@ -142,71 +88,19 @@ int main(int argc, char** argv)
 		}, &sampler };
 		const Game::Texture* floorTextures[] = { &floorTexture, &floorTexture };
 		const Game::Mesh floorMesh{ meshLoader.Cube() };
-		Game::Entity floorEntity{ &floorMesh, &checkerboardMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, floorTextures };
 
-		std::vector<TransformedEntity> entities{};
-		entities.emplace_back(
-			Game::Entity{ &mesh, &material, {}, {1.0f}, textures },
-			Game::AABB{ {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f} },
-			std::make_unique<Game::Chain<GameTransformState>>());
-		entities.emplace_back(
-			Game::Entity{ &mesh, &material, {5.0f, 0.0f, 0.0f}, {1.0f}, textures },
-			Game::AABB{ {3.0f, -1.0f, -1.0f}, {5.0f, 1.0f, 1.0f} },
-			std::make_unique<Game::Chain<GameTransformState, CheckVisible, CameraDelta>>());
-		entities.emplace_back(
-			Game::Entity{ &mesh, &material, {-5.0f, 0.0f, 0.0f}, {1.0f}, textures },
-			Game::AABB{ {-6.0f, -1.0f, -1.0f}, {-4.0f, 1.0f, 1.0f} },
-			std::make_unique<Game::Chain<GameTransformState, CheckVisible, CameraDelta, Invert>>());
-
-		Game::Scene scene{
-			.entities = entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
-			.ambient = {0.3f, 0.3f, 0.3f},
-			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
-			.pointLights = {
-				{.position = {5.0f, 5.0f, 0.0f},
-				.color = {1.0f, 0.0f, 0.0f},
-				.constAttenuation = 1.0f,
-				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.007f },
-
-				{.position = {-5.0f, 5.0f, 0.0f},
-				.color = {0.0f, 1.0f, 0.0f},
-				.constAttenuation = 1.0f,
-				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.007f },
-
-				{.position = {-5.0f, 5.0f, 0.0f},
-				.color = {0.0f, 0.0f, 1.0f},
-				.constAttenuation = 1.0f,
-				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.007f }
-			},
-			.debugLines = {}
+		const Game::Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
+		
+		Game::LevelAlpha level{
+			&floorMesh, &checkerboardMaterial, floorTextures,
+			&mesh, &material, textures,
+			reader, player
 		};
-
-		scene.entities.push_back(&floorEntity);
-
-		Game::CubeMap skybox{
-			reader,
-			{{
-				"right",
-				"left",
-				"top",
-				"bottom",
-				"front",
-				"back"
-			}}
-		};
-		Game::Sampler skyboxSampler{};
-
-		std::unordered_map<Game::Key, bool> keyState{};
 
 		float gamma = 2.2f;
 
 		bool showDebug = false;
-		const Game::DebugUI debugUI{ window.GetNativeHandle(), scene, player.GetCamera(), gamma };
-
-		GameTransformState state{ player.GetCamera(), {}, player.GetCamera().GetPosition() };
+		const Game::DebugUI debugUI{ window.GetNativeHandle(), level.GetScene(), player.GetCamera(), gamma};
 
 		Game::WireframeRenderer wireframeRenderer{};
 
@@ -266,19 +160,18 @@ int main(int argc, char** argv)
 				light.position = { position.x, 5.0f, position.z };
 			}*/
 			player.Update();
+			level.Update(player);
 
 			wireframeRenderer.Draw(player.GetCamera());
 
-			scene.debugLines = { wireframeRenderer.yield() };
+			level.GetScene().debugLines = { wireframeRenderer.yield() };
 
-			renderer.Render(player.GetCamera(), scene, skybox, skyboxSampler, gamma);
+			renderer.Render(player.GetCamera(), level.GetScene(), gamma);
 
 			if (showDebug)
 				debugUI.Render();
 
 			window.Swap();
-
-			state.lastCameraPos = player.GetPosition();
 		}
 	}
 	catch (const Game::Exception& err)
