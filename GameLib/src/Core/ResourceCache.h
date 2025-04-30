@@ -2,21 +2,28 @@
 
 #include "Utilities/StringMap.h"
 #include "Utilities/Error.h"
-#include "Renderer/Mesh.h"
 
 #include <string_view>
 #include <ranges>
+#include <tuple>
 
 namespace Game {
 
+	class Mesh;
+	class Texture;
+	class Material;
+
+	template <class... T>
 	class ResourceCache
 	{
 	public:
-		template <class... Args>
-		Mesh* InsertMesh(std::string_view name, Args&&... args)
+		template <class U, class... Args>
+		U* Insert(std::string_view name, Args&&... args)
 		{
-			Expect(!m_Meshes.contains(name), "{} already exists", name);
-			const auto [iter, inserted] = m_Meshes.emplace(std::make_pair(name, Mesh{ std::forward<Args>(args)... }));
+			auto& map = std::get<StringMap<U>>(m_Maps);
+
+			Expect(!map.contains(name), "{} already exists", name);
+			const auto [iter, inserted] = map.emplace(std::make_pair(name, U{ std::forward<Args>(args)... }));
 
 			Expect(inserted, "Insertion failed as key exists");
 
@@ -24,22 +31,27 @@ namespace Game {
 		}
 
 		/*
-		* Get a mesh.
+		* Get an object.
 		* 
-		* @param name Name of mesh to get (undefined behaviour if it doesn't exist)
+		* @param name Name of object to get. (undefined behaviour if it doesn't exist)
 		* 
-		* @returns Pointer to requested mesh.
+		* @returns Pointer to requested object.
 		*/
-		const Mesh* GetMesh(std::string_view name)
+		template <class U>
+		const U* Get(std::string_view name)
 		{
-			const auto mesh = m_Meshes.find(name);
-			Expect(mesh != std::ranges::end(m_Meshes), "{} does not exist", name);
+			const auto& map = std::get<StringMap<U>>(m_Maps);
 
-			return std::addressof(mesh->second);
+			const auto object = map.find(name);
+			Expect(object != std::ranges::end(map), "{} does not exist", name);
+
+			return std::addressof(object->second);
 		}
 
 	private:
-		StringMap<Mesh> m_Meshes;
+		std::tuple<StringMap<T>...> m_Maps;
 	};
+
+	using DefaultCache = ResourceCache<Mesh, Material, Texture>;
 
 }
