@@ -12,6 +12,7 @@ namespace Game {
 	class Mesh;
 	class Texture;
 	class Material;
+	class Sampler;
 
 	template <class... T>
 	class ResourceCache
@@ -38,9 +39,9 @@ namespace Game {
 		* @returns Pointer to requested object.
 		*/
 		template <class U>
-		const U* Get(std::string_view name)
+		auto Get(std::string_view name)
 		{
-			const auto& map = std::get<StringMap<U>>(m_Maps);
+			auto& map = std::get<StringMap<U>>(m_Maps);
 
 			const auto object = map.find(name);
 			Expect(object != std::ranges::end(map), "{} does not exist", name);
@@ -52,6 +53,6 @@ namespace Game {
 		std::tuple<StringMap<T>...> m_Maps;
 	};
 
-	using DefaultCache = ResourceCache<Mesh, Material, Texture>;
+	using DefaultCache = ResourceCache<Mesh, Material, Texture, Sampler>;
 
 }
