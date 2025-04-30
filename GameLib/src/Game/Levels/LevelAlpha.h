@@ -15,16 +15,17 @@
 
 namespace Game {
 
+	class MessageBus;
+
 	class LevelAlpha : public Level
 	{
 	public:
 		LevelAlpha(const Mesh* floorMesh, const Material* floorMaterial, std::span<const Texture*> floorTextures,
 				   const Mesh* barrelMesh, Material* barrelMaterial, std::span<const Texture*> barrelTextures,
-				   const TLVReader& reader, const Player& player);
+				   const TLVReader& reader, const Player& player, MessageBus& bus);
 		~LevelAlpha() override = default;
 
 		void Update(const Player& player) override;
-		bool Complete() const override;
 
 	private:
 		std::vector<TransformedEntity> m_Entities;
@@ -32,6 +33,7 @@ namespace Game {
 		CubeMap m_Skybox;
 		Sampler m_SkyboxSampler;
 		GameTransformState m_State;
+		MessageBus& m_Bus;
 	};
 
 }

@@ -23,7 +23,7 @@ namespace Game {
 
 	private:
 		Camera m_Camera;
-		std::unordered_map<Game::Key, bool> m_KeyState;
+		std::unordered_map<Key, bool> m_KeyState;
 	};
 
 }

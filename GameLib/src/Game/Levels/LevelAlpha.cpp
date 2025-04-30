@@ -1,5 +1,7 @@
 #include "LevelAlpha.h"
 
+#include "Messaging/MessageBus.h"
+
 #include "Game/TransformedEntity.h"
 #include "Game/Player.h"
 
@@ -46,12 +48,13 @@ namespace Game {
 
 	LevelAlpha::LevelAlpha(const Mesh* floorMesh, const Material* floorMaterial, std::span<const Texture*> floorTextures,
 						   const Mesh* barrelMesh, Material* barrelMaterial, std::span<const Texture*> barrelTextures,
-						   const TLVReader& reader, const Player& player)
+						   const TLVReader& reader, const Player& player, MessageBus& bus)
 		: m_Entities{}
 		, m_Floor{ floorMesh, floorMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, floorTextures }
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
 		, m_State{ player.GetCamera(), {}, player.GetCamera().GetPosition() }
+		, m_Bus{ bus }
 	{
 		m_Entities.emplace_back(
 			Entity{ barrelMesh, barrelMaterial, {}, {1.0f}, barrelTextures },
@@ -114,11 +117,11 @@ namespace Game {
 		}
 
 		m_State.lastCameraPos = player.GetCamera().GetPosition();
-	}
 
-	bool LevelAlpha::Complete() const
-	{
-		return vec3::Distance(m_Entities[0].entity.GetPosition(), m_Entities[1].entity.GetPosition()) < 1.0f;
+		if (vec3::Distance(m_Entities[0].entity.GetPosition(), m_Entities[1].entity.GetPosition()) < 1.0f)
+		{
+			m_Bus.PostLevelComplete("alpha");
+		}
 	}
 
 }
