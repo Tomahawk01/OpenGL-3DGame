@@ -6,6 +6,7 @@
 #include "Renderer/Material.h"
 #include "Renderer/CubeMap.h"
 #include "Renderer/Sampler.h"
+#include "Core/ResourceCache.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/TransformedEntity.h"
@@ -20,8 +21,9 @@ namespace Game {
 	class LevelAlpha : public Level
 	{
 	public:
-		LevelAlpha(const Mesh* floorMesh, const Material* floorMaterial, std::span<const Texture*> floorTextures,
-				   const Mesh* barrelMesh, Material* barrelMaterial, std::span<const Texture*> barrelTextures,
+		LevelAlpha(ResourceCache& resourceCache,
+				   const Material* floorMaterial, std::span<const Texture*> floorTextures,
+				   Material* barrelMaterial, std::span<const Texture*> barrelTextures,
 				   const TLVReader& reader, const Player& player, MessageBus& bus);
 		~LevelAlpha() override = default;
 

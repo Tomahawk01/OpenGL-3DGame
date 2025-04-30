@@ -11,7 +11,7 @@ namespace Game {
 		bool stop = false;
 	};
 
-	template<class S>
+	template <class S>
 	struct ChainBase
 	{
 		virtual constexpr vec3 Go(const vec3&, const S&) const

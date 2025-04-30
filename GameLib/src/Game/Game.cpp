@@ -7,6 +7,7 @@
 #include "Core/Entity.h"
 #include "Core/Scene.h"
 #include "Core/ResourceLoader.h"
+#include "Core/ResourceCache.h"
 #include "Math/AABB.h"
 #include "Math/FrustumPlane.h"
 #include "Renderer/Texture.h"
@@ -58,6 +59,7 @@ namespace Game {
 
 		ResourceLoader resourceLoader{ resourceRoot };
 		MeshLoader meshLoader{ resourceLoader };
+		ResourceCache resourceCache{};
 
 		const File tlvFile{ resourceLoader.Load("resources") };
 		const TLVReader reader{ tlvFile.AsData() };
@@ -80,7 +82,7 @@ namespace Game {
 		const Shader checkerboardShader{ checkerboardFragFile.AsString(), ShaderType::FRAGMENT };
 		Material barrelMaterial{ vertexShader, barrelFragmentShader };
 		Material checkerboardMaterial{ vertexShader, checkerboardShader };
-		const Mesh mesh{ reader, "Barrel" };
+		resourceCache.InsertMesh("barrel", reader, "Barrel");
 
 		const Texture floorTexture{
 			TextureDescription{
@@ -91,13 +93,14 @@ namespace Game {
 				.data = { static_cast<std::byte>(0xff), static_cast<std::byte>(0xff), static_cast<std::byte>(0xff) }
 		}, &sampler };
 		const Texture* floorTextures[] = { &floorTexture, &floorTexture };
-		const Mesh floorMesh{ meshLoader.Cube() };
+		resourceCache.InsertMesh("floor", meshLoader.Cube());
 
 		const Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
 		LevelAlpha level{
-			&floorMesh, &checkerboardMaterial, floorTextures,
-			&mesh, &barrelMaterial, textures,
+			resourceCache,
+			&checkerboardMaterial, floorTextures,
+			&barrelMaterial, textures,
 			reader, player, bus
 		};
 

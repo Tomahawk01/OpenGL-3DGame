@@ -1,6 +1,7 @@
 #include "LevelAlpha.h"
 
 #include "Messaging/MessageBus.h"
+#include "Core/ResourceCache.h"
 
 #include "Game/TransformedEntity.h"
 #include "Game/Player.h"
@@ -46,22 +47,23 @@ namespace {
 
 namespace Game {
 
-	LevelAlpha::LevelAlpha(const Mesh* floorMesh, const Material* floorMaterial, std::span<const Texture*> floorTextures,
-						   const Mesh* barrelMesh, Material* barrelMaterial, std::span<const Texture*> barrelTextures,
+	LevelAlpha::LevelAlpha(ResourceCache& resourceCache,
+						   const Material* floorMaterial, std::span<const Texture*> floorTextures,
+						   Material* barrelMaterial, std::span<const Texture*> barrelTextures,
 						   const TLVReader& reader, const Player& player, MessageBus& bus)
 		: m_Entities{}
-		, m_Floor{ floorMesh, floorMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, floorTextures }
+		, m_Floor{ resourceCache.GetMesh("floor"), floorMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, floorTextures}
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
 		, m_State{ player.GetCamera(), {}, player.GetCamera().GetPosition() }
 		, m_Bus{ bus }
 	{
 		m_Entities.emplace_back(
-			Entity{ barrelMesh, barrelMaterial, {}, {1.0f}, barrelTextures },
+			Entity{ resourceCache.GetMesh("barrel"), barrelMaterial, {}, {1.0f}, barrelTextures},
 			AABB{ {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f} },
 			std::make_unique<Chain<GameTransformState>>());
 		m_Entities.emplace_back(
-			Entity{ barrelMesh, barrelMaterial, {5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
+			Entity{ resourceCache.GetMesh("barrel"), barrelMaterial, {5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
 			AABB{ {3.0f, -1.0f, -1.0f}, {5.0f, 1.0f, 1.0f} },
 			std::make_unique<Chain<GameTransformState, CheckVisible, CameraDelta>>());
 
