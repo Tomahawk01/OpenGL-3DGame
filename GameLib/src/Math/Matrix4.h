@@ -26,18 +26,18 @@ namespace Game {
 			})
 		{}
 
-		mat4(const std::array<float, 16u>& elements)
+		explicit mat4(const std::array<float, 16u>& elements)
 			: mat4{ std::span<const float>{elements} }
 		{}
 
-		mat4(const std::span<const float>& elements)
+		explicit mat4(const std::span<const float>& elements)
 			: mat4{}
 		{
 			Ensure(elements.size() == 16u, "Not enough elements");
 			std::ranges::copy(elements, std::ranges::begin(m_Elements));
 		}
 
-		constexpr mat4(const vec3& translation)
+		explicit constexpr mat4(const vec3& translation)
 			: m_Elements({
 				1.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 1.0f, 0.0f, 0.0f,
