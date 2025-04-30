@@ -59,6 +59,7 @@ namespace Game {
 		, m_SkyboxSampler{}
 		, m_State{ player.GetCamera(), {}, player.GetCamera().GetPosition() }
 		, m_Bus{ bus }
+		, m_ResourceCache{ resourceCache }
 	{
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
@@ -74,13 +75,6 @@ namespace Game {
 			Entity{ resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), {5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
 			AABB{ {3.0f, -1.0f, -1.0f}, {5.0f, 1.0f, 1.0f} },
 			std::make_unique<Chain<GameTransformState, CheckVisible, CameraDelta>>());
-
-		resourceCache.Get<Material>("barrel")->SetUniformCallback([this](const Material* material, const Entity* entity)
-		{
-			const float tintAmount = entity == std::addressof(m_Entities[0].entity) ? 1.0f : 0.5f;
-			material->SetUniform("tint_color", Color{ 0.0f, 0.0f, 1.0f });
-			material->SetUniform("tint_amount", tintAmount);
-		});
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
@@ -132,6 +126,16 @@ namespace Game {
 		{
 			m_Bus.PostLevelComplete("alpha");
 		}
+	}
+
+	void LevelAlpha::Restart()
+	{
+		m_ResourceCache.Get<Material>("barrel")->SetUniformCallback([this](const Material* material, const Entity* entity)
+		{
+			const float tintAmount = entity == std::addressof(m_Entities[0].entity) ? 1.0f : 0.5f;
+			material->SetUniform("tint_color", Color{ 0.0f, 0.0f, 1.0f });
+			material->SetUniform("tint_amount", tintAmount);
+		});
 	}
 
 }

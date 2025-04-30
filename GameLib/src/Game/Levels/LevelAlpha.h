@@ -25,6 +25,7 @@ namespace Game {
 		~LevelAlpha() override = default;
 
 		void Update(const Player& player) override;
+		void Restart() override;
 
 	private:
 		std::vector<TransformedEntity> m_Entities;
@@ -33,6 +34,7 @@ namespace Game {
 		Sampler m_SkyboxSampler;
 		GameTransformState m_State;
 		MessageBus& m_Bus;
+		DefaultCache& m_ResourceCache;
 	};
 
 }

@@ -12,6 +12,7 @@ namespace Game {
 		virtual ~Level() = default;
 
 		virtual void Update(const Player& player) = 0;
+		virtual void Restart() = 0;
 
 		inline Scene& GetScene() { return m_Scene; }
 
