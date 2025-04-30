@@ -39,4 +39,9 @@ namespace Game {
 		_PostMessage(MessageType::MOUSE_MOVE, m_Subscribers, [](auto* sub, const auto& event) { sub->HandleMouseMove(event); }, event);
 	}
 
+	void MessageBus::PostLevelComplete(std::string_view levelName)
+	{
+		_PostMessage(MessageType::LEVEL_COMPLETE, m_Subscribers, [](auto* sub, const auto& levelName) { sub->HandleLevelComplete(levelName); }, levelName);
+	}
+
 }

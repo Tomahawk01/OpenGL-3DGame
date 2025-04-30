@@ -3,7 +3,7 @@
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
 
-#include <any>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -15,6 +15,7 @@ namespace Game {
 	{
 		KEY_PRESS,
 		MOUSE_MOVE,
+		LEVEL_COMPLETE
 	};
 
 	class MessageBus
@@ -24,6 +25,7 @@ namespace Game {
 
 		void PostKeyPress(const KeyEvent& event);
 		void PostMouseMove(const MouseEvent& event);
+		void PostLevelComplete(std::string_view levelName);
 
 	private:
 		std::unordered_map<MessageType, std::vector<Subscriber*>> m_Subscribers;

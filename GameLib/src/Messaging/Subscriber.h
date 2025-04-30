@@ -19,6 +19,10 @@ namespace Game {
 			{
 				bus.Subscribe(MessageType::MOUSE_MOVE, obj);
 			}
+			if (&T::HandleLevelComplete != &HandleLevelComplete)
+			{
+				bus.Subscribe(MessageType::LEVEL_COMPLETE, obj);
+			}
 		}
 
 		virtual void HandleKeyPress(const KeyEvent&)
@@ -27,6 +31,11 @@ namespace Game {
 		}
 
 		virtual void HandleMouseMove(const MouseEvent&)
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleLevelComplete(std::string_view)
 		{
 			Logger::Warn("Unhandled message!");
 		}
