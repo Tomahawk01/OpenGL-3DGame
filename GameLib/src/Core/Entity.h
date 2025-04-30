@@ -22,7 +22,7 @@ namespace Game {
 			   const Material* material,
 			   const vec3& position,
 			   const vec3& scale,
-			   const std::span<const Texture*>& textures);
+			   std::span<const Texture* const> textures);
 
 		const Mesh* GetMesh() const;
 		const Material* GetMaterial() const;

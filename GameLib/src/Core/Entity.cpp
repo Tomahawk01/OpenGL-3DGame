@@ -2,7 +2,7 @@
 
 namespace Game {
 
-	Entity::Entity(const Mesh* mesh, const Material* material, const vec3& position, const vec3& scale, const std::span<const Texture*>& textures)
+	Entity::Entity(const Mesh* mesh, const Material* material, const vec3& position, const vec3& scale, std::span<const Texture* const> textures)
 		: m_Mesh(mesh)
 		, m_Material(material)
 		, m_Textures(std::ranges::cbegin(textures), std::ranges::cend(textures))
