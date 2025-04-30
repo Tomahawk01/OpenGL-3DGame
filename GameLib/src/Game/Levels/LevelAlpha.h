@@ -21,10 +21,7 @@ namespace Game {
 	class LevelAlpha : public Level
 	{
 	public:
-		LevelAlpha(DefaultCache& resourceCache,
-				   const Material* floorMaterial, std::span<const Texture*> floorTextures,
-				   Material* barrelMaterial, std::span<const Texture*> barrelTextures,
-				   const TLVReader& reader, const Player& player, MessageBus& bus);
+		LevelAlpha(DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 		~LevelAlpha() override = default;
 
 		void Update(const Player& player) override;

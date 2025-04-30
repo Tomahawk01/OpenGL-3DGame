@@ -64,14 +64,12 @@ namespace Game {
 		const File tlvFile{ resourceLoader.Load("resources") };
 		const TLVReader reader{ tlvFile.AsData() };
 
-		Sampler sampler{};
-		Texture albedoTex{ reader, "barrel_Albedo", &sampler };
-		Texture specMap{ reader, "barrel_Specular", &sampler };
-		Texture normalMap{ reader, "barrel_Normal", &sampler };
+		const Sampler* sampler{ resourceCache.Insert<Sampler>("default") };
+		resourceCache.Insert<Texture>("barrel_albedo", reader, "barrel_Albedo", sampler);
+		resourceCache.Insert<Texture>("barrel_specular", reader, "barrel_Specular", sampler);
+		resourceCache.Insert<Texture>("barrel_normal", reader, "barrel_Normal", sampler);
 
 		Logger::Info("Textures loaded successfully");
-
-		const Texture* textures[]{ &albedoTex, &specMap, &normalMap };
 
 		const File basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
 		const File barrelFragFile{ resourceLoader.Load("shaders/barrel.frag") };
@@ -80,29 +78,23 @@ namespace Game {
 		const Shader vertexShader{ basicVertFile.AsString(), ShaderType::VERTEX };
 		const Shader barrelFragmentShader{ barrelFragFile.AsString(), ShaderType::FRAGMENT };
 		const Shader checkerboardShader{ checkerboardFragFile.AsString(), ShaderType::FRAGMENT };
-		Material barrelMaterial{ vertexShader, barrelFragmentShader };
-		Material checkerboardMaterial{ vertexShader, checkerboardShader };
 		resourceCache.Insert<Mesh>("barrel", reader, "Barrel");
+		resourceCache.Insert<Material>("barrel", vertexShader, barrelFragmentShader);
+		resourceCache.Insert<Material>("floor", vertexShader, checkerboardShader);
 
-		const Texture floorTexture{
+		resourceCache.Insert<Texture>("floor_albedo",
 			TextureDescription{
 				.width = 1u,
 				.height = 1u,
 				.format = TextureFormat::RGB,
 				.usage = TextureUsage::SRGB,
 				.data = { static_cast<std::byte>(0xff), static_cast<std::byte>(0xff), static_cast<std::byte>(0xff) }
-		}, &sampler };
-		const Texture* floorTextures[] = { &floorTexture, &floorTexture };
+			}, sampler);
 		resourceCache.Insert<Mesh>("floor", meshLoader.Cube());
 
 		const Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		LevelAlpha level{
-			resourceCache,
-			&checkerboardMaterial, floorTextures,
-			&barrelMaterial, textures,
-			reader, player, bus
-		};
+		LevelAlpha level{ resourceCache, reader, player, bus };
 
 		float gamma = 2.2f;
 

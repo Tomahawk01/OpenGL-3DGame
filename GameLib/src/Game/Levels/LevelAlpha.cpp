@@ -28,46 +28,54 @@ namespace {
 	}
 
 	constexpr auto CameraDelta = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
-		{
-			return { in + (state.camera.GetPosition() - state.lastCameraPos) };
-		};
+	{
+		return { in + (state.camera.GetPosition() - state.lastCameraPos) };
+	};
 
 	constexpr auto Invert = [](const Game::vec3& in, const Game::GameTransformState&) -> Game::TransformerResult
-		{
-			return { -in };
-		};
+	{
+		return { -in };
+	};
 
 	constexpr auto CheckVisible = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
-		{
-			const auto planes = state.camera.FrustumPlanes();
-			return { in, !IntersectsFrustum(state.aabb, planes) };
-		};
+	{
+		const auto planes = state.camera.FrustumPlanes();
+		return { in, !IntersectsFrustum(state.aabb, planes) };
+	};
 
 }
 
 namespace Game {
 
-	LevelAlpha::LevelAlpha(DefaultCache& resourceCache,
-						   const Material* floorMaterial, std::span<const Texture*> floorTextures,
-						   Material* barrelMaterial, std::span<const Texture*> barrelTextures,
-						   const TLVReader& reader, const Player& player, MessageBus& bus)
+	LevelAlpha::LevelAlpha(DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
 		: m_Entities{}
-		, m_Floor{ resourceCache.Get<Mesh>("floor"), floorMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, floorTextures}
+		, m_Floor{
+			resourceCache.Get<Mesh>("floor"),
+			resourceCache.Get<Material>("floor"),
+			{0.0f, -2.0f, 0.0f},
+			{100.0f, 1.0f, 100.0f},
+			std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")} }
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
 		, m_State{ player.GetCamera(), {}, player.GetCamera().GetPosition() }
 		, m_Bus{ bus }
 	{
+		const Texture* barrelTextures[]{
+			resourceCache.Get<Texture>("barrel_albedo"),
+			resourceCache.Get<Texture>("barrel_specular"),
+			resourceCache.Get<Texture>("barrel_normal")
+		};
+
 		m_Entities.emplace_back(
-			Entity{ resourceCache.Get<Mesh>("barrel"), barrelMaterial, {}, {1.0f}, barrelTextures},
+			Entity{ resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), {}, {1.0f}, barrelTextures},
 			AABB{ {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f} },
 			std::make_unique<Chain<GameTransformState>>());
 		m_Entities.emplace_back(
-			Entity{ resourceCache.Get<Mesh>("barrel"), barrelMaterial, {5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
+			Entity{ resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), {5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
 			AABB{ {3.0f, -1.0f, -1.0f}, {5.0f, 1.0f, 1.0f} },
 			std::make_unique<Chain<GameTransformState, CheckVisible, CameraDelta>>());
 
-		barrelMaterial->SetUniformCallback([this](const Material* material, const Entity* entity)
+		resourceCache.Get<Material>("barrel")->SetUniformCallback([this](const Material* material, const Entity* entity)
 		{
 			const float tintAmount = entity == std::addressof(m_Entities[0].entity) ? 1.0f : 0.5f;
 			material->SetUniform("tint_color", Color{ 0.0f, 0.0f, 1.0f });
