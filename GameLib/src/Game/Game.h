@@ -2,7 +2,10 @@
 
 #include "Messaging/Subscriber.h"
 
+#include "Game/Levels/Level.h"
+
 #include <string_view>
+#include <memory>
 
 namespace Game {
 
@@ -17,6 +20,8 @@ namespace Game {
 
 	private:
 		bool m_Running;
+		std::vector<std::unique_ptr<Level>> m_Levels;
+		size_t m_LevelNum;
 	};
 
 }

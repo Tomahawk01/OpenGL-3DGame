@@ -24,6 +24,7 @@
 #include "Game/Chain.h"
 #include "Game/Player.h"
 #include "Game/Levels/LevelAlpha.h"
+#include "Game/Levels/LevelBravo.h"
 
 #include <iostream>
 #include <print>
@@ -38,6 +39,8 @@ namespace Game {
 
 	Game::Game()
 		: m_Running{ true }
+		, m_Levels{}
+		, m_LevelNum{ 0u }
 	{}
 
 	void Game::Run(std::string_view resourceRoot)
@@ -94,12 +97,12 @@ namespace Game {
 
 		const Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		LevelAlpha level{ resourceCache, reader, player, bus };
+		m_Levels.push_back(std::make_unique<LevelAlpha>(resourceCache, reader, player, bus));
+		m_Levels.push_back(std::make_unique<LevelBravo>(resourceCache, reader, player, bus));
+
+		m_Levels[m_LevelNum]->Restart();
 
 		float gamma = 2.2f;
-
-		bool showDebug = false;
-		const DebugUI debugUI{ window.GetNativeHandle(), level.GetScene(), player.GetCamera(), gamma };
 
 		WireframeRenderer wireframeRenderer{};
 
@@ -109,45 +112,40 @@ namespace Game {
 			while (event && m_Running)
 			{
 				std::visit([&](auto&& arg)
-					{
-						using T = std::decay_t<decltype(arg)>;
+				{
+					using T = std::decay_t<decltype(arg)>;
 
-						if constexpr (std::same_as<T, StopEvent>)
+					if constexpr (std::same_as<T, StopEvent>)
+					{
+						m_Running = false;
+					}
+					else if constexpr (std::same_as<T, KeyEvent>)
+					{
+						if (arg.GetKey() == Key::ESC)
 						{
 							m_Running = false;
 						}
-						else if constexpr (std::same_as<T, KeyEvent>)
-						{
-							if (arg.GetKey() == Key::ESC)
-							{
-								m_Running = false;
-							}
 
-							bus.PostKeyPress(arg);
-						}
-						else if constexpr (std::same_as<T, MouseEvent>)
-						{
-							bus.PostMouseMove(arg);
-						}
-						else if constexpr (std::same_as<T, MouseButtonEvent>)
-						{
-							debugUI.AddMouseEvent(arg);
-						}
-					}, *event);
+						bus.PostKeyPress(arg);
+					}
+					else if constexpr (std::same_as<T, MouseEvent>)
+					{
+						bus.PostMouseMove(arg);
+					}
+				}, *event);
 				event = window.PollEvent();
 			}
 
+			auto* level = m_Levels[m_LevelNum].get();
+
 			player.Update();
-			level.Update(player);
+			level->Update(player);
 
 			wireframeRenderer.Draw(player.GetCamera());
 
-			level.GetScene().debugLines = DebugLines{ wireframeRenderer.yield() };
+			level->GetScene().debugLines = DebugLines{ wireframeRenderer.yield() };
 
-			renderer.Render(player.GetCamera(), level.GetScene(), gamma);
-
-			if (showDebug)
-				debugUI.Render();
+			renderer.Render(player.GetCamera(), level->GetScene(), gamma);
 
 			window.Swap();
 		}
@@ -156,7 +154,9 @@ namespace Game {
 	void Game::HandleLevelComplete(std::string_view levelName)
 	{
 		Logger::Info("Level complete: {}", levelName);
-		m_Running = false;
+		m_LevelNum = (m_LevelNum + 1) % m_Levels.size();
+
+		m_Levels[m_LevelNum]->Restart();
 	}
 
 }
