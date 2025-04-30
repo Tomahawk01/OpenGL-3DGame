@@ -131,6 +131,7 @@ namespace Game {
 			material->Use();
 			const mat4 model{ entity->GetTransform() };
 			material->SetUniform("model", model);
+			material->InvokeUniformCallback(entity);
 			material->BindTextures(entity->GetTextures());
 
 			mesh->Bind();

@@ -1,6 +1,7 @@
 #include "Material.h"
 
 #include "Utilities/Logger.h"
+#include "Core/Entity.h"
 #include "OpenGL.h"
 
 namespace Game {
@@ -8,6 +9,7 @@ namespace Game {
 	Material::Material(const Shader& vertexShader, const Shader& fragmentShader)
 		: m_Handle{}
 		, m_Uniforms{}
+		, m_UniformCallback{}
 	{
 		Ensure(vertexShader.GetType() == ShaderType::VERTEX, "Shader is not a vertex shader");
 		Ensure(fragmentShader.GetType() == ShaderType::FRAGMENT, "Shader is not a fragment shader");
@@ -75,6 +77,14 @@ namespace Game {
 		::glUniformMatrix4fv(uniform->second, 1, GL_FALSE, obj.data().data());
 	}
 
+	void Material::SetUniform(std::string_view name, const Color& obj) const
+	{
+		const auto uniform = m_Uniforms.find(name);
+		Ensure(uniform != std::ranges::cend(m_Uniforms), "Missing uniform {}", name);
+
+		::glUniform3fv(uniform->second, 1, reinterpret_cast<const ::GLfloat*>(std::addressof(obj)));
+	}
+
 	void Material::SetUniform(std::string_view name, int obj) const
 	{
 		const auto uniform = m_Uniforms.find(name);
@@ -122,6 +132,17 @@ namespace Game {
 		{
 			BindTexture(static_cast<uint32_t>(index), texture);
 		}
+	}
+
+	void Material::SetUniformCallback(UniformCallback uniformCallback)
+	{
+		m_UniformCallback = std::move(uniformCallback);
+	}
+
+	void Material::InvokeUniformCallback(const Entity* entity) const
+	{
+		if (m_UniformCallback)
+			m_UniformCallback(this, entity);
 	}
 
 	::GLuint Material::GetNativeHandle() const
