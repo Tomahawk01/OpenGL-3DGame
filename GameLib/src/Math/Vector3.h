@@ -53,6 +53,8 @@ namespace Game {
 			return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 		}
 
+		static float Distance(const vec3& v1, const vec3& v2);
+
 		constexpr bool operator==(const vec3&) const = default;
 
 		float x;
@@ -108,6 +110,11 @@ namespace Game {
 	{
 		vec3 temp = v1;
 		return temp *= v2;
+	}
+
+	inline float vec3::Distance(const vec3& v1, const vec3& v2)
+	{
+		return (v2 - v1).Length();
 	}
 
 }
