@@ -45,7 +45,7 @@ namespace {
 namespace Game {
 
 	LevelAlpha::LevelAlpha(const Mesh* floorMesh, const Material* floorMaterial, std::span<const Texture*> floorTextures,
-						   const Mesh* barrelMesh, const Material* barrelMaterial, std::span<const Texture*> barrelTextures,
+						   const Mesh* barrelMesh, Material* barrelMaterial, std::span<const Texture*> barrelTextures,
 						   const TLVReader& reader, const Player& player)
 		: m_Entities{}
 		, m_Floor{ floorMesh, floorMaterial, {0.0f, -2.0f, 0.0f}, {100.0f, 1.0f, 100.0f}, floorTextures }
@@ -61,10 +61,13 @@ namespace Game {
 			Entity{ barrelMesh, barrelMaterial, {5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
 			AABB{ {3.0f, -1.0f, -1.0f}, {5.0f, 1.0f, 1.0f} },
 			std::make_unique<Chain<GameTransformState, CheckVisible, CameraDelta>>());
-		m_Entities.emplace_back(
-			Entity{ barrelMesh, barrelMaterial, {-5.0f, 0.0f, 0.0f}, {1.0f}, barrelTextures },
-			AABB{ {-6.0f, -1.0f, -1.0f}, {-4.0f, 1.0f, 1.0f} },
-			std::make_unique<Chain<GameTransformState, CheckVisible, CameraDelta, Invert>>());
+
+		barrelMaterial->SetUniformCallback([this](const Material* material, const Entity* entity)
+		{
+			const float tintAmount = entity == std::addressof(m_Entities[0].entity) ? 1.0f : 0.5f;
+			material->SetUniform("tint_color", Color{ 0.0f, 0.0f, 1.0f });
+			material->SetUniform("tint_amount", tintAmount);
+		});
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
@@ -110,12 +113,12 @@ namespace Game {
 			aabb.max += entityDelta;
 		}
 
-		m_State.lastCameraPos = player.GetPosition();
+		m_State.lastCameraPos = player.GetCamera().GetPosition();
 	}
 
 	bool LevelAlpha::Complete() const
 	{
-		return false;
+		return vec3::Distance(m_Entities[0].entity.GetPosition(), m_Entities[1].entity.GetPosition()) < 1.0f;
 	}
 
 }

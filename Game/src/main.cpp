@@ -68,13 +68,13 @@ int main(int argc, char** argv)
 		const Game::Texture* textures[]{ &albedoTex, &specMap, &normalMap };
 
 		const Game::File basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
-		const Game::File basicFragFile{ resourceLoader.Load("shaders/basic.frag") };
+		const Game::File barrelFragFile{ resourceLoader.Load("shaders/barrel.frag") };
 		const Game::File checkerboardFragFile{ resourceLoader.Load("shaders/checkerboard.frag") };
 
 		const Game::Shader vertexShader{ basicVertFile.AsString(), Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ basicFragFile.AsString(), Game::ShaderType::FRAGMENT };
+		const Game::Shader barrelFragmentShader{ barrelFragFile.AsString(), Game::ShaderType::FRAGMENT };
 		const Game::Shader checkerboardShader{ checkerboardFragFile.AsString(), Game::ShaderType::FRAGMENT };
-		Game::Material material{ vertexShader, fragmentShader };
+		Game::Material barrelMaterial{ vertexShader, barrelFragmentShader };
 		Game::Material checkerboardMaterial{ vertexShader, checkerboardShader };
 		const Game::Mesh mesh{ reader, "Barrel" };
 
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 		
 		Game::LevelAlpha level{
 			&floorMesh, &checkerboardMaterial, floorTextures,
-			&mesh, &material, textures,
+			&mesh, &barrelMaterial, textures,
 			reader, player
 		};
 
@@ -144,27 +144,17 @@ int main(int argc, char** argv)
 				event = window.PollEvent();
 			}
 
-			/*for (const auto& [transformedEntity, light] : std::views::zip(entities, scene.pointLights))
-			{
-				auto& [entity, aabb, transformer] = transformedEntity;
-
-				state.aabb = aabb;
-				const Game::vec3 entityDelta = transformer->Go({}, state);
-				entity.Translate(entityDelta);
-				aabb.min += entityDelta;
-				aabb.max += entityDelta;
-				
-				wireframeRenderer.Draw(aabb);
-
-				const auto position = entity.GetPosition();
-				light.position = { position.x, 5.0f, position.z };
-			}*/
 			player.Update();
 			level.Update(player);
 
+			if (level.Complete())
+			{
+				running = false;
+			}
+
 			wireframeRenderer.Draw(player.GetCamera());
 
-			level.GetScene().debugLines = { wireframeRenderer.yield() };
+			level.GetScene().debugLines = Game::DebugLines{ wireframeRenderer.yield() };
 
 			renderer.Render(player.GetCamera(), level.GetScene(), gamma);
 

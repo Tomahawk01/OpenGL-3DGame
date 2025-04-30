@@ -19,7 +19,7 @@ namespace Game {
 	{
 	public:
 		LevelAlpha(const Mesh* floorMesh, const Material* floorMaterial, std::span<const Texture*> floorTextures,
-				   const Mesh* barrelMesh, const Material* barrelMaterial, std::span<const Texture*> barrelTextures,
+				   const Mesh* barrelMesh, Material* barrelMaterial, std::span<const Texture*> barrelTextures,
 				   const TLVReader& reader, const Player& player);
 		~LevelAlpha() override = default;
 
