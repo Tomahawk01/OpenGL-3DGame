@@ -47,6 +47,7 @@ namespace Game {
 
 	void LuaScipt::Execute(uint32_t numArgs, uint32_t numResults) const
 	{
+		Ensure(::lua_gettop(m_Lua.get()) >= static_cast<int>(numArgs), "Arg count mismatch {}", numArgs);
 		if (::lua_pcall(m_Lua.get(), numArgs, numResults, 0) != LUA_OK)
 		{
 			const auto res = ::lua_tostring(m_Lua.get(), -1);
@@ -59,6 +60,14 @@ namespace Game {
 	void LuaScipt::SetArgument(std::string_view value) const
 	{
 		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
+	}
+
+	void LuaScipt::GetResult(int64_t& result) const
+	{
+		Ensure(::lua_gettop(m_Lua.get()) != 0u, "No results to get!");
+		Ensure(::lua_isnumber(m_Lua.get(), -1) == 1, "Result not an integer!");
+		result = ::lua_tointeger(m_Lua.get(), -1);
+		::lua_pop(m_Lua.get(), 1);
 	}
 
 }
