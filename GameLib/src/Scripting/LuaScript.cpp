@@ -56,4 +56,9 @@ namespace Game {
 		}
 	}
 
+	void LuaScipt::SetArgument(std::string_view value) const
+	{
+		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
+	}
+
 }
