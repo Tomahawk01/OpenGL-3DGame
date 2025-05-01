@@ -27,14 +27,21 @@ project "GameLib"
         "%{wks.location}/vendor/stb",
         "%{wks.location}/vendor/ImGui/src",
         "%{wks.location}/vendor/ImGuizmo",
-        "%{wks.location}/vendor/JoltPhysics-5.2.0/JoltPhysics"
+        "%{wks.location}/vendor/JoltPhysics-5.2.0/JoltPhysics",
+        "%{wks.location}/vendor/lua_5.4.2/include"
+    }
+
+    libdirs
+    {
+        "%{wks.location}/vendor/lua_5.4.2/lib"
     }
 
     links
     {
         "OpenGL32.lib",
         "ImGui",
-        "JoltPhysics"
+        "JoltPhysics",
+        "lua54.lib"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
