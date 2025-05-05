@@ -57,21 +57,42 @@ namespace Game {
 		}
 	}
 
-	void LuaScipt::SetArgument(std::string_view value) const
-	{
-		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
-	}
-
 	void LuaScipt::SetArgument(int64_t value) const
 	{
 		::lua_pushinteger(m_Lua.get(), value);
 	}
 
+	void LuaScipt::SetArgument(float value) const
+	{
+		::lua_pushnumber(m_Lua.get(), value);
+	}
+
+	void LuaScipt::SetArgument(std::string_view value) const
+	{
+		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
+	}
+
 	void LuaScipt::GetResult(int64_t& result) const
 	{
 		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
-		Ensure(::lua_isnumber(m_Lua.get(), -1) == 1, "Result not an integer!");
+		Ensure(::lua_isinteger(m_Lua.get(), -1) == 1, "Result not an integer!");
 		result = ::lua_tointeger(m_Lua.get(), -1);
+		::lua_pop(m_Lua.get(), 1);
+	}
+
+	void LuaScipt::GetResult(float& result) const
+	{
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
+		Ensure(::lua_isnumber(m_Lua.get(), -1) == 1, "Result not a float!");
+		result = static_cast<float>(::lua_tonumber(m_Lua.get(), -1));
+		::lua_pop(m_Lua.get(), 1);
+	}
+
+	void LuaScipt::GetResult(std::string& result) const
+	{
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
+		Ensure(::lua_isstring(m_Lua.get(), -1) == 1, "Result not a string!");
+		result = ::lua_tostring(m_Lua.get(), -1);
 		::lua_pop(m_Lua.get(), 1);
 	}
 
