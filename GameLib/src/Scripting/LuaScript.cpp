@@ -1,6 +1,7 @@
 #include "LuaScript.h"
 
 #include "Utilities/Error.h"
+#include "Vector3Interop.h"
 
 namespace {
 
@@ -31,6 +32,7 @@ namespace Game {
 		Ensure(m_Lua, "Failed to create lua state!");
 
 		::luaL_openlibs(m_Lua.get());
+		lua_register(m_Lua.get(), "vec3", &Vector3Constructor);
 
 		LoadData loadData{ source, 0 };
 
