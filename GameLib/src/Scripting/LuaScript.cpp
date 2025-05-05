@@ -62,9 +62,14 @@ namespace Game {
 		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
 	}
 
+	void LuaScipt::SetArgument(int64_t value) const
+	{
+		::lua_pushinteger(m_Lua.get(), value);
+	}
+
 	void LuaScipt::GetResult(int64_t& result) const
 	{
-		Ensure(::lua_gettop(m_Lua.get()) != 0u, "No results to get!");
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
 		Ensure(::lua_isnumber(m_Lua.get(), -1) == 1, "Result not an integer!");
 		result = ::lua_tointeger(m_Lua.get(), -1);
 		::lua_pop(m_Lua.get(), 1);

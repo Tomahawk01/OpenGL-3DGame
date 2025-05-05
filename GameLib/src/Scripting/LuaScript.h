@@ -15,6 +15,7 @@ namespace Game {
 		void SetFunction(const std::string& name) const;
 		void Execute(uint32_t numArgs, uint32_t numResults) const;
 		void SetArgument(std::string_view value) const;
+		void SetArgument(int64_t value) const;
 		void GetResult(int64_t& result) const;
 
 	private:
