@@ -8,14 +8,14 @@ namespace Game {
 
 	namespace impl {
 
-		template <size_t I, size_t Size, class T>
-		auto GetResult(LuaScipt& script, T& resultTuple)
+		template <size_t I = 0u, class... R>
+		auto GetResult(LuaScipt& script, std::tuple<R...>& resultTuple)
 		{
-			script.GetResult(std::get<Size - I - 1>(resultTuple));
+			script.GetResult(std::get<sizeof...(R) - I - 1>(resultTuple));
 
-			if constexpr (I != Size - 1)
+			if constexpr (I != sizeof...(R) - 1)
 			{
-				GetResult<I + 1, Size>(script, resultTuple);
+				GetResult<I + 1>(script, resultTuple);
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace Game {
 			else
 			{
 				auto res = std::tuple<R...>{};
-				impl::GetResult<0, sizeof...(R)>(m_Script, res);
+				impl::GetResult(m_Script, res);
 				return res;
 			}
 		}
