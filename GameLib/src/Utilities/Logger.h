@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Formatter.h"
+
 #include <filesystem>
 #include <format>
 #include <print>

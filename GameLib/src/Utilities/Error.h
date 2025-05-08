@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Formatter.h"
 #include "AutoRelease.h"
 #include "Exception.h"
 #include "Logger.h"

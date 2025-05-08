@@ -9,15 +9,18 @@ namespace Game {
 	{
 		constexpr vec4()
 			: vec4(0.0f)
-		{}
+		{
+		}
 
 		constexpr vec4(float xyzw)
 			: vec4(xyzw, xyzw, xyzw, xyzw)
-		{}
+		{
+		}
 
 		constexpr vec4(float x, float y, float z, float w)
 			: x(x), y(y), z(z), w(w)
-		{}
+		{
+		}
 
 		static constexpr float Dot(const vec4& v1, const vec4& v2)
 		{
@@ -25,6 +28,8 @@ namespace Game {
 		}
 
 		constexpr bool operator==(const vec4&) const = default;
+
+		std::string to_string() const;
 
 		float x;
 		float y;
@@ -64,18 +69,9 @@ namespace Game {
 		return temp -= v2;
 	}
 
+	inline std::string vec4::to_string() const
+	{
+		return std::format("x={} y={} z={} w={}", x, y, z, w);
+	}
+
 }
-
-template<>
-struct std::formatter<Game::vec4>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::vec4& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "x={} y={} z={} w={}", obj.x, obj.y, obj.z, obj.w);
-	}
-};

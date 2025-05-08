@@ -15,24 +15,17 @@ namespace Game {
 			: X(x), Y(y), Z(z), W(w)
 		{}
 
+		std::string to_string() const;
+
 		float X;
 		float Y;
 		float Z;
 		float W;
 	};
 
+	inline std::string quat::to_string() const
+	{
+		return std::format("x={} y={} z={} w={}", X, Y, Z, W);
+	}
+
 }
-
-template<>
-struct std::formatter<Game::quat>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::quat& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "x={} y={} z={} w={}", obj.X, obj.Y, obj.Z, obj.W);
-	}
-};

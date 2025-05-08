@@ -1,5 +1,7 @@
 #include "KeyEvent.h"
 
+#include "Utilities/Formatter.h"
+
 namespace Game {
 
 	KeyEvent::KeyEvent(Key key, KeyState state)
@@ -15,6 +17,11 @@ namespace Game {
 	KeyState KeyEvent::GetState() const
 	{
 		return m_State;
+	}
+
+	std::string KeyEvent::to_string() const
+	{
+		return std::format("KeyEvent {} {}", m_Key, m_State);
 	}
 
 }

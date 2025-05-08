@@ -5,8 +5,6 @@
 
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 
-#include <format>
-
 namespace Game {
 
 	class PhysicsSystem;
@@ -20,23 +18,11 @@ namespace Game {
 
 		const ::JPH::ShapeSettings* GetNativeHandle() const override;
 
+		std::string to_string() const;
+
 	private:
 		float m_Radius;
 		::JPH::SphereShapeSettings m_SphereShapeSettings;
 	};
 
 }
-
-template<>
-struct std::formatter<Game::SphereShape>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::SphereShape& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "SphereShape: {}", obj.GetRadius());
-	}
-};

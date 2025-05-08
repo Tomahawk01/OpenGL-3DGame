@@ -42,7 +42,7 @@ namespace Game {
 
 		static constexpr mat3 Invert(const mat3& m)
 		{
-			const mat3 adjoint{{
+			const mat3 adjoint{ {
 				(m[4] * m[8]) - (m[5] * m[7]),
 				-((m[1] * m[8]) - (m[2] * m[7])),
 				(m[1] * m[5]) - (m[2] * m[4]),
@@ -52,7 +52,7 @@ namespace Game {
 				(m[3] * m[7]) - (m[4] * m[6]),
 				-((m[0] * m[7]) - (m[1] * m[6])),
 				(m[0] * m[4]) - (m[1] * m[3])
-			}};
+			} };
 
 			const float determinant{
 				(m[0] * m[4] * m[8]) +
@@ -91,6 +91,8 @@ namespace Game {
 		friend constexpr mat3& operator*=(mat3& m1, const mat3& m2);
 
 		constexpr bool operator==(const mat3&) const = default;
+
+		std::string to_string() const;
 
 	private:
 		std::array<float, 9u> m_Elements;
@@ -131,22 +133,13 @@ namespace Game {
 		};
 	}
 
+	inline std::string mat3::to_string() const
+	{
+		const float* d = data().data();
+		return std::format("{} {} {}\n{} {} {}\n{} {} {}",
+			d[0], d[3], d[6],
+			d[1], d[4], d[7],
+			d[2], d[5], d[8]);
+	}
+
 }
-
-template<>
-struct std::formatter<Game::mat3>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::mat3& obj, std::format_context& ctx) const
-	{
-		const float* data = obj.data().data();
-		return std::format_to(ctx.out(), "{} {} {}\n{} {} {}\n{} {} {}",
-			data[0], data[3], data[6],
-			data[1], data[4], data[7],
-			data[2], data[5], data[8]);
-	}
-};

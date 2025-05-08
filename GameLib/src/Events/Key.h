@@ -2,10 +2,7 @@
 
 #include <Windows.h>
 
-#include <string_view>
-#include <format>
-
-using namespace std::literals;
+#include <string>
 
 namespace Game {
 
@@ -51,70 +48,52 @@ namespace Game {
 		DOWN
 	};
 
+	inline std::string to_string(Key obj)
+	{
+		switch (obj)
+		{
+		case Key::ESC: return "ESC";
+		case Key::A: return "A";
+		case Key::B: return "B";
+		case Key::C: return "C";
+		case Key::D: return "D";
+		case Key::E: return "E";
+		case Key::F: return "F";
+		case Key::G: return "G";
+		case Key::H: return "H";
+		case Key::I: return "I";
+		case Key::J: return "J";
+		case Key::K: return "K";
+		case Key::L: return "L";
+		case Key::M: return "M";
+		case Key::N: return "N";
+		case Key::O: return "O";
+		case Key::P: return "P";
+		case Key::Q: return "Q";
+		case Key::R: return "R";
+		case Key::S: return "S";
+		case Key::T: return "T";
+		case Key::U: return "U";
+		case Key::V: return "V";
+		case Key::W: return "W";
+		case Key::X: return "X";
+		case Key::Y: return "Y";
+		case Key::Z: return "Z";
+		case Key::SPACE: return "SPACE";
+		case Key::F1: return "F1";
+		}
+
+		return "?";
+	}
+
+	inline std::string to_string(KeyState obj)
+	{
+		switch (obj)
+		{
+		case KeyState::UP: return "UP";
+		case KeyState::DOWN: return "DOWN";
+		default: return "UNKNOWN STATE";
+		}
+	}
+
 }
-
-template<>
-struct std::formatter<Game::Key>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::Key& obj, std::format_context& ctx) const
-	{
-		std::string_view s{ "?"sv };
-
-		switch (obj)
-		{
-		case Game::Key::ESC: s = "ESC"sv; break;
-		case Game::Key::A: s = "A"sv; break;
-		case Game::Key::B: s = "B"sv; break;
-		case Game::Key::C: s = "C"sv; break;
-		case Game::Key::D: s = "D"sv; break;
-		case Game::Key::E: s = "E"sv; break;
-		case Game::Key::F: s = "F"sv; break;
-		case Game::Key::G: s = "G"sv; break;
-		case Game::Key::H: s = "H"sv; break;
-		case Game::Key::I: s = "I"sv; break;
-		case Game::Key::J: s = "J"sv; break;
-		case Game::Key::K: s = "K"sv; break;
-		case Game::Key::L: s = "L"sv; break;
-		case Game::Key::M: s = "M"sv; break;
-		case Game::Key::N: s = "N"sv; break;
-		case Game::Key::O: s = "O"sv; break;
-		case Game::Key::P: s = "P"sv; break;
-		case Game::Key::Q: s = "Q"sv; break;
-		case Game::Key::R: s = "R"sv; break;
-		case Game::Key::S: s = "S"sv; break;
-		case Game::Key::T: s = "T"sv; break;
-		case Game::Key::U: s = "U"sv; break;
-		case Game::Key::V: s = "V"sv; break;
-		case Game::Key::W: s = "W"sv; break;
-		case Game::Key::X: s = "X"sv; break;
-		case Game::Key::Y: s = "Y"sv; break;
-		case Game::Key::Z: s = "Z"sv; break;
-		}
-
-		return std::format_to(ctx.out(), "{}", s);
-	}
-};
-
-template<>
-struct std::formatter<Game::KeyState>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::KeyState& obj, std::format_context& ctx) const
-	{
-		switch (obj)
-		{
-		case Game::KeyState::UP: return std::format_to(ctx.out(), "UP");
-		case Game::KeyState::DOWN: return std::format_to(ctx.out(), "DOWN");
-		default: return std::format_to(ctx.out(), "UNKNOWN STATE");
-		}
-	}
-};

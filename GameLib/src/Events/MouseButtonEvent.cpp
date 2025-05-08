@@ -1,5 +1,7 @@
 #include "MouseButtonEvent.h"
 
+#include "Utilities/Formatter.h"
+
 namespace Game {
 
 	MouseButtonEvent::MouseButtonEvent(float x, float y, MouseButtonState state)
@@ -21,6 +23,21 @@ namespace Game {
 	MouseButtonState MouseButtonEvent::GetState() const
 	{
 		return m_State;
+	}
+
+	std::string MouseButtonEvent::to_string() const
+	{
+		return std::format("MouseButtonEvent {} {} {}", GetState(), GetX(), GetY());
+	}
+
+	std::string to_string(MouseButtonState obj)
+	{
+		switch (obj)
+		{
+		case MouseButtonState::UP: return "UP";
+		case MouseButtonState::DOWN: return "DOWN";
+		default: return "UNKNOWN";
+		}
 	}
 
 }

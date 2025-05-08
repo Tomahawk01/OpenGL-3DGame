@@ -11,6 +11,8 @@
 #include <span>
 #include <vector>
 
+using namespace std::literals;
+
 namespace Game {
 
 	enum class TLVType : uint32_t
@@ -54,35 +56,6 @@ namespace Game {
 		std::span<const std::byte> m_Value;
 	};
 
+	std::string to_string(const TLVType& obj);
+
 }
-
-template<>
-struct std::formatter<Game::TLVType>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::TLVType& obj, std::format_context& ctx) const
-	{
-		auto str = "unknown"sv;
-
-		switch (obj)
-		{
-		case Game::TLVType::UINT32: str = "UINT32"sv; break;
-		case Game::TLVType::UINT32_ARRAY: str = "UINT32_ARRAY"sv; break;
-		case Game::TLVType::STRING: str = "STRING"sv; break;
-		case Game::TLVType::BYTE_ARRAY: str = "BYTE_ARRAY"sv; break;
-		case Game::TLVType::TEXTURE_FORMAT: str = "TEXTURE_FORMAT"sv; break;
-		case Game::TLVType::TEXTURE_USAGE: str = "TEXTURE_USAGE"sv; break;
-		case Game::TLVType::VERTEX_DATA: str = "VERTEX_DATA"sv; break;
-		case Game::TLVType::VERTEX_DATA_ARRAY: str = "VERTEX_DATA_ARRAY"sv; break;
-
-		case Game::TLVType::TEXTURE_DESCRIPTION: str = "TEXTURE_DESCRIPTION"sv; break;
-		case Game::TLVType::MESH_DATA: str = "MESH_DATA"sv; break;
-		}
-
-		return std::format_to(ctx.out(), "{}", str);
-	}
-};

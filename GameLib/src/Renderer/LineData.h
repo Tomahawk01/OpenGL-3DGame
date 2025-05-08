@@ -1,9 +1,8 @@
 #pragma once
 
+#include "Utilities/Formatter.h"
 #include "Math/Color.h"
 #include "Math/Vector3.h"
-
-#include <format>
 
 namespace Game {
 
@@ -13,18 +12,9 @@ namespace Game {
 		Color color;
 	};
 
+	inline std::string to_string(const LineData& obj)
+	{
+		return std::format("p=[{}] c=[{}]", obj.position, obj.color);
+	}
+
 }
-
-template<>
-struct std::formatter<Game::LineData>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::LineData& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "p=[{}] c=[{}]", obj.position, obj.color);
-	}
-};

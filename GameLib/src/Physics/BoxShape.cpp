@@ -3,6 +3,8 @@
 #include "Utilities/Error.h"
 #include "JoltUtils.h"
 
+#include <format>
+
 namespace Game {
 
 	BoxShape::BoxShape(const vec3& dimensions, PassKey<PhysicsSystem> passKey)
@@ -21,6 +23,11 @@ namespace Game {
 	const ::JPH::ShapeSettings* BoxShape::GetNativeHandle() const
 	{
 		return std::addressof(m_BoxShapeSettings);
+	}
+
+	std::string BoxShape::to_string() const
+	{
+		return std::format("BoxShape: {}", GetDimensions());
 	}
 
 }

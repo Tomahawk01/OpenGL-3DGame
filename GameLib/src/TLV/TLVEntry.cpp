@@ -175,6 +175,28 @@ namespace Game {
 		return meshName == name;
 	}
 
+	std::string to_string(const TLVType& obj)
+	{
+		auto str = "unknown"sv;
+
+		switch (obj)
+		{
+		case TLVType::UINT32: str = "UINT32"sv; break;
+		case TLVType::UINT32_ARRAY: str = "UINT32_ARRAY"sv; break;
+		case TLVType::STRING: str = "STRING"sv; break;
+		case TLVType::BYTE_ARRAY: str = "BYTE_ARRAY"sv; break;
+		case TLVType::TEXTURE_FORMAT: str = "TEXTURE_FORMAT"sv; break;
+		case TLVType::TEXTURE_USAGE: str = "TEXTURE_USAGE"sv; break;
+		case TLVType::VERTEX_DATA: str = "VERTEX_DATA"sv; break;
+		case TLVType::VERTEX_DATA_ARRAY: str = "VERTEX_DATA_ARRAY"sv; break;
+
+		case TLVType::TEXTURE_DESCRIPTION: str = "TEXTURE_DESCRIPTION"sv; break;
+		case TLVType::MESH_DATA: str = "MESH_DATA"sv; break;
+		}
+
+		return std::format("{}", str);
+	}
+
 	TLVType TLVEntry::Type() const
 	{
 		return m_Type;

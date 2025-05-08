@@ -1,5 +1,7 @@
 #include "CylinderShape.h"
 
+#include <format>
+
 namespace Game {
 
 	CylinderShape::CylinderShape(float halfHeight, float radius, PassKey<PhysicsSystem> passKey)
@@ -24,6 +26,11 @@ namespace Game {
 	const ::JPH::ShapeSettings* CylinderShape::GetNativeHandle() const
 	{
 		return std::addressof(m_CylinderShapeSettings);
+	}
+
+	std::string CylinderShape::to_string() const
+	{
+		return std::format("CylinderShape: {} {}", GetHalfHeight(), GetRadius());
 	}
 
 }

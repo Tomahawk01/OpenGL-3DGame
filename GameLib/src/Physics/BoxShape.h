@@ -6,8 +6,6 @@
 
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 
-#include <format>
-
 namespace Game {
 
 	class PhysicsSystem;
@@ -21,23 +19,11 @@ namespace Game {
 
 		const ::JPH::ShapeSettings* GetNativeHandle() const override;
 
+		std::string to_string() const;
+
 	private:
 		vec3 m_Dimensions;
 		::JPH::BoxShapeSettings m_BoxShapeSettings;
 	};
 
 }
-
-template<>
-struct std::formatter<Game::BoxShape>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::BoxShape& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "BoxShape: {}", obj.GetDimensions());
-	}
-};

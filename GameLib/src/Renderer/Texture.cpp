@@ -1,5 +1,6 @@
 #include "Texture.h"
 
+#include "Utilities/Formatter.h"
 #include "Utilities/Error.h"
 #include "TLV/TLVReader.h"
 #include "Sampler.h"
@@ -113,6 +114,16 @@ namespace Game {
 	const Sampler* Texture::GetSampler() const
 	{
 		return m_Sampler;
+	}
+
+	std::string to_string(const TextureDescription& obj)
+	{
+		return std::format("width={} height={} format={} usage={} data={}",
+			obj.width,
+			obj.height,
+			std::to_underlying(obj.format),
+			std::to_underlying(obj.usage),
+			obj.data.size());
 	}
 
 }

@@ -5,8 +5,6 @@
 
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 
-#include <format>
-
 namespace Game {
 
 	class PhysicsSystem;
@@ -21,6 +19,8 @@ namespace Game {
 
 		const ::JPH::ShapeSettings* GetNativeHandle() const override;
 
+		std::string to_string() const;
+
 	private:
 		float m_HalfHeight;
 		float m_Radius;
@@ -28,17 +28,3 @@ namespace Game {
 	};
 
 }
-
-template<>
-struct std::formatter<Game::CylinderShape>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::CylinderShape& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "CylinderShape: {} {}", obj.GetHalfHeight(), obj.GetRadius());
-	}
-};

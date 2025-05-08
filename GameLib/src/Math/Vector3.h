@@ -57,6 +57,8 @@ namespace Game {
 
 		constexpr bool operator==(const vec3&) const = default;
 
+		std::string to_string() const;
+
 		float x;
 		float y;
 		float z;
@@ -117,18 +119,9 @@ namespace Game {
 		return (v2 - v1).Length();
 	}
 
+	inline std::string vec3::to_string() const
+	{
+		return std::format("x={} y={} z={}", x, y, z);
+	}
+
 }
-
-template<>
-struct std::formatter<Game::vec3>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::vec3& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "x={} y={} z={}", obj.x, obj.y, obj.z);
-	}
-};

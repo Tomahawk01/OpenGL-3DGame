@@ -1,5 +1,7 @@
 #include "MouseEvent.h"
 
+#include <format>
+
 namespace Game {
 
 	MouseEvent::MouseEvent(float deltaX, float deltaY)
@@ -15,6 +17,11 @@ namespace Game {
 	float MouseEvent::GetDeltaY() const
 	{
 		return m_DeltaY;
+	}
+
+	std::string MouseEvent::to_string() const
+	{
+		return std::format("MouseEvent {} {}", GetDeltaX(), GetDeltaY());
 	}
 
 }

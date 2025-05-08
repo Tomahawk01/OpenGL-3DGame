@@ -2,7 +2,7 @@
 
 #include "Key.h"
 
-#include <format>
+#include <string>
 
 namespace Game {
 
@@ -16,23 +16,11 @@ namespace Game {
 
 		bool operator==(const KeyEvent&) const = default;
 
+		std::string to_string() const;
+
 	private:
 		Key m_Key;
 		KeyState m_State;
 	};
 
 }
-
-template<>
-struct std::formatter<Game::KeyEvent>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::KeyEvent& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "KeyEvent {} {}", obj.GetKey(), obj.GetState());
-	}
-};

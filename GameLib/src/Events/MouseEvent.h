@@ -1,6 +1,6 @@
 #pragma once
 
-#include <format>
+#include <string>
 
 namespace Game {
 
@@ -12,23 +12,11 @@ namespace Game {
 		float GetDeltaX() const;
 		float GetDeltaY() const;
 
+		std::string to_string() const;
+
 	private:
 		float m_DeltaX;
 		float m_DeltaY;
 	};
 
 }
-
-template<>
-struct std::formatter<Game::MouseEvent>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::MouseEvent& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "MouseEvent {} {}", obj.GetDeltaX(), obj.GetDeltaY());
-	}
-};

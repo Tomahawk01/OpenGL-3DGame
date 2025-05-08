@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <format>
+
 namespace {
 
 	GLenum ToNative(Game::ShaderType type)
@@ -20,7 +22,7 @@ namespace Game {
 	Shader::Shader(std::string_view src, ShaderType type)
 		:m_Handle{}, m_Type(type)
 	{
-		m_Handle = Game::AutoRelease<::GLuint>{
+		m_Handle = AutoRelease<::GLuint>{
 			::glCreateShader(ToNative(type)),
 			::glDeleteShader
 		};
@@ -39,7 +41,7 @@ namespace Game {
 			char log[512];
 			::glGetShaderInfoLog(m_Handle, sizeof(log), nullptr, log);
 
-			Game::Ensure(result, "Failed to compile shader {}\n{}", m_Type, log);
+			Ensure(result, "Failed to compile shader {}\n{}", m_Type, log);
 		}
 	}
 
@@ -51,6 +53,17 @@ namespace Game {
 	::GLuint Shader::GetNativeHandle() const
 	{
 		return m_Handle;
+	}
+
+	std::string to_string(ShaderType obj)
+	{
+		switch (obj)
+		{
+		case ShaderType::VERTEX: return "VERTEX";
+		case ShaderType::FRAGMENT: return "FRAGMENT";
+		}
+
+		throw Exception("Unknown shader type: {}", std::to_underlying(obj));
 	}
 
 }

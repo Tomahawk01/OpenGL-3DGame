@@ -5,7 +5,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <format>
 #include <span>
 #include <string_view>
 
@@ -53,23 +52,6 @@ namespace Game {
 		const Sampler* m_Sampler;
 	};
 
+	std::string to_string(const TextureDescription& obj);
+
 }
-
-template<>
-struct std::formatter<Game::TextureDescription>
-{
-	constexpr auto parse(std::format_parse_context& ctx)
-	{
-		return std::begin(ctx);
-	}
-
-	auto format(const Game::TextureDescription& obj, std::format_context& ctx) const
-	{
-		return std::format_to(ctx.out(), "width={} height={} format={} usage={} data={}",
-			obj.width,
-			obj.height,
-			std::to_underlying(obj.format),
-			std::to_underlying(obj.usage),
-			obj.data.size());
-	}
-};
