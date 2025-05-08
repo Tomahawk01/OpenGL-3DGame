@@ -74,6 +74,15 @@ namespace Game {
 		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
 	}
 
+	void LuaScipt::SetArgument(const vec3& value) const
+	{
+		SetArgument(value.x);
+		SetArgument(value.y);
+		SetArgument(value.z);
+
+		Vector3Constructor(m_Lua.get());
+	}
+
 	void LuaScipt::GetResult(int64_t& result) const
 	{
 		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
