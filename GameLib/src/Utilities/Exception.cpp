@@ -4,8 +4,9 @@
 
 namespace Game {
 
-	Exception::Exception(const std::string& what, uint32_t skip)
-		: std::runtime_error(what), m_Trace(std::stacktrace::current(skip))
+	Exception::Exception(std::string what, uint32_t skip)
+		: m_What(std::move(what))
+		, m_Trace(std::stacktrace::current(skip))
 	{}
 
 	std::string Exception::Stacktrace() const
@@ -16,6 +17,11 @@ namespace Game {
 	std::string Exception::to_string() const
 	{
 		return std::format("{}\n{}", what(), Stacktrace());
+	}
+
+	std::string_view Exception::what() const
+	{
+		return m_What;
 	}
 
 }
