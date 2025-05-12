@@ -30,6 +30,11 @@ namespace Game {
 		std::unique_ptr<::lua_State, decltype(&::lua_close)> m_Lua;
 	};
 
-	std::string to_string(::lua_State* state);
+	struct LuaStateObjWrapper
+	{
+		::lua_State* state;
+	};
+
+	std::string to_string(LuaStateObjWrapper obj);
 
 }

@@ -112,16 +112,17 @@ namespace Game {
 
 	std::string LuaScipt::to_string() const
 	{
-		return Game::to_string(m_Lua.get());
+		return Game::to_string({ m_Lua.get() });
 	}
 
-	std::string to_string(::lua_State* state)
+	std::string to_string(LuaStateObjWrapper obj)
 	{
+		auto* state = obj.state;
 		std::stringstream strm{};
 
 		const int stackSize = ::lua_gettop(state);
 		if (stackSize == 0)
-			return {};
+			return "<empty stack>";
 
 		for (const int index : std::views::iota(1, stackSize + 1) | std::views::reverse)
 		{
