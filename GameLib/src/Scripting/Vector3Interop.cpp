@@ -1,12 +1,20 @@
 #include "Vector3Interop.h"
 
+#include "Utilities/Error.h"
+#include "Utilities/Formatter.h"
+#include "LuaScript.h"
+
 namespace Game {
 
 	int Vector3Constructor(::lua_State* state)
 	{
-		const auto x = ::luaL_checknumber(state, 1);
-		const auto y = ::luaL_checknumber(state, 2);
-		const auto z = ::luaL_checknumber(state, 3);
+		auto wrappedState = LuaStateObjWrapper{ state };
+		Ensure(::lua_isnumber(state, -3) == 1, "Stack index 1 not number:\n{}", wrappedState);
+		const auto x = ::lua_tonumber(state, -3);
+		Ensure(::lua_isnumber(state, -2) == 1, "Stack index 2 not number:\n{}", wrappedState);
+		const auto y = ::lua_tonumber(state, -2);
+		Ensure(::lua_isnumber(state, -1) == 1, "Stack index 3 not number:\n{}", wrappedState);
+		const auto z = ::lua_tonumber(state, -1);
 
 		::lua_pop(state, 3);
 
