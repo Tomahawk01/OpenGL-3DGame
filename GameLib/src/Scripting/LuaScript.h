@@ -24,8 +24,12 @@ namespace Game {
 		void GetResult(float& result) const;
 		void GetResult(std::string& result) const;
 
+		std::string to_string() const;
+
 	private:
 		std::unique_ptr<::lua_State, decltype(&::lua_close)> m_Lua;
 	};
+
+	std::string to_string(::lua_State* state);
 
 }

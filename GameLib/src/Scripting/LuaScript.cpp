@@ -3,6 +3,9 @@
 #include "Utilities/Error.h"
 #include "Vector3Interop.h"
 
+#include <sstream>
+#include <ranges>
+
 namespace {
 
 	struct LoadData
@@ -105,6 +108,53 @@ namespace Game {
 		Ensure(::lua_isstring(m_Lua.get(), -1) == 1, "Result not a string!");
 		result = ::lua_tostring(m_Lua.get(), -1);
 		::lua_pop(m_Lua.get(), 1);
+	}
+
+	std::string LuaScipt::to_string() const
+	{
+		return Game::to_string(m_Lua.get());
+	}
+
+	std::string to_string(::lua_State* state)
+	{
+		std::stringstream strm{};
+
+		const int stackSize = ::lua_gettop(state);
+		if (stackSize == 0)
+			return {};
+
+		for (const int index : std::views::iota(1, stackSize + 1) | std::views::reverse)
+		{
+			const int type = ::lua_type(state, index);
+			switch (type)
+			{
+			case LUA_TNIL: strm << "LUA_TNIL"; break;
+			case LUA_TNUMBER:
+			{
+				if (::lua_isinteger(state, index) == 1)
+				{
+					strm << std::format("LUA_TNUMBER (int) {}", ::lua_tointeger(state, index));
+				}
+				else
+				{
+					strm << std::format("LUA_TNUMBER (float) {}", ::lua_tonumber(state, index));
+				}
+				break;
+			}
+			case LUA_TBOOLEAN: strm << std::format("LUA_TBOOLEAN {}", ::lua_toboolean(state, index)); break;
+			case LUA_TSTRING: strm << std::format("LUA_TSTRING '{}'", ::lua_tostring(state, index)); break;
+			case LUA_TTABLE: strm << "LUA_TTABLE"; break;
+			case LUA_TFUNCTION: strm << "LUA_TFUNCTION"; break;
+			case LUA_TUSERDATA: strm << "LUA_TUSERDATA"; break;
+			case LUA_TTHREAD: strm << "LUA_TTHREAD"; break;
+			case LUA_TLIGHTUSERDATA: strm << "LUA_TLIGHTUSERDATA"; break;
+			default: strm << "unknown"; break;
+			}
+
+			strm << "\n";
+		}
+
+		return strm.str();
 	}
 
 }
