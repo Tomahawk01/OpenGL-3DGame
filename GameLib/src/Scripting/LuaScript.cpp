@@ -32,27 +32,27 @@ namespace Game {
 	LuaScipt::LuaScipt(std::string_view source)
 		: m_Lua(::luaL_newstate(), &::lua_close)
 	{
-		Ensure(m_Lua, "Failed to create lua state!");
+		Ensure(m_Lua, "Failed to create lua state!\n{}", *this);
 
 		::luaL_openlibs(m_Lua.get());
 		lua_register(m_Lua.get(), "vec3", &Vector3Constructor);
 
 		LoadData loadData{ source, 0 };
 
-		Ensure(::lua_load(m_Lua.get(), &LoadStringView, reinterpret_cast<void*>(&loadData), "lua_script", "t") == LUA_OK, "Failed to load lua source!");
+		Ensure(::lua_load(m_Lua.get(), &LoadStringView, reinterpret_cast<void*>(&loadData), "lua_script", "t") == LUA_OK, "Failed to load lua source!\n{}", *this);
 
-		Ensure(::lua_pcall(m_Lua.get(), 0, 0, 0) == LUA_OK, "Failed to initialize script!");
+		Ensure(::lua_pcall(m_Lua.get(), 0, 0, 0) == LUA_OK, "Failed to initialize script!\n{}", *this);
 	}
 
 	void LuaScipt::SetFunction(const std::string& name) const
 	{
 		const auto retType = ::lua_getglobal(m_Lua.get(), name.c_str());
-		Ensure(retType == LUA_TFUNCTION, "Missing function {}", name);
+		Ensure(retType == LUA_TFUNCTION, "Missing function {}\n{}", name, *this);
 	}
 
 	void LuaScipt::Execute(uint32_t numArgs, uint32_t numResults) const
 	{
-		Ensure(::lua_gettop(m_Lua.get()) >= static_cast<int>(numArgs), "Arg count mismatch {}", numArgs);
+		Ensure(::lua_gettop(m_Lua.get()) >= static_cast<int>(numArgs), "Arg count mismatch {}\n{}", numArgs, *this);
 		if (::lua_pcall(m_Lua.get(), numArgs, numResults, 0) != LUA_OK)
 		{
 			const auto res = ::lua_tostring(m_Lua.get(), -1);
@@ -88,31 +88,31 @@ namespace Game {
 
 	void LuaScipt::GetResult(int64_t& result) const
 	{
-		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
-		Ensure(::lua_isinteger(m_Lua.get(), -1) == 1, "Result not an integer!");
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!\n{}", *this);
+		Ensure(::lua_isinteger(m_Lua.get(), -1) == 1, "Result not an integer!\n{}", *this);
 		result = ::lua_tointeger(m_Lua.get(), -1);
 		::lua_pop(m_Lua.get(), 1);
 	}
 
 	void LuaScipt::GetResult(float& result) const
 	{
-		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
-		Ensure(::lua_isnumber(m_Lua.get(), -1) == 1, "Result not a float!");
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!\n{}", *this);
+		Ensure(::lua_isnumber(m_Lua.get(), -1) == 1, "Result not a float!\n{}", *this);
 		result = static_cast<float>(::lua_tonumber(m_Lua.get(), -1));
 		::lua_pop(m_Lua.get(), 1);
 	}
 
 	void LuaScipt::GetResult(std::string& result) const
 	{
-		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
-		Ensure(::lua_isstring(m_Lua.get(), -1) == 1, "Result not a string!");
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!\n{}", *this);
+		Ensure(::lua_isstring(m_Lua.get(), -1) == 1, "Result not a string!\n{}", *this);
 		result = ::lua_tostring(m_Lua.get(), -1);
 		::lua_pop(m_Lua.get(), 1);
 	}
 
 	void LuaScipt::GetResult(vec3& result) const
 	{
-		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!\n{}", *this);
 		Ensure(::lua_type(m_Lua.get(), -1) == LUA_TTABLE, "No table at top of stack\n{}", *this);
 
 		Ensure(::lua_getfield(m_Lua.get(), -1, "x") == LUA_TNUMBER, "Could not get 'x' field\n{}", *this);
