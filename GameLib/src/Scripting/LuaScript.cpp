@@ -41,6 +41,21 @@ namespace Game {
 		::lua_pushcfunction(m_Lua.get(), &Vector3Add);
 		::lua_setfield(m_Lua.get(), -2, "__add");
 
+		::lua_pushcfunction(m_Lua.get(), &Vector3Sub);
+		::lua_setfield(m_Lua.get(), -2, "__sub");
+
+		::lua_pushcfunction(m_Lua.get(), &Vector3Mul);
+		::lua_setfield(m_Lua.get(), -2, "__mul");
+
+		::lua_pushcfunction(m_Lua.get(), &Vector3Unm);
+		::lua_setfield(m_Lua.get(), -2, "__unm");
+
+		::lua_pushcfunction(m_Lua.get(), &Vector3Eq);
+		::lua_setfield(m_Lua.get(), -2, "__eq");
+
+		::lua_pushcfunction(m_Lua.get(), &Vector3ToString);
+		::lua_setfield(m_Lua.get(), -2, "__tostring");
+
 		::lua_setmetatable(m_Lua.get(), -1);
 
 		LoadData loadData{ source, 0 };
@@ -133,6 +148,14 @@ namespace Game {
 		result.z = static_cast<float>(::lua_tonumber(m_Lua.get(), -1));
 		::lua_pop(m_Lua.get(), 1);
 
+		::lua_pop(m_Lua.get(), 1);
+	}
+
+	void LuaScipt::GetResult(bool& result) const
+	{
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!\n{}", *this);
+		Ensure(lua_isboolean(m_Lua.get(), -1) == 1, "Result not a bool!\n{}", *this);
+		result = ::lua_toboolean(m_Lua.get(), -1);
 		::lua_pop(m_Lua.get(), 1);
 	}
 

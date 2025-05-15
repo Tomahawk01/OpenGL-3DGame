@@ -72,9 +72,67 @@ namespace Game {
 		LuaStateObjWrapper wrappedState{ state };
 		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
 		
-		const auto vec1 = PopVector3(state);
 		const auto vec2 = PopVector3(state);
+		const auto vec1 = PopVector3(state);
 		PushVector3(state, vec1 + vec2);
+
+		return 1;
+	}
+
+	int Vector3Sub(::lua_State* state)
+	{
+		LuaStateObjWrapper wrappedState{ state };
+		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+
+		const auto vec2 = PopVector3(state);
+		const auto vec1 = PopVector3(state);
+		PushVector3(state, vec1 - vec2);
+
+		return 1;
+	}
+
+	int Vector3Mul(::lua_State* state)
+	{
+		LuaStateObjWrapper wrappedState{ state };
+		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+
+		const auto vec2 = PopVector3(state);
+		const auto vec1 = PopVector3(state);
+		PushVector3(state, vec1 * vec2);
+
+		return 1;
+	}
+
+	int Vector3Unm(::lua_State* state)
+	{
+		LuaStateObjWrapper wrappedState{ state };
+		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+
+		const auto vec = PopVector3(state);
+		PushVector3(state, -vec);
+
+		return 1;
+	}
+
+	int Vector3Eq(::lua_State* state)
+	{
+		LuaStateObjWrapper wrappedState{ state };
+		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+
+		const auto vec2 = PopVector3(state);
+		const auto vec1 = PopVector3(state);
+		::lua_pushboolean(state, vec1 == vec2);
+
+		return 1;
+	}
+
+	int Vector3ToString(::lua_State* state)
+	{
+		LuaStateObjWrapper wrappedState{ state };
+		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+
+		const auto vec = PopVector3(state);
+		::lua_pushstring(state, vec.to_string().c_str());
 
 		return 1;
 	}

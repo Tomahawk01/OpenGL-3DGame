@@ -25,6 +25,7 @@ namespace Game {
 		void GetResult(float& result) const;
 		void GetResult(std::string& result) const;
 		void GetResult(vec3& result) const;
+		void GetResult(bool& result) const;
 
 		std::string to_string() const;
 
