@@ -110,6 +110,26 @@ namespace Game {
 		::lua_pop(m_Lua.get(), 1);
 	}
 
+	void LuaScipt::GetResult(vec3& result) const
+	{
+		Ensure(::lua_gettop(m_Lua.get()) != 0, "No results to get!");
+		Ensure(::lua_type(m_Lua.get(), -1) == LUA_TTABLE, "No table at top of stack\n{}", *this);
+
+		Ensure(::lua_getfield(m_Lua.get(), -1, "x") == LUA_TNUMBER, "Could not get 'x' field\n{}", *this);
+		result.x = static_cast<float>(::lua_tonumber(m_Lua.get(), -1));
+		::lua_pop(m_Lua.get(), 1);
+
+		Ensure(::lua_getfield(m_Lua.get(), -1, "y") == LUA_TNUMBER, "Could not get 'y' field\n{}", *this);
+		result.y = static_cast<float>(::lua_tonumber(m_Lua.get(), -1));
+		::lua_pop(m_Lua.get(), 1);
+
+		Ensure(::lua_getfield(m_Lua.get(), -1, "z") == LUA_TNUMBER, "Could not get 'z' field\n{}", *this);
+		result.z = static_cast<float>(::lua_tonumber(m_Lua.get(), -1));
+		::lua_pop(m_Lua.get(), 1);
+
+		::lua_pop(m_Lua.get(), 1);
+	}
+
 	std::string LuaScipt::to_string() const
 	{
 		return Game::to_string({ m_Lua.get() });

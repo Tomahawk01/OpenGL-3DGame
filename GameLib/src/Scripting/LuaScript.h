@@ -16,6 +16,7 @@ namespace Game {
 
 		void SetFunction(const std::string& name) const;
 		void Execute(uint32_t numArgs, uint32_t numResults) const;
+
 		void SetArgument(int64_t value) const;
 		void SetArgument(float value) const;
 		void SetArgument(std::string_view value) const;
@@ -23,6 +24,7 @@ namespace Game {
 		void GetResult(int64_t& result) const;
 		void GetResult(float& result) const;
 		void GetResult(std::string& result) const;
+		void GetResult(vec3& result) const;
 
 		std::string to_string() const;
 
