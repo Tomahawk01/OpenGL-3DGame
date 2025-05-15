@@ -36,6 +36,12 @@ namespace Game {
 
 		::luaL_openlibs(m_Lua.get());
 		lua_register(m_Lua.get(), "vec3", &Vector3Constructor);
+		::luaL_newmetatable(m_Lua.get(), "vec3");
+
+		::lua_pushcfunction(m_Lua.get(), &Vector3Add);
+		::lua_setfield(m_Lua.get(), -2, "__add");
+
+		::lua_setmetatable(m_Lua.get(), -1);
 
 		LoadData loadData{ source, 0 };
 
