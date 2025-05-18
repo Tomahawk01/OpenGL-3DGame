@@ -106,7 +106,7 @@ namespace Game {
 	int Vector3Unm(::lua_State* state)
 	{
 		LuaStateObjWrapper wrappedState{ state };
-		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+		Ensure(::lua_gettop(state) >= 1, "No results to get!\n{}", wrappedState);
 
 		const auto vec = PopVector3(state);
 		PushVector3(state, -vec);
@@ -129,7 +129,7 @@ namespace Game {
 	int Vector3ToString(::lua_State* state)
 	{
 		LuaStateObjWrapper wrappedState{ state };
-		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+		Ensure(::lua_gettop(state) >= 1, "No results to get!\n{}", wrappedState);
 
 		const auto vec = PopVector3(state);
 		::lua_pushstring(state, vec.to_string().c_str());
