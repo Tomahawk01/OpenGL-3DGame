@@ -42,7 +42,7 @@ namespace Game {
 			};
 
 			m_Script.SetFunction(functionName);
-			SetArgs(std::forward<Args>(args)...);
+			setArgs(std::forward<Args>(args)...);
 
 			m_Script.Execute(sizeof...(args), sizeof...(R));
 
