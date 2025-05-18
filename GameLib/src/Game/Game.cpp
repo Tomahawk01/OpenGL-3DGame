@@ -19,6 +19,7 @@
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/WireframeRenderer.h"
+#include "Scripting/LuaLevel.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
@@ -97,8 +98,7 @@ namespace Game {
 
 		const Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		m_Levels.push_back(std::make_unique<LevelAlpha>(resourceCache, reader, player, bus));
-		m_Levels.push_back(std::make_unique<LevelBravo>(resourceCache, reader, player, bus));
+		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_alpha.lua", resourceCache, reader));
 
 		m_Levels[m_LevelNum]->Restart();
 
