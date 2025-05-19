@@ -4,7 +4,7 @@
 #include "Core/ResourceLoader.h"
 #include "Game/Levels/Level.h"
 #include "Game/TransformedEntity.h"
-#include "Scripting/LuaScript.h"
+#include "LuaScript.h"
 
 #include <string_view>
 #include <vector>
@@ -18,10 +18,9 @@ namespace Game {
 
 		void Update(const Player& player) override;
 		void Restart() override;
-		const std::vector<TransformedEntity>& GetEntities() const;
 
 	private:
-		LuaScript m_Script;
+		LuaScipt m_Script;
 		std::vector<TransformedEntity> m_Entities;
 		Entity m_Floor;
 		CubeMap m_Skybox;

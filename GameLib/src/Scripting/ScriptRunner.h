@@ -9,7 +9,7 @@ namespace Game {
 	namespace impl {
 
 		template <size_t I = 0u, class... R>
-		auto GetResult(LuaScript& script, std::tuple<R...>& resultTuple)
+		auto GetResult(LuaScipt& script, std::tuple<R...>& resultTuple)
 		{
 			script.GetResult(std::get<sizeof...(R) - I - 1>(resultTuple));
 
@@ -24,7 +24,7 @@ namespace Game {
 	class ScriptRunner
 	{
 	public:
-		ScriptRunner(LuaScript& script)
+		ScriptRunner(LuaScipt& script)
 			: m_Script(script)
 		{}
 
@@ -65,7 +65,7 @@ namespace Game {
 		}
 
 	private:
-		LuaScript& m_Script;
+		LuaScipt& m_Script;
 	};
 
 }
