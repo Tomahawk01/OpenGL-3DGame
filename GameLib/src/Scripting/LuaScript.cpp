@@ -36,6 +36,7 @@ namespace Game {
 
 		::luaL_openlibs(m_Lua.get());
 		lua_register(m_Lua.get(), "vec3", &Vector3Constructor);
+		lua_register(m_Lua.get(), "distance", &Vector3Distance);
 		::luaL_newmetatable(m_Lua.get(), "vec3");
 
 		::lua_pushcfunction(m_Lua.get(), &Vector3Add);

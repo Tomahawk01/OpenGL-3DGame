@@ -137,4 +137,16 @@ namespace Game {
 		return 1;
 	}
 
+	int Vector3Distance(::lua_State* state)
+	{
+		LuaStateObjWrapper wrappedState{ state };
+		Ensure(::lua_gettop(state) >= 2, "No results to get!\n{}", wrappedState);
+
+		const auto vec2 = PopVector3(state);
+		const auto vec1 = PopVector3(state);
+		::lua_pushnumber(state, vec3::Distance(vec1, vec2));
+
+		return 1;
+	}
+
 }

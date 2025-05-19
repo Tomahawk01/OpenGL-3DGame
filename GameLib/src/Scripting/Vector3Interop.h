@@ -11,5 +11,6 @@ namespace Game {
 	int Vector3Unm(::lua_State* state);
 	int Vector3Eq(::lua_State* state);
 	int Vector3ToString(::lua_State* state);
+	int Vector3Distance(::lua_State* state);
 
 }
