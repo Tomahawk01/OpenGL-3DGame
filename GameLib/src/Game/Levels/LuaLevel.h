@@ -2,9 +2,16 @@
 
 #include "Core/ResourceCache.h"
 #include "Core/ResourceLoader.h"
+#include "Core/Entity.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/Texture.h"
+#include "Renderer/Material.h"
+#include "Scripting/LuaScript.h"
+#include "TLV/TLVReader.h"
+
 #include "Game/Levels/Level.h"
 #include "Game/TransformedEntity.h"
-#include "Scripting/LuaScript.h"
+#include "Game/Player.h"
 
 #include <string_view>
 #include <vector>
@@ -18,6 +25,8 @@ namespace Game {
 
 		void Update(const Player& player) override;
 		void Restart() override;
+
+		const std::vector<TransformedEntity>& GetEntities() const;
 
 	private:
 		LuaScript m_Script;
