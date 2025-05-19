@@ -4,7 +4,7 @@
 #include "Core/ResourceLoader.h"
 #include "Game/Levels/Level.h"
 #include "Game/TransformedEntity.h"
-#include "LuaScript.h"
+#include "Scripting/LuaScript.h"
 
 #include <string_view>
 #include <vector>

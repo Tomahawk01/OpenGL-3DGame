@@ -5,8 +5,8 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
 #include "TLV/TLVReader.h"
+#include "Scripting/ScriptRunner.h"
 #include "Game/Player.h"
-#include "ScriptRunner.h"
 
 namespace Game {
 
