@@ -24,8 +24,25 @@ namespace Game {
 		, m_SkyboxSampler{}
 		, m_ResourceCache{ resourceCache }
 	{
+		const Texture* barrelTextures[]{
+			resourceCache.Get<Texture>("barrel_albedo"),
+			resourceCache.Get<Texture>("barrel_specular"),
+			resourceCache.Get<Texture>("barrel_normal")
+		};
+
 		const ScriptRunner runner{ m_Script };
 		runner.Execute("init_level");
+
+		const auto barrelCount = runner.Execute<int64_t>("barrel_count");
+		for (int64_t i = 0; i < barrelCount; i++)
+		{
+			const vec3 position = runner.Execute<vec3>("barrel_position", i + 1ll);
+
+			m_Entities.emplace_back(
+				Entity{ resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), position, {1.0f}, barrelTextures },
+				AABB{ {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f} },
+				std::make_unique<Chain<GameTransformState>>());
+		}
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
