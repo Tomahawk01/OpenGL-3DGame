@@ -20,7 +20,7 @@ namespace Game {
 		void Restart() override;
 
 	private:
-		LuaScipt m_Script;
+		LuaScript m_Script;
 		std::vector<TransformedEntity> m_Entities;
 		Entity m_Floor;
 		CubeMap m_Skybox;
