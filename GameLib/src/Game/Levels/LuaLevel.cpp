@@ -2,9 +2,11 @@
 
 #include "Scripting/ScriptRunner.h"
 
+#include <ranges>
+
 namespace Game {
 
-	LuaLevel::LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader)
+	LuaLevel::LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
 		: m_Script{ loader.Load(scriptName).AsString() }
 		, m_Entities{}
 		, m_Floor{
@@ -17,6 +19,7 @@ namespace Game {
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
 		, m_ResourceCache{ resourceCache }
+		, m_Bus{ bus }
 	{
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
@@ -25,7 +28,7 @@ namespace Game {
 		};
 
 		const ScriptRunner runner{ m_Script };
-		runner.Execute("init_level");
+		runner.Execute("init_level", player.GetPosition());
 
 		const auto barrelCount = runner.Execute<int64_t>("barrel_count");
 		for (int64_t i = 0; i < barrelCount; i++)
@@ -34,7 +37,7 @@ namespace Game {
 
 			m_Entities.emplace_back(
 				Entity{ resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), position, {1.0f}, barrelTextures },
-				AABB{ {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f} },
+				AABB{ vec3{-1.0f, -1.0f, -1.0f} + position, vec3{1.0f, 1.0f, 1.0f} + position },
 				std::make_unique<Chain<GameTransformState>>());
 		}
 
@@ -73,6 +76,23 @@ namespace Game {
 	{
 		const ScriptRunner runner{ m_Script };
 		runner.Execute("update_level", player.GetPosition());
+
+		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
+		{
+			const auto position = runner.Execute<vec3>("barrel_position", index + 1ll);
+
+			const auto oldPosition = entity.entity.GetPosition();
+			entity.entity.SetPosition(position);
+
+			const auto deltaPosition = position - oldPosition;
+			entity.boundingBox.min += deltaPosition;
+			entity.boundingBox.max += deltaPosition;
+		}
+
+		if (runner.Execute<bool>("is_complete"))
+		{
+			m_Bus.PostLevelComplete("lua_level");
+		}
 	}
 
 	void LuaLevel::Restart()

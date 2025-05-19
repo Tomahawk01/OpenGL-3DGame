@@ -97,7 +97,7 @@ namespace Game {
 
 		const Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
 
-		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_alpha.lua", resourceCache, reader));
+		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_alpha.lua", resourceCache, reader, player, bus));
 
 		m_Levels[m_LevelNum]->Restart();
 

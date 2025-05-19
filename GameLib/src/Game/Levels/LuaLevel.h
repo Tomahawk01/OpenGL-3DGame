@@ -7,6 +7,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
 #include "Scripting/LuaScript.h"
+#include "Messaging/MessageBus.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Levels/Level.h"
@@ -21,7 +22,7 @@ namespace Game {
 	class LuaLevel : public Level
 	{
 	public:
-		LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader);
+		LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 
 		void Update(const Player& player) override;
 		void Restart() override;
@@ -35,6 +36,7 @@ namespace Game {
 		CubeMap m_Skybox;
 		Sampler m_SkyboxSampler;
 		DefaultCache& m_ResourceCache;
+		MessageBus m_Bus;
 	};
 
 }
