@@ -9,10 +9,10 @@
 
 namespace Game {
 
-	class LuaScipt
+	class LuaScript
 	{
 	public:
-		LuaScipt(std::string_view source);
+		LuaScript(std::string_view source);
 
 		void SetFunction(const std::string& name) const;
 		void Execute(uint32_t numArgs, uint32_t numResults) const;

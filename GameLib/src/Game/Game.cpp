@@ -19,13 +19,13 @@
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/WireframeRenderer.h"
-#include "Scripting/LuaLevel.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Chain.h"
 #include "Game/Player.h"
 #include "Game/Levels/LevelAlpha.h"
 #include "Game/Levels/LevelBravo.h"
+#include "Game/Levels/LuaLevel.h"
 
 #include <iostream>
 #include <print>
@@ -140,6 +140,11 @@ namespace Game {
 
 			player.Update();
 			level->Update(player);
+
+			for (const auto& entity : level->GetEntities())
+			{
+				wireframeRenderer.Draw(entity.boundingBox);
+			}
 
 			wireframeRenderer.Draw(player.GetCamera());
 
