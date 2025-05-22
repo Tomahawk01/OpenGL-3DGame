@@ -35,6 +35,45 @@
 #include <unordered_map>
 #include <random>
 
+namespace {
+
+	bool IntersectsFrustum(const Game::AABB& aabb, const std::array<Game::FrustumPlane, 6u>& planes)
+	{
+		for (const auto& plane : planes)
+		{
+			Game::vec3 positiveVertex = aabb.min;
+			if (plane.normal.x >= 0)
+				positiveVertex.x = aabb.max.x;
+			if (plane.normal.y >= 0)
+				positiveVertex.y = aabb.max.y;
+			if (plane.normal.z >= 0)
+				positiveVertex.z = aabb.max.z;
+
+			if (Game::vec3::Dot(plane.normal, positiveVertex) + plane.distance < 0.0f)
+				return false;
+		}
+
+		return true;
+	}
+
+	constexpr auto CameraDelta = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
+		{
+			return { in + (state.camera.GetPosition() - state.lastCameraPos) };
+		};
+
+	constexpr auto Invert = [](const Game::vec3& in, const Game::GameTransformState&) -> Game::TransformerResult
+		{
+			return { -in };
+		};
+
+	constexpr auto CheckVisible = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
+		{
+			const auto planes = state.camera.FrustumPlanes();
+			return { in, !IntersectsFrustum(state.aabb, planes) };
+		};
+
+}
+
 namespace Game {
 
 	Game::Game()
@@ -142,8 +181,9 @@ namespace Game {
 			player.Update();
 			level->Update(player);
 
-			for (const auto& entity : level->GetScene().entities)
+			for (auto& entity : level->GetScene().entities)
 			{
+				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), camera.FrustumPlanes()));
 				wireframeRenderer.Draw(entity->GetBoundingBox());
 			}
 
