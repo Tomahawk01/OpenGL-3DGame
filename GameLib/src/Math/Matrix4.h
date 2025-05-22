@@ -138,9 +138,9 @@ namespace Game {
 		const auto row3 = m.Row(2);
 
 		return {
-			v.x * row1.x + v.y * row1.y + v.z * row1.z,
-			v.x * row2.x + v.y * row2.y + v.z * row2.z,
-			v.x * row3.x + v.y * row3.y + v.z * row3.z
+			v.x * row1.x + v.y * row1.y + v.z * row1.z + row1.w,
+			v.x * row2.x + v.y * row2.y + v.z * row2.z + row2.w,
+			v.x * row3.x + v.y * row3.y + v.z * row3.z + row3.w
 		};
 	}
 
