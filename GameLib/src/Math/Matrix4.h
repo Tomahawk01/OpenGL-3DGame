@@ -87,9 +87,9 @@ namespace Game {
 
 		constexpr auto& operator[](this auto&& self, size_t index) { return self.m_Elements[index]; }
 
-		vec4 Row(size_t index) const
+		constexpr vec4 Row(size_t index) const
 		{
-			Ensure(index <= 3, "Index out of range");
+			Expect(index <= 3, "Index out of range");
 
 			return { m_Elements[index], m_Elements[index + 4u], m_Elements[index + 8u], m_Elements[index + 12u] };
 		}
@@ -129,6 +129,19 @@ namespace Game {
 	{
 		mat4 temp{ m1 };
 		return temp *= m2;
+	}
+
+	constexpr vec3 operator*(const mat4& m, const vec3& v)
+	{
+		const auto row1 = m.Row(0);
+		const auto row2 = m.Row(1);
+		const auto row3 = m.Row(2);
+
+		return {
+			v.x * row1.x + v.y * row1.y + v.z * row1.z,
+			v.x * row2.x + v.y * row2.y + v.z * row2.z,
+			v.x * row3.x + v.y * row3.y + v.z * row3.z
+		};
 	}
 
 	inline mat4 mat4::LookAt(const vec3& eye, const vec3& lookAt, const vec3& up)
