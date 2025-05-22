@@ -39,7 +39,7 @@ namespace Game {
 		}
 
 		m_Scene = Scene{
-			.entities = m_Entities | std::views::transform([](const auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
+			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
 			.pointLights = {
