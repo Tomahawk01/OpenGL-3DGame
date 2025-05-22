@@ -11,11 +11,11 @@
 #include "TLV/TLVReader.h"
 
 #include "Game/Levels/Level.h"
-#include "Game/TransformedEntity.h"
 #include "Game/Player.h"
 
 #include <string_view>
 #include <vector>
+#include <span>
 
 namespace Game {
 
@@ -27,11 +27,11 @@ namespace Game {
 		void Update(const Player& player) override;
 		void Restart() override;
 
-		const std::vector<TransformedEntity>& GetEntities() const;
+		std::span<const Entity> GetEntities() const;
 
 	private:
 		LuaScript m_Script;
-		std::vector<TransformedEntity> m_Entities;
+		std::vector<Entity> m_Entities;
 		Entity m_Floor;
 		CubeMap m_Skybox;
 		Sampler m_SkyboxSampler;

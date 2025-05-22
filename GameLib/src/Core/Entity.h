@@ -4,6 +4,7 @@
 #include "Math/Vector3.h"
 #include "Math/Transform.h"
 #include "Math/Quaternion.h"
+#include "Math/AABB.h"
 
 #include <vector>
 #include <tuple>
@@ -29,6 +30,9 @@ namespace Game {
 		std::span<const Texture* const> GetTextures() const;
 		const Sampler* GetSampler() const;
 		const Transform& GetTransform() const;
+		bool IsVisible() const;
+		void SetVisibility(bool visible);
+		AABB GetBoundingBox() const;
 
 		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
@@ -41,6 +45,8 @@ namespace Game {
 		std::vector<const Texture*> m_Textures;
 		const Sampler* m_Sampler;
 		Transform m_Transform;
+		bool m_Visible;
+		AABB m_BoundingBox;
 	};
 
 }

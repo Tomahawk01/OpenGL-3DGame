@@ -135,14 +135,16 @@ namespace Game {
 				event = window.PollEvent();
 			}
 
+			// Update visibility
+
 			auto* level = m_Levels[m_LevelNum].get();
 
 			player.Update();
 			level->Update(player);
 
-			for (const auto& entity : level->GetEntities())
+			for (const auto& entity : level->GetScene().entities)
 			{
-				wireframeRenderer.Draw(entity.boundingBox);
+				wireframeRenderer.Draw(entity->GetBoundingBox());
 			}
 
 			wireframeRenderer.Draw(player.GetCamera());

@@ -35,14 +35,11 @@ namespace Game {
 		{
 			const vec3 position = runner.Execute<vec3>("barrel_position", i + 1ll);
 
-			m_Entities.emplace_back(
-				Entity{ resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), position, {1.0f}, barrelTextures },
-				AABB{ vec3{-1.0f, -1.0f, -1.0f} + position, vec3{1.0f, 1.0f, 1.0f} + position },
-				std::make_unique<Chain<GameTransformState>>());
+			m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), position, vec3{1.0f}, barrelTextures);
 		}
 
 		m_Scene = Scene{
-			.entities = m_Entities | std::views::transform([](const auto& e) { return std::addressof(e.entity); }) | std::ranges::to<std::vector>(),
+			.entities = m_Entities | std::views::transform([](const auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
 			.ambient = {0.3f, 0.3f, 0.3f},
 			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
 			.pointLights = {
@@ -81,12 +78,7 @@ namespace Game {
 		{
 			const auto position = runner.Execute<vec3>("barrel_position", index + 1ll);
 
-			const auto oldPosition = entity.entity.GetPosition();
-			entity.entity.SetPosition(position);
-
-			const auto deltaPosition = position - oldPosition;
-			entity.boundingBox.min += deltaPosition;
-			entity.boundingBox.max += deltaPosition;
+			entity.SetPosition(position);
 		}
 
 		if (runner.Execute<bool>("is_complete"))
@@ -101,7 +93,7 @@ namespace Game {
 		runner.Execute("restart_level");
 	}
 
-	const std::vector<TransformedEntity>& LuaLevel::GetEntities() const
+	std::span<const Entity> LuaLevel::GetEntities() const
 	{
 		return m_Entities;
 	}
