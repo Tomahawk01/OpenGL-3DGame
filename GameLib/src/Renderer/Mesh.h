@@ -22,12 +22,16 @@ namespace Game {
 		uint32_t IndexCount() const;
 		uintptr_t IndexOffset() const;
 
+		MeshData GetMeshData() const;
+
 	private:
 		AutoRelease<::GLuint> m_VAO;
 		Buffer m_VBO;
 
 		uint32_t m_IndexCount;
 		uintptr_t m_IndexOffset;
+
+		MeshData m_MeshData;
 	};
 
 }

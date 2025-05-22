@@ -14,6 +14,7 @@ namespace Game {
 		, m_VBO{ static_cast<uint32_t>(data.vertices.size_bytes() + data.indices.size_bytes()) }
 		, m_IndexCount(static_cast<uint32_t>(data.indices.size()))
 		, m_IndexOffset(data.vertices.size_bytes())
+		, m_MeshData(data)
 	{
 		{
 			BufferWriter writer{ m_VBO };
@@ -56,6 +57,7 @@ namespace Game {
 		std::ranges::swap(m_VBO, mesh.m_VBO);
 		std::ranges::swap(m_IndexCount, mesh.m_IndexCount);
 		std::ranges::swap(m_IndexOffset, mesh.m_IndexOffset);
+		std::ranges::swap(m_MeshData, mesh.m_MeshData);
 	}
 
 	void Mesh::Bind() const
@@ -76,6 +78,11 @@ namespace Game {
 	uintptr_t Mesh::IndexOffset() const
 	{
 		return m_IndexOffset;
+	}
+
+	MeshData Mesh::GetMeshData() const
+	{
+		return m_MeshData;
 	}
 
 }
