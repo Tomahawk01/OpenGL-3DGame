@@ -88,7 +88,7 @@ namespace Game {
 		Subscriber::Subscribe(this, bus);
 
 		Window window{ 1280u, 720u, 640u, 360u };
-		Camera camera{
+		const Camera camera{
 			{0.0f, 5.0f, 30.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
