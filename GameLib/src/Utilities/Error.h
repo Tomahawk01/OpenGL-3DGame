@@ -10,7 +10,7 @@
 namespace Game {
 
 	template<class ...Args>
-	void Expect(bool predicate, std::string_view msg, Args&&... args)
+	constexpr void Expect(bool predicate, std::string_view msg, Args&&... args)
 	{
 		if (!predicate)
 		{
