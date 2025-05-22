@@ -174,7 +174,7 @@ namespace Game {
 				event = window.PollEvent();
 			}
 
-			// Update visibility
+			// NOTE: Update visibility
 
 			auto* level = m_Levels[m_LevelNum].get();
 
@@ -183,7 +183,7 @@ namespace Game {
 
 			for (auto& entity : level->GetScene().entities)
 			{
-				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), camera.FrustumPlanes()));
+				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), player.GetCamera().FrustumPlanes()));
 				wireframeRenderer.Draw(entity->GetBoundingBox());
 			}
 
