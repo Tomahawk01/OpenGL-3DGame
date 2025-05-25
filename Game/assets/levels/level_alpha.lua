@@ -2,26 +2,30 @@ barrels = {}
 last_player_position = vec3(0.0, 0.0, 0.0)
 
 function init_level(player_position)
-	print("init_level")
-
-	barrels[1] = vec3(0.0, 0.0, 0.0)
-	barrels[2] = vec3(5.0, 0.0, 0.0)
+	restart_level()
 	last_player_position = player_position
 end
 
 function update_level(player_position)
-	print("update_level ", tostring(player_position))
-
-	barrels[2] = barrels[2] + (player_position - last_player_position)
+	if barrels[2].visibility then
+		barrels[2].position = barrels[2].position + (player_position - last_player_position)
+	end
 	last_player_position = player_position
 end
 
 function restart_level()
-	print("restart_level")
+	barrels[1] = {
+		position = vec3(0.0, 0.0, 0.0),
+		visibility = true
+	}
+	barrels[2] = {
+		position = vec3(5.0, 0.0, 0.0),
+		visibility = true
+	}
 end
 
 function is_complete()
-	return distance(barrels[1], barrels[2]) < 0.1
+	return distance(barrels[1].position, barrels[2].position) < 1.0
 end
 
 function barrel_count()
@@ -29,5 +33,9 @@ function barrel_count()
 end
 
 function barrel_position(index)
-	return barrels[index]
+	return barrels[index].position
+end
+
+function set_barrel_visibility(index, visibility)
+	barrels[index].visibility = visibility
 end

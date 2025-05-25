@@ -72,6 +72,12 @@ namespace Game {
 	void LuaLevel::Update(const Player& player)
 	{
 		const ScriptRunner runner{ m_Script };
+
+		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
+		{
+			runner.Execute("set_barrel_visibility", index + 1ll, entity.IsVisible());
+		}
+
 		runner.Execute("update_level", player.GetPosition());
 
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
