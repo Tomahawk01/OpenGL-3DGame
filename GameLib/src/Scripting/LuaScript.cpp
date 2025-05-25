@@ -99,6 +99,11 @@ namespace Game {
 		::lua_pushlstring(m_Lua.get(), value.data(), value.size());
 	}
 
+	void LuaScript::SetArgument(const char* value) const
+	{
+		SetArgument(std::string_view{ value });
+	}
+
 	void LuaScript::SetArgument(const vec3& value) const
 	{
 		SetArgument(value.x);
@@ -106,6 +111,11 @@ namespace Game {
 		SetArgument(value.z);
 
 		Vector3Constructor(m_Lua.get());
+	}
+
+	void LuaScript::SetArgument(bool value) const
+	{
+		::lua_pushboolean(m_Lua.get(), value);
 	}
 
 	void LuaScript::GetResult(int64_t& result) const

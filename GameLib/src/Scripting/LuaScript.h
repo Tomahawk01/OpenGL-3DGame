@@ -20,7 +20,9 @@ namespace Game {
 		void SetArgument(int64_t value) const;
 		void SetArgument(float value) const;
 		void SetArgument(std::string_view value) const;
+		void SetArgument(const char* value) const;
 		void SetArgument(const vec3& value) const;
+		void SetArgument(bool value) const;
 		void GetResult(int64_t& result) const;
 		void GetResult(float& result) const;
 		void GetResult(std::string& result) const;
