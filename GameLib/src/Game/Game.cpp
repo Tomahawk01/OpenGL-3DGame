@@ -21,10 +21,7 @@
 #include "Renderer/WireframeRenderer.h"
 #include "TLV/TLVReader.h"
 
-#include "Game/Chain.h"
 #include "Game/Player.h"
-#include "Game/Levels/LevelAlpha.h"
-#include "Game/Levels/LevelBravo.h"
 
 #include <iostream>
 #include <print>
@@ -55,22 +52,6 @@ namespace {
 
 		return true;
 	}
-
-	constexpr auto CameraDelta = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
-	{
-		return { in + (state.camera.GetPosition() - state.lastCameraPos) };
-	};
-
-	constexpr auto Invert = [](const Game::vec3& in, const Game::GameTransformState&) -> Game::TransformerResult
-	{
-		return { -in };
-	};
-
-	constexpr auto CheckVisible = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
-	{
-		const auto planes = state.camera.FrustumPlanes();
-		return { in, !IntersectsFrustum(state.aabb, planes) };
-	};
 
 	Game::Camera CreateCamera(const Game::Window& window)
 	{
