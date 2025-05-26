@@ -14,6 +14,7 @@ namespace Game {
 		Player(MessageBus& bus, Camera camera);
 
 		void Update();
+		void Restart();
 
 		void HandleKeyPress(const KeyEvent& event) override;
 		void HandleMouseMove(const MouseEvent& event) override;
@@ -24,6 +25,7 @@ namespace Game {
 	private:
 		Camera m_Camera;
 		std::unordered_map<Key, bool> m_KeyState;
+		vec3 m_StartPosition;
 	};
 
 }

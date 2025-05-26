@@ -2,11 +2,14 @@
 
 #include "Utilities/Logger.h"
 
+#include <numbers>
+
 namespace Game {
 
 	Player::Player(MessageBus& bus, Camera camera)
 		: m_Camera{ std::move(camera) }
 		, m_KeyState{}
+		, m_StartPosition{ m_Camera.GetPosition() }
 	{
 		Subscriber::Subscribe(this, bus);
 	}
@@ -37,6 +40,13 @@ namespace Game {
 		const float speed = 0.5f;
 		const vec3 velocity = vec3::Normalize(walkDirection) * speed;
 		m_Camera.Translate(velocity);
+	}
+
+	void Player::Restart()
+	{
+		m_Camera.SetYaw(-std::numbers::pi_v<float> / 2.0f);
+		m_Camera.SetPitch(0.0f);
+		m_Camera.SetPosition(m_StartPosition);
 	}
 
 	void Player::HandleKeyPress(const KeyEvent& event)
