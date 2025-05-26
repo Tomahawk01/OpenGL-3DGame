@@ -57,20 +57,33 @@ namespace {
 	}
 
 	constexpr auto CameraDelta = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
-		{
-			return { in + (state.camera.GetPosition() - state.lastCameraPos) };
-		};
+	{
+		return { in + (state.camera.GetPosition() - state.lastCameraPos) };
+	};
 
 	constexpr auto Invert = [](const Game::vec3& in, const Game::GameTransformState&) -> Game::TransformerResult
-		{
-			return { -in };
-		};
+	{
+		return { -in };
+	};
 
 	constexpr auto CheckVisible = [](const Game::vec3& in, const Game::GameTransformState& state) -> Game::TransformerResult
-		{
-			const auto planes = state.camera.FrustumPlanes();
-			return { in, !IntersectsFrustum(state.aabb, planes) };
+	{
+		const auto planes = state.camera.FrustumPlanes();
+		return { in, !IntersectsFrustum(state.aabb, planes) };
+	};
+
+	Game::Camera CreateCamera(const Game::Window& window)
+	{
+		return {
+			{0.0f, 5.0f, 30.0f},
+			{0.0f, 0.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f},
+			std::numbers::pi_v<float> / 4.0f,
+			static_cast<float>(window.GetWidth()),
+			static_cast<float>(window.GetHeight()),
+			0.1f, 1000.0f
 		};
+	}
 
 }
 
@@ -80,25 +93,15 @@ namespace Game {
 		: m_Running{ true }
 		, m_Levels{}
 		, m_LevelNum{ 0u }
-	{}
+		, m_Bus{}
+		, m_Window{ 1280u, 720u, 640u, 360u }
+		, m_Player{ m_Bus, CreateCamera(m_Window) }
+	{
+		Subscriber::Subscribe(this, m_Bus);
+	}
 
 	void Game::Run(std::string_view resourceRoot)
 	{
-		MessageBus bus{};
-		Subscriber::Subscribe(this, bus);
-
-		Window window{ 1280u, 720u, 640u, 360u };
-		Camera camera{
-			{0.0f, 5.0f, 30.0f},
-			{0.0f, 0.0f, 0.0f},
-			{0.0f, 1.0f, 0.0f},
-			std::numbers::pi_v<float> / 4.0f,
-			static_cast<float>(window.GetWidth()),
-			static_cast<float>(window.GetHeight()),
-			0.1f, 1000.0f
-		};
-		Player player{ bus, std::move(camera) };
-
 		ResourceLoader resourceLoader{ resourceRoot };
 		MeshLoader meshLoader{ resourceLoader };
 		DefaultCache resourceCache{};
@@ -134,9 +137,9 @@ namespace Game {
 			}, sampler);
 		resourceCache.Insert<Mesh>("floor", meshLoader.Cube());
 
-		const Renderer renderer{ resourceLoader, meshLoader, window.GetWidth(), window.GetHeight() };
+		const Renderer renderer{ resourceLoader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() };
 
-		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_alpha.lua", resourceCache, reader, player, bus));
+		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_alpha.lua", resourceCache, reader, m_Player, m_Bus));
 
 		m_Levels[m_LevelNum]->Restart();
 
@@ -146,7 +149,7 @@ namespace Game {
 
 		while (m_Running)
 		{
-			auto event = window.PollEvent();
+			auto event = m_Window.PollEvent();
 			while (event && m_Running)
 			{
 				std::visit([&](auto&& arg)
@@ -164,36 +167,34 @@ namespace Game {
 							m_Running = false;
 						}
 
-						bus.PostKeyPress(arg);
+						m_Bus.PostKeyPress(arg);
 					}
 					else if constexpr (std::same_as<T, MouseEvent>)
 					{
-						bus.PostMouseMove(arg);
+						m_Bus.PostMouseMove(arg);
 					}
 				}, *event);
-				event = window.PollEvent();
+				event = m_Window.PollEvent();
 			}
-
-			// NOTE: Update visibility
 
 			auto* level = m_Levels[m_LevelNum].get();
 
-			player.Update();
-			level->Update(player);
+			m_Player.Update();
+			level->Update(m_Player);
 
 			for (auto& entity : level->GetScene().entities)
 			{
-				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), player.GetCamera().FrustumPlanes()));
+				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), m_Player.GetCamera().FrustumPlanes()));
 				wireframeRenderer.Draw(entity->GetBoundingBox());
 			}
 
-			wireframeRenderer.Draw(player.GetCamera());
+			wireframeRenderer.Draw(m_Player.GetCamera());
 
 			level->GetScene().debugLines = DebugLines{ wireframeRenderer.yield() };
 
-			renderer.Render(player.GetCamera(), level->GetScene(), gamma);
+			renderer.Render(m_Player.GetCamera(), level->GetScene(), gamma);
 
-			window.Swap();
+			m_Window.Swap();
 		}
 	}
 
@@ -203,6 +204,7 @@ namespace Game {
 		m_LevelNum = (m_LevelNum + 1) % m_Levels.size();
 
 		m_Levels[m_LevelNum]->Restart();
+		m_Player.Restart();
 	}
 
 }
