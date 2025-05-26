@@ -22,7 +22,9 @@ namespace Game {
 		void Translate(const vec3& translation);
 
 		void AddYaw(float value);
+		void SetYaw(float yaw);
 		void AddPitch(float value);
+		void SetPitch(float pitch);
 
 		std::array<FrustumPlane, 6u> FrustumPlanes() const;
 		std::array<vec3, 8u> FrustumCorners() const;

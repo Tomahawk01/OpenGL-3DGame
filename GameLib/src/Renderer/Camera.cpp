@@ -61,6 +61,11 @@ namespace Game {
 		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
 	}
 
+	void Camera::SetYaw(float yaw)
+	{
+		AddYaw(yaw - m_Yaw);
+	}
+
 	void Camera::AddPitch(float value)
 	{
 		m_Pitch += value;
@@ -71,6 +76,11 @@ namespace Game {
 		m_Up = vec3::Normalize(vec3::Cross(m_Right, m_Direction));
 
 		m_View = mat4::LookAt(m_Position, m_Position + m_Direction, m_Up);
+	}
+
+	void Camera::SetPitch(float pitch)
+	{
+		AddPitch(pitch - m_Pitch);
 	}
 
 	std::array<FrustumPlane, 6u> Camera::FrustumPlanes() const
