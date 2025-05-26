@@ -15,6 +15,7 @@
 
 #include <string_view>
 #include <vector>
+#include <unordered_map>
 #include <span>
 
 namespace Game {
@@ -22,6 +23,12 @@ namespace Game {
 	class LuaLevel : public Level
 	{
 	public:
+		struct BarrelInfo
+		{
+			Color tintColor;
+			float tintAmount;
+		};
+
 		LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 
 		void Update(const Player& player) override;
@@ -37,6 +44,7 @@ namespace Game {
 		Sampler m_SkyboxSampler;
 		DefaultCache& m_ResourceCache;
 		MessageBus m_Bus;
+		std::unordered_map<const Entity*, BarrelInfo> m_BarrelInfo;
 	};
 
 }

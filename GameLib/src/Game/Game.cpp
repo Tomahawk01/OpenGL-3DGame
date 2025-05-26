@@ -120,10 +120,16 @@ namespace Game {
 
 		const Renderer renderer{ resourceLoader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() };
 
-		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_alpha.lua", resourceCache, reader, m_Player, m_Bus));
-		m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, "levels/level_bravo.lua", resourceCache, reader, m_Player, m_Bus));
+		std::string_view levels[] = {
+			//"levels/level_alpha.lua",
+			//"levels/level_bravo.lua",
+			"levels/level_charlie.lua",
+		};
 
-		m_Levels[m_LevelNum]->Restart();
+		for (const auto level : levels)
+		{
+			m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, level, resourceCache, reader, m_Player, m_Bus));
+		}
 
 		float gamma = 2.2f;
 

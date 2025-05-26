@@ -20,6 +20,7 @@ namespace Game {
 		, m_SkyboxSampler{}
 		, m_ResourceCache{ resourceCache }
 		, m_Bus{ bus }
+		, m_BarrelInfo{}
 	{
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
@@ -33,9 +34,9 @@ namespace Game {
 		const auto barrelCount = runner.Execute<int64_t>("barrel_count");
 		for (int64_t i = 0; i < barrelCount; i++)
 		{
-			const vec3 position = runner.Execute<vec3>("barrel_position", i + 1ll);
+			const auto info = runner.Execute<vec3, vec3, float>("barrel_info", i + 1ll);
 
-			m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), position, vec3{1.0f}, barrelTextures);
+			m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), std::get<0>(info), vec3{ 1.0f }, barrelTextures);
 		}
 
 		m_Scene = Scene{
@@ -67,6 +68,8 @@ namespace Game {
 		};
 
 		m_Scene.entities.push_back(&m_Floor);
+
+		Restart();
 	}
 
 	void LuaLevel::Update(const Player& player)
@@ -82,9 +85,14 @@ namespace Game {
 
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
 		{
-			const auto position = runner.Execute<vec3>("barrel_position", index + 1ll);
+			const auto& [position, color, tintAmount] = runner.Execute<vec3, vec3, float>("barrel_info", index + 1ll);
 
 			entity.SetPosition(position);
+
+			m_BarrelInfo[std::addressof(entity)] = {
+				.tintColor = { color.x, color.y, color.z },
+				.tintAmount = tintAmount
+			};
 		}
 
 		if (runner.Execute<bool>("is_complete"))
@@ -97,6 +105,17 @@ namespace Game {
 	{
 		const ScriptRunner runner{ m_Script };
 		runner.Execute("restart_level");
+
+		m_ResourceCache.Get<Material>("barrel")->SetUniformCallback(
+			[this](const auto* mat, const auto* ent)
+			{
+				if (const auto info = m_BarrelInfo.find(ent); info != std::ranges::cend(m_BarrelInfo))
+				{
+					mat->SetUniform("tint_color", info->second.tintColor);
+					mat->SetUniform("tint_amount", info->second.tintAmount);
+				}
+			}
+		);
 	}
 
 	std::span<const Entity> LuaLevel::GetEntities() const
