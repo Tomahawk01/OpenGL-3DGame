@@ -114,6 +114,21 @@ namespace Game {
 		return temp *= v2;
 	}
 
+	constexpr vec3& operator/=(vec3& v1, const vec3& v2)
+	{
+		v1.x /= v2.x;
+		v1.y /= v2.y;
+		v1.z /= v2.z;
+
+		return v1;
+	}
+
+	constexpr vec3 operator/(const vec3& v1, const vec3& v2)
+	{
+		vec3 temp = v1;
+		return temp /= v2;
+	}
+
 	inline float vec3::Distance(const vec3& v1, const vec3& v2)
 	{
 		return (v2 - v1).Length();
