@@ -3,7 +3,6 @@
 #include "Utilities/Logger.h"
 #include "Utilities/Error.h"
 #include "BoxShape.h"
-#include "SphereShape.h"
 #include "CharacterController.h"
 #include "RigidBody.h"
 #include "JoltUtils.h"
@@ -16,6 +15,8 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterMask.h>
+#include <Jolt/Physics/Collision/CollideShape.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
@@ -82,6 +83,19 @@ namespace {
 		Game::Logger::Info("JOLT TRACE: {}", buffer);
 	}
 
+	struct SimpleCollisionCollector : ::JPH::CollideShapeCollector
+	{
+		void OnBody(const ::JPH::Body&) override
+		{
+			Game::Logger::Trace("Collision");
+		}
+
+		void AddHit(const ResultType&) override
+		{
+			Game::Logger::Trace("Hit");
+		}
+	};
+
 }
 
 namespace Game {
@@ -94,7 +108,6 @@ namespace Game {
 		::JPH::TempAllocatorImpl TempAllocator = ::JPH::TempAllocatorImpl{ 10u * 1024u * 1024u };
 		::JPH::JobSystemThreadPool JobSystem = ::JPH::JobSystemThreadPool(::JPH::cMaxPhysicsJobs, ::JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1u);
 		::JPH::PhysicsSystem PhysicsSystem;
-		::JPH::BodyID Sphere;
 		DebugRenderer Debug_Renderer = { {} };
 		std::unique_ptr<CharacterController> CharacterController;
 	};
@@ -165,6 +178,17 @@ namespace Game {
 	CharacterController& PhysicsSystem::GetCharacterController() const
 	{
 		return *m_Impl->CharacterController;
+	}
+
+	std::vector<const Shape*> PhysicsSystem::QueryCollisions(const Shape* shape, const Transform& transform)
+	{
+		const auto& narrowPhase = m_Impl->PhysicsSystem.GetNarrowPhaseQuery();
+
+		::JPH::CollideShapeSettings settings{};
+		SimpleCollisionCollector collector{};
+		narrowPhase.CollideShape(shape->GetNativeHandle(), ::JPH::Vec3(1.0f, 1.0f, 1.0f), ToJolt(transform), settings, ::JPH::Vec3(0.0f, 0.0f, 0.0f), collector);
+
+		return {};
 	}
 
 }
