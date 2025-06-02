@@ -21,7 +21,8 @@ project "Game"
         "%{wks.location}/GameLib/src",
 
         "%{wks.location}/vendor/OpenGL/include",
-        "%{wks.location}/vendor/lua_5.4.2/include"
+        "%{wks.location}/vendor/lua_5.4.2/include",
+        "%{wks.location}/vendor/JoltPhysics-5.2.0/JoltPhysics"
     }
 
     links
