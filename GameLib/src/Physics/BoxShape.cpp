@@ -10,19 +10,17 @@ namespace Game {
 	BoxShape::BoxShape(const vec3& dimensions, PassKey<PhysicsSystem> passKey)
 		: Shape(passKey)
 		, m_Dimensions{ dimensions }
-		, m_BoxShapeSettings{ ToJolt(m_Dimensions) }
-	{
-		m_BoxShapeSettings.SetEmbedded();
-	}
+		, m_BoxShape{ ToJolt(dimensions) }
+	{}
 
 	vec3 BoxShape::GetDimensions() const
 	{
 		return m_Dimensions;
 	}
 
-	const ::JPH::ShapeSettings* BoxShape::GetNativeHandle() const
+	const ::JPH::Shape* BoxShape::GetNativeHandle() const
 	{
-		return std::addressof(m_BoxShapeSettings);
+		return std::addressof(m_BoxShape);
 	}
 
 	std::string BoxShape::to_string() const

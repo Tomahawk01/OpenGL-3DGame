@@ -17,13 +17,13 @@ namespace Game {
 
 		vec3 GetDimensions() const;
 
-		const ::JPH::ShapeSettings* GetNativeHandle() const override;
+		const ::JPH::Shape* GetNativeHandle() const override;
 
 		std::string to_string() const;
 
 	private:
 		vec3 m_Dimensions;
-		::JPH::BoxShapeSettings m_BoxShapeSettings;
+		::JPH::BoxShape m_BoxShape;
 	};
 
 }

@@ -21,26 +21,26 @@ function restart_level()
 	barrels[1] = {
 		position = vec3(0.0, 0.0, 5.0),
 		visibility = true,
-        color = vec3(1.0, 0.0, 0.0),
-        tint = 1.0
+		color = vec3(1.0, 0.0, 0.0),
+		tint = 1.0
 	}
 	barrels[2] = {
 		position = vec3(5.0, 0.0, 0.0),
 		visibility = true,
-        color = vec3(1.0, 0.0, 0.0),
-        tint = 0.5
+		color = vec3(1.0, 0.0, 0.0),
+		tint = 0.5
 	}
     barrels[3] = {
 		position = vec3(0.0, 0.0, -5.0),
 		visibility = true,
-        color = vec3(0.0, 0.0, 1.0),
-        tint = 1.0
+		color = vec3(0.0, 0.0, 1.0),
+		tint = 1.0
 	}
 	barrels[4] = {
 		position = vec3(-5.0, 0.0, 0.0),
 		visibility = true,
-        color = vec3(0.0, 0.0, 1.0),
-        tint = 0.5
+		color = vec3(0.0, 0.0, 1.0),
+		tint = 0.5
 	}
 	last_player_position = original_player_position
 end
