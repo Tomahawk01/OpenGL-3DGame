@@ -2,7 +2,9 @@
 
 #include "Math/Color.h"
 #include "Math/Vector3.h"
+#include "Math/Matrix4.h"
 #include "Math/Quaternion.h"
+#include "Math/Transform.h"
 
 #include "RigidBody.h"
 
@@ -18,5 +20,6 @@ namespace Game {
 
 	::JPH::RVec3 ToJolt(const vec3& v);
 	::JPH::ObjectLayer ToJolt(RigidBodyType type);
+	::JPH::RMat44 ToJolt(const Transform& transform);
 
 }

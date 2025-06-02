@@ -1,6 +1,7 @@
 #include "JoltUtils.h"
 
 #include <concepts>
+#include <ranges>
 
 namespace Game {
 
@@ -28,6 +29,18 @@ namespace Game {
 	::JPH::ObjectLayer ToJolt(RigidBodyType type)
 	{
 		return static_cast<::JPH::ObjectLayer>(std::to_underlying(type));
+	}
+
+	::JPH::RMat44 ToJolt(const Transform& transform)
+	{
+		const auto mat = static_cast<mat4>(transform);
+		const auto chunks = mat.data() | std::views::chunk(4u);
+		const auto cols = chunks | std::views::transform([](auto&& chunk) { return ::JPH::Float4(chunk[0], chunk[1], chunk[2], chunk[3]); });
+
+		::JPH::Float4 floatArgs[4]{};
+		std::ranges::copy(cols, floatArgs);
+
+		return ::JPH::RMat44::sLoadFloat4x4(floatArgs);
 	}
 
 }
