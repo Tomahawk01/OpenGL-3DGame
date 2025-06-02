@@ -1,6 +1,7 @@
 #include "LuaLevel.h"
 
 #include "Scripting/ScriptRunner.h"
+#include "Physics/BoxShape.h"
 
 #include <ranges>
 
@@ -21,6 +22,8 @@ namespace Game {
 		, m_ResourceCache{ resourceCache }
 		, m_Bus{ bus }
 		, m_BarrelInfo{}
+		, m_PS{}
+		, m_Shapes{}
 	{
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
@@ -36,7 +39,12 @@ namespace Game {
 		{
 			const auto info = runner.Execute<vec3, vec3, float>("barrel_info", i + 1ll);
 
-			m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), std::get<0>(info), vec3{ 1.0f }, barrelTextures);
+			const auto& ent = m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), std::get<0>(info), vec3{ 1.0f }, barrelTextures);
+
+			const auto aabb = ent.GetBoundingBox();
+			const auto halfExtents = (aabb.max - aabb.min) / 2.0f; // + aabb.min
+			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ halfExtents.x, halfExtents.y, halfExtents.z });
+			m_Shapes.push_back(shape);
 		}
 
 		m_Scene = Scene{
@@ -93,6 +101,8 @@ namespace Game {
 				.tintColor = { color.x, color.y, color.z },
 				.tintAmount = tintAmount
 			};
+
+			m_PS.QueryCollisions(m_Shapes[index], entity.GetTransform());
 		}
 
 		if (runner.Execute<bool>("is_complete"))

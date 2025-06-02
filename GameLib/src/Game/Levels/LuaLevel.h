@@ -6,6 +6,7 @@
 #include "Renderer/Mesh.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
+#include "Physics/PhysicsSystem.h"
 #include "Scripting/LuaScript.h"
 #include "Messaging/MessageBus.h"
 #include "TLV/TLVReader.h"
@@ -45,6 +46,8 @@ namespace Game {
 		DefaultCache& m_ResourceCache;
 		MessageBus m_Bus;
 		std::unordered_map<const Entity*, BarrelInfo> m_BarrelInfo;
+		PhysicsSystem m_PS;
+		std::vector<const Shape*> m_Shapes;
 	};
 
 }
