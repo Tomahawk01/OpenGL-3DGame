@@ -2,8 +2,12 @@
 
 #include "Scripting/ScriptRunner.h"
 #include "Physics/BoxShape.h"
+#include "Physics/TransformedShape.h"
 
 #include <ranges>
+#include <algorithm>
+
+using namespace std::literals;
 
 namespace Game {
 
@@ -91,6 +95,16 @@ namespace Game {
 
 		runner.Execute("update_level", player.GetPosition());
 
+		const auto transformedShapes =
+			std::views::zip_transform(
+				[](const auto& shape, const auto& entity)
+				{
+					return TransformedShape{ shape, {entity.GetPosition(), {1.0f, 1.0f, 1.0f}, {}} };
+				},
+				m_Shapes, m_Entities
+			) | std::ranges::to<std::vector>();
+		const auto indexView = std::views::iota(0ull, std::ranges::size(transformedShapes));
+
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
 		{
 			const auto& [position, color, tintAmount] = runner.Execute<vec3, vec3, float>("barrel_info", index + 1ll);
@@ -102,12 +116,25 @@ namespace Game {
 				.tintAmount = tintAmount
 			};
 
-			m_PS.QueryCollisions(m_Shapes[index], entity.GetTransform());
+			for (const auto& combo : std::views::cartesian_product(indexView, indexView) |
+									 std::views::filter([](const auto& e) { return std::get<0>(e) < std::get<1>(e); }))
+			{
+				const auto& transformShape1 = transformedShapes[std::get<0>(combo)];
+				const auto& transformShape2 = transformedShapes[std::get<1>(combo)];
+
+				transformShape1.Intersects(transformShape2);
+			}
 		}
 
 		if (runner.Execute<bool>("is_complete"))
 		{
 			m_Bus.PostLevelComplete("lua_level");
+		}
+
+		m_PS.Debug_Renderer().Clear();
+		for (const auto& e : transformedShapes)
+		{
+			e.Draw(m_PS.Debug_Renderer());
 		}
 	}
 
@@ -131,6 +158,11 @@ namespace Game {
 	std::span<const Entity> LuaLevel::GetEntities() const
 	{
 		return m_Entities;
+	}
+
+	std::span<const LineData> LuaLevel::GetLines() const
+	{
+		return m_PS.Debug_Renderer().GetLines();
 	}
 
 }

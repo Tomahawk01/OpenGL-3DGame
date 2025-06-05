@@ -6,6 +6,7 @@
 #include "Renderer/Mesh.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
+#include "Renderer/LineData.h"
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/LuaScript.h"
 #include "Messaging/MessageBus.h"
@@ -36,6 +37,7 @@ namespace Game {
 		void Restart() override;
 
 		std::span<const Entity> GetEntities() const;
+		std::span<const LineData> GetLines() const;
 
 	private:
 		LuaScript m_Script;
