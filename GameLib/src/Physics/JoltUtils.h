@@ -19,6 +19,7 @@ namespace Game {
 	Color ToNative(::JPH::ColorArg c);
 
 	::JPH::RVec3 ToJolt(const vec3& v);
+	::JPH::Quat ToJolt(const quat& q);
 	::JPH::ObjectLayer ToJolt(RigidBodyType type);
 	::JPH::RMat44 ToJolt(const Transform& transform);
 
