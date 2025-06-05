@@ -29,7 +29,7 @@ namespace Game {
 
 		void Update();
 
-		const DebugRenderer& Debug_Renderer() const;
+		DebugRenderer& Debug_Renderer() const;
 
 		template<IsShape T, class ...Args>
 		T* CreateShape(Args&& ...args)
@@ -41,8 +41,6 @@ namespace Game {
 		RigidBody CreateRigidBody(const Shape& shape, const vec3& position, RigidBodyType type) const;
 
 		CharacterController& GetCharacterController() const;
-
-		std::vector<const Shape*> QueryCollisions(const Shape* shape, const Transform& transform);
 
 	private:
 		struct Implementation;

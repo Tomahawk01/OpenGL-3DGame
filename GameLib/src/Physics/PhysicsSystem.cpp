@@ -83,19 +83,6 @@ namespace {
 		Game::Logger::Info("JOLT TRACE: {}", buffer);
 	}
 
-	struct SimpleCollisionCollector : ::JPH::CollideShapeCollector
-	{
-		void OnBody(const ::JPH::Body&) override
-		{
-			Game::Logger::Trace("Collision");
-		}
-
-		void AddHit(const ResultType&) override
-		{
-			Game::Logger::Trace("Hit");
-		}
-	};
-
 }
 
 namespace Game {
@@ -164,7 +151,7 @@ namespace Game {
 		m_Impl->CharacterController->DebugDraw(&m_Impl->Debug_Renderer, {});
 	}
 
-	const DebugRenderer& PhysicsSystem::Debug_Renderer() const
+	DebugRenderer& PhysicsSystem::Debug_Renderer() const
 	{
 		return m_Impl->Debug_Renderer;
 	}
@@ -178,17 +165,6 @@ namespace Game {
 	CharacterController& PhysicsSystem::GetCharacterController() const
 	{
 		return *m_Impl->CharacterController;
-	}
-
-	std::vector<const Shape*> PhysicsSystem::QueryCollisions(const Shape* shape, const Transform& transform)
-	{
-		const auto& narrowPhase = m_Impl->PhysicsSystem.GetNarrowPhaseQuery();
-
-		::JPH::CollideShapeSettings settings{};
-		SimpleCollisionCollector collector{};
-		narrowPhase.CollideShape(shape->GetNativeHandle(), ::JPH::Vec3(1.0f, 1.0f, 1.0f), ToJolt(transform), settings, ::JPH::Vec3(0.0f, 0.0f, 0.0f), collector);
-
-		return {};
 	}
 
 }
