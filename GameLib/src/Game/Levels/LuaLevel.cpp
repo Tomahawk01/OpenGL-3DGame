@@ -103,7 +103,7 @@ namespace Game {
 				},
 				m_Shapes, m_Entities
 			) | std::ranges::to<std::vector>();
-		const auto indexView = std::views::iota(0ull, std::ranges::size(transformedShapes));
+		const auto max = std::ranges::size(transformedShapes);
 
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
 		{
@@ -116,11 +116,18 @@ namespace Game {
 				.tintAmount = tintAmount
 			};
 
-			for (const auto& combo : std::views::cartesian_product(indexView, indexView) |
-									 std::views::filter([](const auto& e) { return std::get<0>(e) < std::get<1>(e); }))
+			auto combs = std::views::iota(0ull, max) |
+						 std::views::transform(
+						 [max](auto x)
+						 {
+								 return std::views::iota(x + 1ull, max) |
+									 std::views::transform([x](auto y) { return std::make_pair(x, y); });
+						 }) | std::views::join;
+
+			for (const auto [i, j] : combs)
 			{
-				const auto& transformShape1 = transformedShapes[std::get<0>(combo)];
-				const auto& transformShape2 = transformedShapes[std::get<1>(combo)];
+				const auto& transformShape1 = transformedShapes[i];
+				const auto& transformShape2 = transformedShapes[j];
 
 				transformShape1.Intersects(transformShape2);
 			}
