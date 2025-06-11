@@ -37,7 +37,6 @@ namespace Game {
 		void Restart() override;
 
 		std::span<const Entity> GetEntities() const;
-		std::span<const LineData> GetLines() const;
 
 	private:
 		LuaScript m_Script;

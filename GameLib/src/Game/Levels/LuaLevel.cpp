@@ -124,11 +124,11 @@ namespace Game {
 
 				transformShape1.Intersects(transformShape2);
 			}
-		}
 
-		if (runner.Execute<bool>("is_complete"))
-		{
-			m_Bus.PostLevelComplete("lua_level");
+			if (runner.Execute<bool>("is_complete"))
+			{
+				m_Bus.PostLevelComplete("lua_level");
+			}
 		}
 
 		m_PS.Debug_Renderer().Clear();
@@ -136,6 +136,8 @@ namespace Game {
 		{
 			e.Draw(m_PS.Debug_Renderer());
 		}
+
+		m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();
 	}
 
 	void LuaLevel::Restart()
@@ -158,11 +160,6 @@ namespace Game {
 	std::span<const Entity> LuaLevel::GetEntities() const
 	{
 		return m_Entities;
-	}
-
-	std::span<const LineData> LuaLevel::GetLines() const
-	{
-		return m_PS.Debug_Renderer().GetLines();
 	}
 
 }

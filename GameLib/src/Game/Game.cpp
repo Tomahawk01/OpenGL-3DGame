@@ -178,8 +178,6 @@ namespace Game {
 
 			wireframeRenderer.Draw(m_Player.GetCamera());
 
-			level->GetScene().debugLines = DebugLines{ level->GetLines() };
-
 			renderer.Render(m_Player.GetCamera(), level->GetScene(), gamma);
 
 			m_Window.Swap();
