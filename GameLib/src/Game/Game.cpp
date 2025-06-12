@@ -10,6 +10,8 @@
 #include "Core/ResourceCache.h"
 #include "Math/AABB.h"
 #include "Math/FrustumPlane.h"
+#include "Physics/BoxShape.h"
+#include "Physics/TransformedShape.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Sampler.h"
 #include "Renderer/Material.h"
@@ -34,17 +36,25 @@
 
 namespace {
 
-	bool IntersectsFrustum(const Game::AABB& aabb, const std::array<Game::FrustumPlane, 6u>& planes)
+	bool IntersectsFrustum(const Game::TransformedShape& boundingBox, const std::array<Game::FrustumPlane, 6u>& planes)
 	{
+		Game::Expect(boundingBox.GetShape()->GetType() == Game::ShapeType::BOX, "This is not a box");
+
+		const auto* boxShape = static_cast<const Game::BoxShape*>(boundingBox.GetShape());
+
+		const auto position = boundingBox.GetTransform().Position;
+		const auto min = position - boxShape->GetDimensions();
+		const auto max = position + boxShape->GetDimensions();
+
 		for (const auto& plane : planes)
 		{
-			Game::vec3 positiveVertex = aabb.min;
+			Game::vec3 positiveVertex = min;
 			if (plane.normal.x >= 0)
-				positiveVertex.x = aabb.max.x;
+				positiveVertex.x = max.x;
 			if (plane.normal.y >= 0)
-				positiveVertex.y = aabb.max.y;
+				positiveVertex.y = max.y;
 			if (plane.normal.z >= 0)
-				positiveVertex.z = aabb.max.z;
+				positiveVertex.z = max.z;
 
 			if (Game::vec3::Dot(plane.normal, positiveVertex) + plane.distance < 0.0f)
 				return false;
@@ -173,7 +183,6 @@ namespace Game {
 			for (auto& entity : level->GetScene().entities)
 			{
 				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), m_Player.GetCamera().FrustumPlanes()));
-				wireframeRenderer.Draw(entity->GetBoundingBox());
 			}
 
 			wireframeRenderer.Draw(m_Player.GetCamera());

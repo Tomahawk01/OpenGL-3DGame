@@ -1,6 +1,7 @@
 #include "LuaLevel.h"
 
 #include "Scripting/ScriptRunner.h"
+#include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
 #include "Physics/TransformedShape.h"
 
@@ -12,21 +13,22 @@ using namespace std::literals;
 namespace Game {
 
 	LuaLevel::LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
-		: m_Script{ loader.Load(scriptName).AsString() }
+		: m_PS{}
+		, m_Script{ loader.Load(scriptName).AsString() }
 		, m_Entities{}
 		, m_Floor{
 			resourceCache.Get<Mesh>("floor"),
 			resourceCache.Get<Material>("floor"),
 			{0.0f, -2.0f, 0.0f},
 			{100.0f, 1.0f, 100.0f},
-			std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")}
+			std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")},
+			{m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}}}
 		}
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
 		, m_ResourceCache{ resourceCache }
 		, m_Bus{ bus }
 		, m_BarrelInfo{}
-		, m_PS{}
 		, m_Shapes{}
 	{
 		const Texture* barrelTextures[]{
@@ -41,14 +43,18 @@ namespace Game {
 		const auto barrelCount = runner.Execute<int64_t>("barrel_count");
 		for (int64_t i = 0; i < barrelCount; i++)
 		{
+			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ 0.5f, 1.0f, 0.5f });
+			m_Shapes.push_back(shape);
+
 			const auto info = runner.Execute<vec3, vec3, float>("barrel_info", i + 1ll);
 
-			const auto& ent = m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), std::get<0>(info), vec3{ 1.0f }, barrelTextures);
-
-			const auto aabb = ent.GetBoundingBox();
-			const auto halfExtents = (aabb.max - aabb.min) / 2.0f;
-			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ halfExtents.x, halfExtents.y, halfExtents.z });
-			m_Shapes.push_back(shape);
+			m_Entities.emplace_back(
+				resourceCache.Get<Mesh>("barrel"),
+				resourceCache.Get<Material>("barrel"),
+				std::get<0>(info), vec3{ 1.0f },
+				barrelTextures,
+				TransformedShape{ shape, {std::get<0>(info), {1.0f}, {}} }
+			);
 		}
 
 		m_Scene = Scene{

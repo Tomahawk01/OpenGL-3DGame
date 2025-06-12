@@ -39,6 +39,7 @@ namespace Game {
 		std::span<const Entity> GetEntities() const;
 
 	private:
+		PhysicsSystem m_PS;
 		LuaScript m_Script;
 		std::vector<Entity> m_Entities;
 		Entity m_Floor;
@@ -47,7 +48,6 @@ namespace Game {
 		DefaultCache& m_ResourceCache;
 		MessageBus m_Bus;
 		std::unordered_map<const Entity*, BarrelInfo> m_BarrelInfo;
-		PhysicsSystem m_PS;
 		std::vector<const Shape*> m_Shapes;
 	};
 
