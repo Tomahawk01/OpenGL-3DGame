@@ -61,3 +61,7 @@ end
 function set_barrel_visibility(index, visibility)
 	barrels[index].visibility = visibility
 end
+
+function set_barrel_position(index, position)
+	barrels[index].position = position
+end

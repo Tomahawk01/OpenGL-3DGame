@@ -46,7 +46,7 @@ namespace Game {
 			const auto& ent = m_Entities.emplace_back(resourceCache.Get<Mesh>("barrel"), resourceCache.Get<Material>("barrel"), std::get<0>(info), vec3{ 1.0f }, barrelTextures);
 
 			const auto aabb = ent.GetBoundingBox();
-			const auto halfExtents = (aabb.max - aabb.min) / 2.0f; // + aabb.min
+			const auto halfExtents = (aabb.max - aabb.min) / 2.0f;
 			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ halfExtents.x, halfExtents.y, halfExtents.z });
 			m_Shapes.push_back(shape);
 		}
@@ -93,17 +93,13 @@ namespace Game {
 			runner.Execute("set_barrel_visibility", index + 1ll, entity.IsVisible());
 		}
 
+		auto origPositions = m_Entities |
+							 std::views::transform([](const auto& e) { return std::make_tuple(false, e.GetPosition()); }) |
+							 std::ranges::to<std::vector>();
+
 		runner.Execute("update_level", player.GetPosition());
 
-		const auto transformedShapes =
-			std::views::zip_transform(
-				[](const auto& shape, const auto& entity)
-				{
-					return TransformedShape{ shape, {entity.GetPosition(), {1.0f, 1.0f, 1.0f}, {}} };
-				},
-				m_Shapes, m_Entities
-			) | std::ranges::to<std::vector>();
-		const auto max = std::ranges::size(transformedShapes);
+		const auto max = std::ranges::size(m_Entities);
 
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
 		{
@@ -126,22 +122,36 @@ namespace Game {
 
 			for (const auto [i, j] : combs)
 			{
-				const auto& transformShape1 = transformedShapes[i];
-				const auto& transformShape2 = transformedShapes[j];
+				const auto& transformShape1 = TransformedShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
+				const auto& transformShape2 = TransformedShape{ m_Shapes[j], {m_Entities[j].GetPosition(), {1.0f}, {}} };
 
-				transformShape1.Intersects(transformShape2);
-			}
-
-			if (runner.Execute<bool>("is_complete"))
-			{
-				m_Bus.PostLevelComplete("lua_level");
+				if (transformShape1.Intersects(transformShape2))
+				{
+					std::get<0>(origPositions[i]) = true;
+					std::get<0>(origPositions[j]) = true;
+				}
 			}
 		}
 
-		m_PS.Debug_Renderer().Clear();
-		for (const auto& e : transformedShapes)
+		for (const auto& [index, orig] : std::views::enumerate(origPositions))
 		{
-			e.Draw(m_PS.Debug_Renderer());
+			if (const auto& [revert, origPosition] = orig; revert)
+			{
+				m_Entities[index].SetPosition(origPosition);
+				runner.Execute("set_barrel_position", index + 1ll, origPosition);
+			}
+		}
+
+		if (runner.Execute<bool>("is_complete"))
+		{
+			m_Bus.PostLevelComplete("lua_level");
+		}
+
+		m_PS.Debug_Renderer().Clear();
+		for (auto i = 0u; i < max; i++)
+		{
+			const auto& transformShape = TransformedShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
+			transformShape.Draw(m_PS.Debug_Renderer());
 		}
 
 		m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();

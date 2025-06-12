@@ -11,15 +11,20 @@ namespace {
 
 	struct SimpleCollisionCollector : ::JPH::CollideShapeCollector
 	{
+		SimpleCollisionCollector(bool& hit)
+			: Hit(hit)
+		{}
+
 		void OnBody(const ::JPH::Body&) override
 		{
-			Game::Logger::Trace("Collision");
 		}
 
 		void AddHit(const ResultType&) override
 		{
-			Game::Logger::Trace("Hit");
+			Hit = true;
 		}
+
+		bool& Hit;
 	};
 
 }
@@ -36,7 +41,8 @@ namespace Game {
 	bool TransformedShape::Intersects(const TransformedShape& shape) const
 	{
 		::JPH::CollideShapeSettings settings{};
-		SimpleCollisionCollector collector{};
+		bool hit = false;
+		SimpleCollisionCollector collector{ hit };
 		const ::JPH::Vec3 scale{ 1.0f, 1.0f, 1.0f };
 		const auto transform1 = ToJolt(m_Transform);
 		const auto transform2 = ToJolt(shape.m_Transform);
@@ -50,7 +56,7 @@ namespace Game {
 			subshapeIDCreator1, subshapeIDCreator2,
 			settings, collector);
 
-		return false;
+		return hit;
 	}
 
 	void TransformedShape::Draw(DebugRenderer& debugRenderer) const
