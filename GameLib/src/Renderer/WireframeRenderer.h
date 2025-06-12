@@ -4,7 +4,6 @@
 #include "LineData.h"
 #include "Math/Vector3.h"
 #include "Math/Color.h"
-#include "Math/AABB.h"
 
 #include <vector>
 
@@ -15,7 +14,6 @@ namespace Game {
 	public:
 		void Draw(const vec3& start, const vec3& end, const Color& color);
 		void Draw(const Camera& camera);
-		void Draw(const AABB& aabb);
 
 		std::vector<LineData> yield();
 

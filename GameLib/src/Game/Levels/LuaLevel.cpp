@@ -43,7 +43,7 @@ namespace Game {
 		const auto barrelCount = runner.Execute<int64_t>("barrel_count");
 		for (int64_t i = 0; i < barrelCount; i++)
 		{
-			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ 0.5f, 1.0f, 0.5f });
+			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ 0.6f, 1.0f, 0.6f });
 			m_Shapes.push_back(shape);
 
 			const auto info = runner.Execute<vec3, vec3, float>("barrel_info", i + 1ll);

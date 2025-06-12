@@ -36,24 +36,6 @@ namespace Game {
 		Draw(corners[3], corners[7], connectColor);
 	}
 
-	void WireframeRenderer::Draw(const AABB& aabb)
-	{
-		Draw({ aabb.max.x, aabb.max.y, aabb.max.z }, { aabb.min.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.min.x, aabb.max.y, aabb.max.z }, { aabb.min.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.min.x, aabb.max.y, aabb.min.z }, { aabb.max.x, aabb.max.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.max.x, aabb.max.y, aabb.min.z }, { aabb.max.x, aabb.max.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
-
-		Draw({ aabb.max.x, aabb.max.y, aabb.max.z }, { aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.min.x, aabb.max.y, aabb.max.z }, { aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.min.x, aabb.max.y, aabb.min.z }, { aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.max.x, aabb.max.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
-
-		Draw({ aabb.max.x, aabb.min.y, aabb.max.z }, { aabb.min.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.min.x, aabb.min.y, aabb.max.z }, { aabb.min.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.min.x, aabb.min.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.min.z }, { 0.0f, 1.0f, 0.0f });
-		Draw({ aabb.max.x, aabb.min.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.max.z }, { 0.0f, 1.0f, 0.0f });
-	}
-
 	std::vector<LineData> WireframeRenderer::yield()
 	{
 		const auto temp = m_Lines;

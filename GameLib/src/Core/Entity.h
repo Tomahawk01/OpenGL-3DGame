@@ -4,7 +4,6 @@
 #include "Math/Vector3.h"
 #include "Math/Transform.h"
 #include "Math/Quaternion.h"
-#include "Math/AABB.h"
 #include "Physics/TransformedShape.h"
 
 #include <vector>

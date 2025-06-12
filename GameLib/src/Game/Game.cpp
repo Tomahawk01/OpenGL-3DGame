@@ -8,7 +8,6 @@
 #include "Core/Scene.h"
 #include "Core/ResourceLoader.h"
 #include "Core/ResourceCache.h"
-#include "Math/AABB.h"
 #include "Math/FrustumPlane.h"
 #include "Physics/BoxShape.h"
 #include "Physics/TransformedShape.h"
