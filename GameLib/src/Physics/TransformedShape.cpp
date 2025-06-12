@@ -65,4 +65,19 @@ namespace Game {
 		m_Shape->GetNativeHandle()->Draw(&debugRenderer, ToJolt(m_Transform), scale, ::JPH::Color{ 0xff, 0xff, 0xff }, false, true);
 	}
 
+	void TransformedShape::Translate(const vec3& translation)
+	{
+		m_Transform.Position += translation;
+	}
+
+	const Shape* TransformedShape::GetShape() const
+	{
+		return m_Shape;
+	}
+
+	const Transform& TransformedShape::GetTransform() const
+	{
+		return m_Transform;
+	}
+
 }

@@ -8,7 +8,7 @@
 namespace Game {
 
 	BoxShape::BoxShape(const vec3& dimensions, PassKey<PhysicsSystem> passKey)
-		: Shape(passKey)
+		: Shape(ShapeType::BOX, passKey)
 		, m_Dimensions{ dimensions }
 		, m_BoxShape{ ToJolt(dimensions) }
 	{}

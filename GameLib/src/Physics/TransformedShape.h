@@ -14,6 +14,10 @@ namespace Game {
 		bool Intersects(const TransformedShape& shape) const;
 
 		void Draw(DebugRenderer& debugRenderer) const;
+		void Translate(const vec3& translation);
+
+		const Shape* GetShape() const;
+		const Transform& GetTransform() const;
 
 	private:
 		const Shape* m_Shape;
