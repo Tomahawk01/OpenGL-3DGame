@@ -5,6 +5,7 @@
 #include "Math/Transform.h"
 #include "Math/Quaternion.h"
 #include "Math/AABB.h"
+#include "Physics/TransformedShape.h"
 
 #include <vector>
 #include <tuple>
@@ -23,7 +24,8 @@ namespace Game {
 			   const Material* material,
 			   const vec3& position,
 			   const vec3& scale,
-			   std::span<const Texture* const> textures);
+			   std::span<const Texture* const> textures,
+			   TransformedShape boundingBox);
 
 		const Mesh* GetMesh() const;
 		const Material* GetMaterial() const;
@@ -32,7 +34,7 @@ namespace Game {
 		const Transform& GetTransform() const;
 		bool IsVisible() const;
 		void SetVisibility(bool visible);
-		AABB GetBoundingBox() const;
+		const TransformedShape& GetBoundingBox() const;
 
 		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
@@ -46,7 +48,7 @@ namespace Game {
 		const Sampler* m_Sampler;
 		Transform m_Transform;
 		bool m_Visible;
-		AABB m_BoundingBox;
+		TransformedShape m_BoundingBox;
 	};
 
 }

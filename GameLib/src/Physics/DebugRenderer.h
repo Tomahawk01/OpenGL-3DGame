@@ -4,7 +4,7 @@
 #include "Renderer/LineData.h"
 
 #if !defined(JPH_DEBUG_RENDERER)
-#define JPH_DEBUG_RENDERER
+#define JPH_DEBUG_RENDERER 1
 #endif
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Color.h>
