@@ -2,8 +2,13 @@
 
 namespace Game {
 
-	Shape::Shape(PassKey<PhysicsSystem>)
+	Shape::Shape(ShapeType type, PassKey<PhysicsSystem>)
+		: m_Type(type)
+	{}
+
+	ShapeType Shape::GetType() const
 	{
+		return m_Type;
 	}
 
 }
