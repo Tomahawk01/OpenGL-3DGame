@@ -19,6 +19,12 @@ namespace Game {
 		}
 	}
 
+	template<class T, class ...Args>
+	constexpr void Expect(std::unique_ptr<T>& obj, std::string_view msg, Args&&... args)
+	{
+		Expect(!!obj, msg, std::forward<Args>(args)...);
+	}
+
 	template<class ...Args>
 	void Ensure(bool predicate, std::string_view msg, Args&&... args)
 	{
