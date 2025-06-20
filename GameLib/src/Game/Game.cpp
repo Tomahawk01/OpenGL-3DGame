@@ -142,6 +142,7 @@ namespace Game {
 		auto currentLevel = m_LevelNum;
 
 		m_Level = std::make_unique<LuaLevel>(resourceLoader, m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
+		m_Window.SetTitle(m_LevelNames[m_LevelNum]);
 
 		while (m_Running)
 		{
@@ -151,6 +152,8 @@ namespace Game {
 				m_Level.reset(nullptr);
 				m_Level = std::make_unique<LuaLevel>(resourceLoader, m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
 				currentLevel = m_LevelNum;
+
+				m_Window.SetTitle(m_LevelNames[m_LevelNum]);
 			}
 
 			Expect(m_Level, "Level cannot be nullptr");

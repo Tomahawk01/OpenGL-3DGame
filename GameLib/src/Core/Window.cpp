@@ -295,6 +295,11 @@ namespace Game {
 		::SwapBuffers(m_DeviceCtx);
 	}
 
+	void Window::SetTitle(const std::string& title) const
+	{
+		::SetWindowTextA(m_Window, title.c_str());
+	}
+
 	HWND Window::GetNativeHandle() const
 	{
 		return m_Window;

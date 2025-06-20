@@ -25,6 +25,8 @@ namespace Game {
 		std::optional<Event> PollEvent() const;
 		void Swap() const;
 
+		void SetTitle(const std::string& title) const;
+
 		HWND GetNativeHandle() const;
 		uint32_t GetWidth() const;
 		uint32_t GetHeight() const;
