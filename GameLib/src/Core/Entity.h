@@ -24,7 +24,9 @@ namespace Game {
 			   const vec3& position,
 			   const vec3& scale,
 			   std::span<const Texture* const> textures,
-			   TransformedShape boundingBox);
+			   TransformedShape boundingBox,
+			   uint32_t collisionLayer,
+			   uint32_t collisionMask);
 
 		const Mesh* GetMesh() const;
 		const Material* GetMaterial() const;
@@ -34,6 +36,8 @@ namespace Game {
 		bool IsVisible() const;
 		void SetVisibility(bool visible);
 		const TransformedShape& GetBoundingBox() const;
+		uint32_t GetCollisionLayer() const;
+		uint32_t GetCollisionMask() const;
 
 		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
@@ -48,6 +52,8 @@ namespace Game {
 		Transform m_Transform;
 		bool m_Visible;
 		TransformedShape m_BoundingBox;
+		uint32_t m_CollisionLayer;
+		uint32_t m_CollisionMask;
 	};
 
 }
