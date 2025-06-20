@@ -22,7 +22,9 @@ namespace Game {
 			{0.0f, -2.0f, 0.0f},
 			{100.0f, 1.0f, 100.0f},
 			std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")},
-			{m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}}}
+			{m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}}},
+			0u,
+			0u
 		}
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
@@ -46,14 +48,16 @@ namespace Game {
 			auto* shape = m_PS.CreateShape<BoxShape>(vec3{ 0.6f, 1.0f, 0.6f });
 			m_Shapes.push_back(shape);
 
-			const auto info = runner.Execute<vec3, vec3, float>("barrel_info", i + 1ll);
+			const auto info = runner.Execute<vec3, vec3, float, int64_t, int64_t>("barrel_info", i + 1ll);
 
 			m_Entities.emplace_back(
 				resourceCache.Get<Mesh>("barrel"),
 				resourceCache.Get<Material>("barrel"),
 				std::get<0>(info), vec3{ 1.0f },
 				barrelTextures,
-				TransformedShape{ shape, {std::get<0>(info), {1.0f}, {}} }
+				TransformedShape{ shape, {std::get<0>(info), {1.0f}, {}} },
+				static_cast<uint32_t>(std::get<3>(info)),
+				static_cast<uint32_t>(std::get<4>(info))
 			);
 		}
 
@@ -109,7 +113,7 @@ namespace Game {
 
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
 		{
-			const auto& [position, color, tintAmount] = runner.Execute<vec3, vec3, float>("barrel_info", index + 1ll);
+			const auto& [position, color, tintAmount, collisionLayer, collisionMask] = runner.Execute<vec3, vec3, float, int64_t, int64_t>("barrel_info", index + 1ll);
 
 			entity.SetPosition(position);
 
@@ -117,19 +121,25 @@ namespace Game {
 				.tintColor = { color.x, color.y, color.z },
 				.tintAmount = tintAmount
 			};
+		}
 
-			auto combs = std::views::iota(0ull, max) |
-						 std::views::transform(
-						 [max](auto x)
-						 {
-								 return std::views::iota(x + 1ull, max) |
-									 std::views::transform([x](auto y) { return std::make_pair(x, y); });
-						 }) | std::views::join;
+		auto combs = std::views::iota(0ull, max) |
+					 std::views::transform(
+					 [max](auto x)
+					 {
+							 return std::views::iota(x + 1ull, max) |
+								 std::views::transform([x](auto y) { return std::make_pair(x, y); });
+					 }) | std::views::join;
 
-			for (const auto [i, j] : combs)
+		for (const auto [i, j] : combs)
+		{
+			const Entity& ent1 = m_Entities[i];
+			const Entity& ent2 = m_Entities[j];
+
+			if ((ent1.GetCollisionMask() & ent2.GetCollisionLayer()) && (ent2.GetCollisionMask() & ent1.GetCollisionLayer()))
 			{
-				const auto& transformShape1 = TransformedShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
-				const auto& transformShape2 = TransformedShape{ m_Shapes[j], {m_Entities[j].GetPosition(), {1.0f}, {}} };
+				const TransformedShape& transformShape1{ m_Shapes[i], {ent1.GetPosition(), {1.0f}, {}} };
+				const TransformedShape& transformShape2{ m_Shapes[j], {ent2.GetPosition(), {1.0f}, {}} };
 
 				if (transformShape1.Intersects(transformShape2))
 				{
@@ -156,7 +166,7 @@ namespace Game {
 		m_PS.Debug_Renderer().Clear();
 		for (auto i = 0u; i < max; i++)
 		{
-			const auto& transformShape = TransformedShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
+			const TransformedShape& transformShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
 			transformShape.Draw(m_PS.Debug_Renderer());
 		}
 
