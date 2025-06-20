@@ -84,7 +84,8 @@ namespace Game {
 		, m_LevelNames{
 			"levels/level_alpha.lua",
 			"levels/level_bravo.lua",
-			"levels/level_charlie.lua"
+			"levels/level_charlie.lua",
+			"levels/level_delta.lua"
 		}
 		, m_Level{}
 		, m_LevelNum{ 0u }
