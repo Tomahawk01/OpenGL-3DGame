@@ -81,7 +81,12 @@ namespace Game {
 
 	Game::Game()
 		: m_Running{ true }
-		, m_Levels{}
+		, m_LevelNames{
+			"levels/level_alpha.lua",
+			"levels/level_bravo.lua",
+			"levels/level_charlie.lua"
+		}
+		, m_Level{}
 		, m_LevelNum{ 0u }
 		, m_Bus{}
 		, m_Window{ 1280u, 720u, 640u, 360u }
@@ -98,8 +103,8 @@ namespace Game {
 
 		const File tlvFile{ resourceLoader.Load("resources") };
 		const TLVReader reader{ tlvFile.AsData() };
-
 		const Sampler* sampler{ resourceCache.Insert<Sampler>("default") };
+
 		resourceCache.Insert<Texture>("barrel_albedo", reader, "barrel_Albedo", sampler);
 		resourceCache.Insert<Texture>("barrel_specular", reader, "barrel_Specular", sampler);
 		resourceCache.Insert<Texture>("barrel_normal", reader, "barrel_Normal", sampler);
@@ -129,23 +134,26 @@ namespace Game {
 
 		const Renderer renderer{ resourceLoader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() };
 
-		std::string_view levels[] = {
-			//"levels/level_alpha.lua",
-			//"levels/level_bravo.lua",
-			"levels/level_charlie.lua",
-		};
-
-		for (const auto level : levels)
-		{
-			m_Levels.push_back(std::make_unique<LuaLevel>(resourceLoader, level, resourceCache, reader, m_Player, m_Bus));
-		}
-
 		float gamma = 2.2f;
 
 		WireframeRenderer wireframeRenderer{};
 
+		auto currentLevel = m_LevelNum;
+
+		m_Level = std::make_unique<LuaLevel>(resourceLoader, m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
+
 		while (m_Running)
 		{
+			if (currentLevel != m_LevelNum)
+			{
+				m_Player.Restart();
+				m_Level.reset(nullptr);
+				m_Level = std::make_unique<LuaLevel>(resourceLoader, m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
+				currentLevel = m_LevelNum;
+			}
+
+			Expect(m_Level, "Level cannot be nullptr");
+
 			auto event = m_Window.PollEvent();
 			while (event && m_Running)
 			{
@@ -174,19 +182,17 @@ namespace Game {
 				event = m_Window.PollEvent();
 			}
 
-			auto* level = m_Levels[m_LevelNum].get();
-
 			m_Player.Update();
-			level->Update(m_Player);
+			m_Level->Update(m_Player);
 
-			for (auto& entity : level->GetScene().entities)
+			for (auto& entity : m_Level->GetScene().entities)
 			{
 				entity->SetVisibility(IntersectsFrustum(entity->GetBoundingBox(), m_Player.GetCamera().FrustumPlanes()));
 			}
 
 			wireframeRenderer.Draw(m_Player.GetCamera());
 
-			renderer.Render(m_Player.GetCamera(), level->GetScene(), gamma);
+			renderer.Render(m_Player.GetCamera(), m_Level->GetScene(), gamma);
 
 			m_Window.Swap();
 		}
@@ -195,10 +201,7 @@ namespace Game {
 	void Game::HandleLevelComplete(std::string_view levelName)
 	{
 		Logger::Info("Level complete: {}", levelName);
-		m_LevelNum = (m_LevelNum + 1) % m_Levels.size();
-
-		m_Levels[m_LevelNum]->Restart();
-		m_Player.Restart();
+		m_LevelNum = (m_LevelNum + 1) % m_LevelNames.size();
 	}
 
 }

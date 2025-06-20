@@ -22,7 +22,8 @@ namespace Game {
 
 	private:
 		bool m_Running;
-		std::vector<std::unique_ptr<LuaLevel>> m_Levels;
+		std::vector<std::string> m_LevelNames;
+		std::unique_ptr<LuaLevel> m_Level;
 		size_t m_LevelNum;
 		MessageBus m_Bus;
 		Window m_Window;
