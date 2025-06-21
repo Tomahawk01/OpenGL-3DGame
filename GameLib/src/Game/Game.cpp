@@ -82,11 +82,11 @@ namespace Game {
 	Game::Game()
 		: m_Running{ true }
 		, m_LevelNames{
+			"levels/level_echo.lua",
 			"levels/level_alpha.lua",
 			"levels/level_bravo.lua",
 			"levels/level_charlie.lua",
 			"levels/level_delta.lua",
-			"levels/level_echo.lua"
 		}
 		, m_Level{}
 		, m_LevelNum{ 0u }
@@ -94,7 +94,7 @@ namespace Game {
 		, m_Window{ 1280u, 720u, 640u, 360u }
 		, m_Player{ m_Bus, CreateCamera(m_Window) }
 	{
-		Subscriber::Subscribe(this, m_Bus);
+		m_Bus.Subscribe(MessageType::LEVEL_COMPLETE, this);
 	}
 
 	void Game::Run(std::string_view resourceRoot)
