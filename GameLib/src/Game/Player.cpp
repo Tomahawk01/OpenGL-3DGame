@@ -11,7 +11,9 @@ namespace Game {
 		, m_KeyState{}
 		, m_StartPosition{ m_Camera.GetPosition() }
 	{
-		Subscriber::Subscribe(this, bus);
+		bus.Subscribe(MessageType::KEY_PRESS, this);
+		bus.Subscribe(MessageType::MOUSE_MOVE, this);
+		bus.Subscribe(MessageType::RESTART_LEVEL, this);
 	}
 
 	void Player::Update()
@@ -62,6 +64,11 @@ namespace Game {
 
 		m_Camera.AddYaw(deltaX);
 		m_Camera.AddPitch(-deltaY);
+	}
+
+	void Player::HandleRestartLevel()
+	{
+		Restart();
 	}
 
 	const Camera& Player::GetCamera() const
