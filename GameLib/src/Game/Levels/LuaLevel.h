@@ -10,8 +10,8 @@
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/LuaScript.h"
 #include "Messaging/MessageBus.h"
+#include "Messaging/Subscriber.h"
 #include "TLV/TLVReader.h"
-
 #include "Game/Levels/Level.h"
 #include "Game/Player.h"
 
@@ -22,7 +22,14 @@
 
 namespace Game {
 
-	class LuaLevel : public Level
+	enum class LevelState
+	{
+		PLAYING,
+		COMPLETE,
+		LOST
+	};
+
+	class LuaLevel : public Level, public Subscriber
 	{
 	public:
 		struct BarrelInfo
@@ -35,6 +42,7 @@ namespace Game {
 
 		void Update(const Player& player) override;
 		void Restart() override;
+		void HandleEntityIntersect(const Entity* a, const Entity* b) override;
 
 		std::span<const Entity> GetEntities() const;
 

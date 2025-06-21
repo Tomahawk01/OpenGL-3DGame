@@ -1,5 +1,6 @@
 #include "LuaLevel.h"
 
+#include "Utilities/Error.h"
 #include "Scripting/ScriptRunner.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
@@ -33,6 +34,8 @@ namespace Game {
 		, m_BarrelInfo{}
 		, m_Shapes{}
 	{
+		m_Bus.Subscribe(MessageType::ENTITY_INTERSECT, this);
+
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
 			resourceCache.Get<Texture>("barrel_specular"),
@@ -49,7 +52,6 @@ namespace Game {
 			m_Shapes.push_back(shape);
 
 			const auto info = runner.Execute<vec3, vec3, float, int64_t, int64_t>("barrel_info", i + 1ll);
-
 			m_Entities.emplace_back(
 				resourceCache.Get<Mesh>("barrel"),
 				resourceCache.Get<Material>("barrel"),
@@ -145,22 +147,33 @@ namespace Game {
 				{
 					std::get<0>(origPositions[i]) = true;
 					std::get<0>(origPositions[j]) = true;
+					m_Bus.PostEntityIntersect(std::addressof(ent1), std::addressof(ent2));
 				}
 			}
 		}
 
-		for (const auto& [index, orig] : std::views::enumerate(origPositions))
+		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
+		switch (levelState)
 		{
-			if (const auto& [revert, origPosition] = orig; revert)
+			case LevelState::COMPLETE:
+				m_Bus.PostLevelComplete("lua_level");
+				break;
+			case LevelState::LOST:
 			{
-				m_Entities[index].SetPosition(origPosition);
-				runner.Execute("set_barrel_position", index + 1ll, origPosition);
-			}
-		}
-
-		if (runner.Execute<bool>("is_complete"))
-		{
-			m_Bus.PostLevelComplete("lua_level");
+				Restart();
+				m_Bus.PostRestartLevel();
+			} break;
+			default:
+			{
+				for (const auto& [index, orig] : std::views::enumerate(origPositions))
+				{
+					if (const auto& [revert, origPosition] = orig; revert)
+					{
+						m_Entities[index].SetPosition(origPosition);
+						runner.Execute("set_barrel_position", index + 1ll, origPosition);
+					}
+				}
+			} break;
 		}
 
 		m_PS.Debug_Renderer().Clear();
@@ -188,6 +201,27 @@ namespace Game {
 				}
 			}
 		);
+
+		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
+		{
+			const auto& [position, color, tintAmount, collisionLayer, collisionMask] = runner.Execute<vec3, vec3, float, int64_t, int64_t>("barrel_info", index + 1ll);
+
+			entity.SetPosition(position);
+		}
+	}
+
+	void LuaLevel::HandleEntityIntersect(const Entity* a, const Entity* b)
+	{
+		const Entity* begin = m_Entities.data();
+		const auto indexA = static_cast<int64_t>(a - begin);
+		const auto indexB = static_cast<int64_t>(b - begin);
+
+		Expect(indexA >= 0 && indexA < static_cast<int64_t>(m_Entities.size()), "indexA {} out of range", indexA);
+		Expect(indexB >= 0 && indexB < static_cast<int64_t>(m_Entities.size()), "indexB {} out of range", indexB);
+
+		const ScriptRunner runner{ m_Script };
+
+		runner.Execute("handle_entity_intersect", indexA + 1ll, indexB + 1ll);
 	}
 
 	std::span<const Entity> LuaLevel::GetEntities() const
