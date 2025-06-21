@@ -8,23 +8,6 @@ namespace Game {
 	class Subscriber
 	{
 	public:
-		template <class T>
-		static void Subscribe(T* obj, MessageBus& bus)
-		{
-			if (&T::HandleKeyPress != &HandleKeyPress)
-			{
-				bus.Subscribe(MessageType::KEY_PRESS, obj);
-			}
-			if (&T::HandleMouseMove != &HandleMouseMove)
-			{
-				bus.Subscribe(MessageType::MOUSE_MOVE, obj);
-			}
-			if (&T::HandleLevelComplete != &HandleLevelComplete)
-			{
-				bus.Subscribe(MessageType::LEVEL_COMPLETE, obj);
-			}
-		}
-
 		virtual void HandleKeyPress(const KeyEvent&)
 		{
 			Logger::Warn("Unhandled message!");
@@ -36,6 +19,16 @@ namespace Game {
 		}
 
 		virtual void HandleLevelComplete(std::string_view)
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleEntityIntersect(const Entity*, const Entity*)
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleRestartLevel()
 		{
 			Logger::Warn("Unhandled message!");
 		}

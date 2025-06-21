@@ -10,12 +10,15 @@
 namespace Game {
 
 	class Subscriber;
+	class Entity;
 
 	enum class MessageType
 	{
 		KEY_PRESS,
 		MOUSE_MOVE,
-		LEVEL_COMPLETE
+		LEVEL_COMPLETE,
+		ENTITY_INTERSECT,
+		RESTART_LEVEL
 	};
 
 	class MessageBus
@@ -26,6 +29,8 @@ namespace Game {
 		void PostKeyPress(const KeyEvent& event);
 		void PostMouseMove(const MouseEvent& event);
 		void PostLevelComplete(std::string_view levelName);
+		void PostEntityIntersect(const Entity* a, const Entity* b);
+		void PostRestartLevel();
 
 	private:
 		std::unordered_map<MessageType, std::vector<Subscriber*>> m_Subscribers;

@@ -44,4 +44,14 @@ namespace Game {
 		_PostMessage(MessageType::LEVEL_COMPLETE, m_Subscribers, [](auto* sub, const auto& levelName) { sub->HandleLevelComplete(levelName); }, levelName);
 	}
 
+	void MessageBus::PostEntityIntersect(const Entity* a, const Entity* b)
+	{
+		_PostMessage(MessageType::ENTITY_INTERSECT, m_Subscribers, [](auto* sub, const auto* a, const auto* b) { sub->HandleEntityIntersect(a, b); }, a, b);
+	}
+
+	void MessageBus::PostRestartLevel()
+	{
+		_PostMessage(MessageType::RESTART_LEVEL, m_Subscribers, [](auto* sub) { sub->HandleRestartLevel(); });
+	}
+
 }
