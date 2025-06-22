@@ -82,11 +82,12 @@ namespace Game {
 	Game::Game()
 		: m_Running{ true }
 		, m_LevelNames{
-			"levels/level_echo.lua",
+			"levels/level_foxtrot.lua",
 			"levels/level_alpha.lua",
 			"levels/level_bravo.lua",
 			"levels/level_charlie.lua",
 			"levels/level_delta.lua",
+			"levels/level_echo.lua",
 		}
 		, m_Level{}
 		, m_LevelNum{ 0u }

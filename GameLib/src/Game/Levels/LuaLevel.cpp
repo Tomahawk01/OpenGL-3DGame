@@ -63,10 +63,16 @@ namespace Game {
 			);
 		}
 
+		const auto ambientVec = runner.Execute<vec3>("get_ambient");
+		const auto [directionalLightDir, directionalLightColor] = runner.Execute<vec3, vec3>("get_directional_light");
+
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
-			.ambient = {0.3f, 0.3f, 0.3f},
-			.directionalLight = {.direction = {-1.0f, -1.0f, -1.0f}, .color = {0.5f, 0.5f, 0.5f}},
+			.ambient = {ambientVec.x, ambientVec.y, ambientVec.z},
+			.directionalLight = {
+				.direction = directionalLightDir,
+				.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
+			},
 			.pointLights = {
 				{.position = {5.0f, 5.0f, 0.0f},
 				.color = {1.0f, 0.0f, 0.0f},
@@ -156,8 +162,9 @@ namespace Game {
 		switch (levelState)
 		{
 			case LevelState::COMPLETE:
+			{
 				m_Bus.PostLevelComplete("lua_level");
-				break;
+			} break;
 			case LevelState::LOST:
 			{
 				Restart();
@@ -175,6 +182,14 @@ namespace Game {
 				}
 			} break;
 		}
+
+		const auto ambientVec = runner.Execute<vec3>("get_ambient");
+		const auto [directionalLightDir, directionalLightColor] = runner.Execute<vec3, vec3>("get_directional_light");
+		m_Scene.ambient = { ambientVec.x, ambientVec.y, ambientVec.z };
+		m_Scene.directionalLight = {
+			.direction = directionalLightDir,
+			.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
+		};
 
 		m_PS.Debug_Renderer().Clear();
 		for (auto i = 0u; i < max; i++)
