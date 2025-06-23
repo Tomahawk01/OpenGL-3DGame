@@ -1,13 +1,14 @@
 #include <Utilities/Error.h>
 #include <Utilities/Logger.h>
 #include <Game/Game.h>
+#include <Game/config.h>
 
 #include <iostream>
 #include <print>
 
 int main(int argc, char** argv)
 {
-	Game::Logger::Info("Starting Game...");
+	Game::Logger::Info("Starting Game v{}.{}.{}", Game::Version::MAJOR, Game::Version::MINOR, Game::Version::PATCH);
 
 	try
 	{

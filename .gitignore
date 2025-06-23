@@ -12,3 +12,4 @@ bin-int/
 # Other files
 imgui.ini
 resources
+**/config.h

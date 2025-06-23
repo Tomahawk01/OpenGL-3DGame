@@ -1,0 +1,9 @@
+#pragma once
+
+namespace Game::Version {
+    
+    static constexpr auto MAJOR = @OpenGL_Game_VERSION_MAJOR@;
+    static constexpr auto MINOR = @OpenGL_Game_VERSION_MINOR@;
+    static constexpr auto PATCH = @OpenGL_Game_VERSION_PATCH@;
+
+}
