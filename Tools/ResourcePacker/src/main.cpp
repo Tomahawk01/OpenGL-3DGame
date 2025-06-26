@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 		Game::Ensure(argc == 3, "usage: ./ResourcePacker.exe <asset_dir> <out_path>");
 
 		const std::set<std::string> imageExtensions{ ".png", ".jpg" };
-		const std::set<std::string> shaderExtensions{ ".frag", ".vert" };
+		const std::set<std::string> fileExtensions{ ".frag", ".vert", ".lua"};
 
 		Game::TLVWriter writer{};
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 					writer.Write(mesh->mName.C_Str(), vertices, indices);
 				}
 			}
-			else if (shaderExtensions.contains(ext))
+			else if (fileExtensions.contains(ext))
 			{
 				Game::Logger::Info("Packing {}", filename);
 
