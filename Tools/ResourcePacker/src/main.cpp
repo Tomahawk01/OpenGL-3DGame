@@ -2,6 +2,7 @@
 #include "Utilities/AutoRelease.h"
 #include "Utilities/Logger.h"
 #include "TLV/TLVWriter.h"
+#include "Core/File.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -53,6 +54,7 @@ int main(int argc, char** argv)
 		Game::Ensure(argc == 3, "usage: ./ResourcePacker.exe <asset_dir> <out_path>");
 
 		const std::set<std::string> imageExtensions{ ".png", ".jpg" };
+		const std::set<std::string> shaderExtensions{ ".frag", ".vert" };
 
 		Game::TLVWriter writer{};
 
@@ -128,6 +130,14 @@ int main(int argc, char** argv)
 
 					writer.Write(mesh->mName.C_Str(), vertices, indices);
 				}
+			}
+			else if (shaderExtensions.contains(ext))
+			{
+				Game::Logger::Info("Packing {}", filename);
+
+				const auto shaderFile = Game::File{ path };
+
+				writer.Write(filename, shaderFile.AsString());
 			}
 		}
 
