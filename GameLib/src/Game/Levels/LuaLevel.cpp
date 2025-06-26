@@ -5,6 +5,7 @@
 #include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
 #include "Physics/TransformedShape.h"
+#include "TLV/Utilities.h"
 
 #include <ranges>
 #include <algorithm>
@@ -13,9 +14,9 @@ using namespace std::literals;
 
 namespace Game {
 
-	LuaLevel::LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
+	LuaLevel::LuaLevel(std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
 		: m_PS{}
-		, m_Script{ loader.Load(scriptName).AsString() }
+		, m_Script{ GetFile(reader, scriptName).Data }
 		, m_Entities{}
 		, m_Floor{
 			resourceCache.Get<Mesh>("floor"),

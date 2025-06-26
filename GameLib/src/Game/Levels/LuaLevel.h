@@ -38,7 +38,7 @@ namespace Game {
 			float tintAmount;
 		};
 
-		LuaLevel(const ResourceLoader& loader, std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
+		LuaLevel(std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 
 		void Update(const Player& player) override;
 		void Restart() override;
