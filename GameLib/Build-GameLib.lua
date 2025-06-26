@@ -44,6 +44,14 @@ project "GameLib"
         "lua54.lib"
     }
 
+    local inputAssets  = "%{wks.location}/Game/assets"
+    local outputAssets = "%{wks.location}/Game/assets/resources"
+
+    prebuildcommands
+    {
+        '"%{wks.location}/bin/' .. outputdir .. '/ResourcePacker/ResourcePacker.exe" ' .. inputAssets .. ' ' .. outputAssets
+    }
+
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
