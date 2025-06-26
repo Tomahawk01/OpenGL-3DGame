@@ -20,7 +20,7 @@
 #include "Renderer/MeshLoader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/WireframeRenderer.h"
-#include "TLV/TLVReader.h"
+#include "TLV/Utilities.h"
 
 #include "Game/Player.h"
 
@@ -75,13 +75,6 @@ namespace {
 		};
 	}
 
-	Game::TextFile GetFile(const Game::TLVReader& reader, std::string_view name)
-	{
-		const auto basicVertFileEntry = std::ranges::find_if(reader, [name](const auto& e) { return e.IsTextFile(name); });
-		Game::Ensure(basicVertFileEntry != std::ranges::end(reader), "Could not find shader {}", name);
-		return (*basicVertFileEntry).textFileValue();
-	}
-
 }
 
 namespace Game {
@@ -89,12 +82,12 @@ namespace Game {
 	Game::Game()
 		: m_Running{ true }
 		, m_LevelNames{
-			"levels/level_foxtrot.lua",
-			"levels/level_alpha.lua",
-			"levels/level_bravo.lua",
-			"levels/level_charlie.lua",
-			"levels/level_delta.lua",
-			"levels/level_echo.lua",
+			"level_foxtrot.lua",
+			"level_alpha.lua",
+			"level_bravo.lua",
+			"level_charlie.lua",
+			"level_delta.lua",
+			"level_echo.lua",
 		}
 		, m_Level{}
 		, m_LevelNum{ 0u }
@@ -142,7 +135,7 @@ namespace Game {
 			}, sampler);
 		resourceCache.Insert<Mesh>("floor", meshLoader.Cube());
 
-		const Renderer renderer{ resourceLoader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() };
+		const Renderer renderer{ reader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() };
 
 		float gamma = 2.2f;
 
@@ -150,7 +143,7 @@ namespace Game {
 
 		auto currentLevel = m_LevelNum;
 
-		m_Level = std::make_unique<LuaLevel>(resourceLoader, m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
+		m_Level = std::make_unique<LuaLevel>(m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
 		m_Window.SetTitle(m_LevelNames[m_LevelNum]);
 
 		while (m_Running)
@@ -159,7 +152,7 @@ namespace Game {
 			{
 				m_Player.Restart();
 				m_Level.reset(nullptr);
-				m_Level = std::make_unique<LuaLevel>(resourceLoader, m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
+				m_Level = std::make_unique<LuaLevel>(m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus);
 				currentLevel = m_LevelNum;
 
 				m_Window.SetTitle(m_LevelNames[m_LevelNum]);

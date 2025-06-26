@@ -1,13 +1,9 @@
 #include "Renderer.h"
 
 #include "Core/Entity.h"
-#include "Core/Scene.h"
 #include "BufferWriter.h"
-#include "Camera.h"
-#include "Material.h"
 #include "Texture.h"
 #include "Sampler.h"
-#include "Mesh.h"
 #include "OpenGL.h"
 
 namespace {
@@ -27,33 +23,33 @@ namespace {
 		int numPoints;
 	};
 
-	Game::Material CreateSkyboxMaterial(Game::ResourceLoader& resourceLoader)
+	Game::Material CreateSkyboxMaterial(const Game::TLVReader& reader)
 	{
-		const Game::File vertFile{ resourceLoader.Load("shaders/cubeMap.vert") };
-		const Game::File fragFile{ resourceLoader.Load("shaders/cubeMap.frag") };
+		const Game::TextFile vertFile{ GetFile(reader, "cubeMap.vert") };
+		const Game::TextFile fragFile{ GetFile(reader, "cubeMap.frag") };
 
-		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT };
+		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
-	Game::Material CreateDebugLineMaterial(Game::ResourceLoader& resourceLoader)
+	Game::Material CreateDebugLineMaterial(const Game::TLVReader& reader)
 	{
-		const Game::File vertFile{ resourceLoader.Load("shaders/line.vert") };
-		const Game::File fragFile{ resourceLoader.Load("shaders/line.frag") };
+		const Game::TextFile vertFile{ GetFile(reader, "line.vert") };
+		const Game::TextFile fragFile{ GetFile(reader, "line.frag") };
 
-		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX};
-		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT};
+		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX};
+		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT};
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
-	Game::Material CreatePostProcessMaterial(Game::ResourceLoader& resourceLoader)
+	Game::Material CreatePostProcessMaterial(const Game::TLVReader& reader)
 	{
-		const Game::File vertFile{ resourceLoader.Load("shaders/postProcess.vert") };
-		const Game::File fragFile{ resourceLoader.Load("shaders/postProcess.frag") };
+		const Game::TextFile vertFile{ GetFile(reader, "postProcess.vert") };
+		const Game::TextFile fragFile{ GetFile(reader, "postProcess.frag") };
 
-		const Game::Shader vertexShader{ vertFile.AsString(), Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ fragFile.AsString(), Game::ShaderType::FRAGMENT };
+		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
@@ -61,15 +57,15 @@ namespace {
 
 namespace Game {
 
-	Renderer::Renderer(ResourceLoader& resourceLoader, MeshLoader& meshLoader, uint32_t width, uint32_t height)
+	Renderer::Renderer(const TLVReader& reader, MeshLoader& meshLoader, uint32_t width, uint32_t height)
 		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3))
 		, m_LightBuffer(10240u)
 		, m_SkyboxCube(meshLoader.Cube())
-		, m_SkyboxMaterial(CreateSkyboxMaterial(resourceLoader))
-		, m_DebugLineMaterial(CreateDebugLineMaterial(resourceLoader))
+		, m_SkyboxMaterial(CreateSkyboxMaterial(reader))
+		, m_DebugLineMaterial(CreateDebugLineMaterial(reader))
 		, m_FB(width, height)
 		, m_PostProcessSprite(meshLoader.Sprite())
-		, m_PostProcessMaterial(CreatePostProcessMaterial(resourceLoader))
+		, m_PostProcessMaterial(CreatePostProcessMaterial(reader))
 	{}
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const

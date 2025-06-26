@@ -12,10 +12,10 @@ int main(int argc, char** argv)
 
 	try
 	{
-		Game::Ensure(argc == 2, "game.exe <root_path>");
+		const std::string root = (argc == 2) ? std::string{ argv[1] } : ".";
 
 		Game::Game app{};
-		app.Run(argv[1]);
+		app.Run(root);
 	}
 	catch (const Game::Exception& err)
 	{
