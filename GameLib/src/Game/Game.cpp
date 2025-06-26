@@ -75,6 +75,13 @@ namespace {
 		};
 	}
 
+	Game::TextFile GetFile(const Game::TLVReader& reader, std::string_view name)
+	{
+		const auto basicVertFileEntry = std::ranges::find_if(reader, [name](const auto& e) { return e.IsTextFile(name); });
+		Game::Ensure(basicVertFileEntry != std::ranges::end(reader), "Could not find shader {}", name);
+		return (*basicVertFileEntry).textFileValue();
+	}
+
 }
 
 namespace Game {
@@ -114,13 +121,13 @@ namespace Game {
 
 		Logger::Info("Textures loaded successfully");
 
-		const File basicVertFile{ resourceLoader.Load("shaders/basic.vert") };
-		const File barrelFragFile{ resourceLoader.Load("shaders/barrel.frag") };
-		const File checkerboardFragFile{ resourceLoader.Load("shaders/checkerboard.frag") };
+		const TextFile basicVertFile = GetFile(reader, "basic.vert");
+		const TextFile barrelFragFile = GetFile(reader, "barrel.frag");
+		const TextFile checkerboardFragFile = GetFile(reader, "checkerboard.frag");
 
-		const Shader vertexShader{ basicVertFile.AsString(), ShaderType::VERTEX };
-		const Shader barrelFragmentShader{ barrelFragFile.AsString(), ShaderType::FRAGMENT };
-		const Shader checkerboardShader{ checkerboardFragFile.AsString(), ShaderType::FRAGMENT };
+		const Shader vertexShader{ basicVertFile.Data, ShaderType::VERTEX };
+		const Shader barrelFragmentShader{ barrelFragFile.Data, ShaderType::FRAGMENT };
+		const Shader checkerboardShader{ checkerboardFragFile.Data, ShaderType::FRAGMENT };
 		resourceCache.Insert<Mesh>("barrel", reader, "Barrel");
 		resourceCache.Insert<Material>("barrel", vertexShader, barrelFragmentShader);
 		resourceCache.Insert<Material>("floor", vertexShader, checkerboardShader);
