@@ -12,7 +12,6 @@
 #include <assimp/Logger.hpp>
 #include <assimp/cimport.h>
 
-#include <print>
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -49,7 +48,7 @@ int main(int argc, char** argv)
 {
 	try
 	{
-		std::println("Resource packer");
+		Game::Logger::Info("Resource packer");
 
 		Game::Ensure(argc == 3, "usage: ./ResourcePacker.exe <asset_dir> <out_path>");
 
@@ -76,7 +75,7 @@ int main(int argc, char** argv)
 					::stbi_image_free
 				);
 
-				std::println("Packing path: {} {} {} {} {}", assetName, ext, w, h, numChannels);
+				Game::Logger::Info("Packing path: {} {} {} {} {}", assetName, ext, w, h, numChannels);
 
 				writer.Write(
 					assetName,
@@ -141,7 +140,7 @@ int main(int argc, char** argv)
 	}
 	catch (Game::Exception& e)
 	{
-		std::println(std::cerr, "{}", e);
+		Game::Logger::Error("{}", e);
 	}
 
 	return 0;
