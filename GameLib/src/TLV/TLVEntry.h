@@ -15,6 +15,12 @@ using namespace std::literals;
 
 namespace Game {
 
+	struct TextFile
+	{
+		std::string Name;
+		std::string Data;
+	};
+
 	enum class TLVType : uint32_t
 	{
 		UINT32,
@@ -27,7 +33,8 @@ namespace Game {
 		VERTEX_DATA_ARRAY,
 
 		TEXTURE_DESCRIPTION,
-		MESH_DATA
+		MESH_DATA,
+		TEXT_FILE
 	};
 
 	class TLVEntry
@@ -47,6 +54,8 @@ namespace Game {
 		std::vector<VertexData> vertexDataArrayValue() const;
 		MeshData meshValue() const;
 		bool IsMesh(std::string_view name) const;
+		TextFile textFileValue() const;
+		bool IsTextFile(std::string_view name) const;
 
 		TLVType Type() const;
 		uint32_t Size() const;

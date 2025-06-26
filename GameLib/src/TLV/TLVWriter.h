@@ -33,6 +33,7 @@ namespace Game {
 			TextureUsage usage,
 			std::span<const std::byte> data);
 		void Write(std::string_view name, std::span<const VertexData> vertices, std::span<const uint32_t> indices);
+		void Write(std::string_view name, std::string_view data);
 
 	private:
 		std::vector<std::byte> m_Buffer;

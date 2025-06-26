@@ -157,7 +157,7 @@ namespace Game {
 		const std::span<const uint32_t> indexData{ reinterpret_cast<const uint32_t*>((*readerCursor).m_Value.data()), (*readerCursor).m_Value.size() / sizeof(uint32_t) };
 		readerCursor++;
 
-		Ensure(readerCursor == std::ranges::end(reader), "Mesh TLV is too large");
+		Ensure(readerCursor == std::ranges::end(reader), "Mesh data TLV is too large");
 
 		return { vertexData, indexData };
 	}
@@ -173,6 +173,36 @@ namespace Game {
 		const std::string meshName = (*readerCursor).stringValue();
 
 		return meshName == name;
+	}
+
+	TextFile TLVEntry::textFileValue() const
+	{
+		Ensure(m_Type == TLVType::TEXT_FILE, "Incorrect type");
+
+		const TLVReader reader{ m_Value };
+		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
+
+		const std::string name = (*readerCursor).stringValue();
+		readerCursor++;
+		const std::string data = (*readerCursor).stringValue();
+
+		readerCursor++;
+		Ensure(readerCursor == std::ranges::end(reader), "Text file TLV is too large");
+
+		return { name, data };
+	}
+
+	bool TLVEntry::IsTextFile(std::string_view name) const
+	{
+		if (m_Type != TLVType::TEXT_FILE)
+			return false;
+
+		const TLVReader reader{ m_Value };
+		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
+
+		const std::string textFileName = (*readerCursor).stringValue();
+
+		return textFileName == name;
 	}
 
 	std::string to_string(const TLVType& obj)
@@ -192,6 +222,7 @@ namespace Game {
 
 		case TLVType::TEXTURE_DESCRIPTION: str = "TEXTURE_DESCRIPTION"sv; break;
 		case TLVType::MESH_DATA: str = "MESH_DATA"sv; break;
+		case TLVType::TEXT_FILE: str = "TEXT_FILE"sv; break;
 		}
 
 		return std::format("{}", str);
