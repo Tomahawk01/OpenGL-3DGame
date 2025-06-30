@@ -28,12 +28,14 @@ project "GameLib"
         "%{wks.location}/vendor/ImGui/src",
         "%{wks.location}/vendor/ImGuizmo",
         "%{wks.location}/vendor/JoltPhysics-5.2.0/JoltPhysics",
-        "%{wks.location}/vendor/lua_5.4.2/include"
+        "%{wks.location}/vendor/lua_5.4.2/include",
+        "%{wks.location}/vendor/zstd-v1.5.7/include"
     }
 
     libdirs
     {
-        "%{wks.location}/vendor/lua_5.4.2/lib"
+        "%{wks.location}/vendor/lua_5.4.2/lib",
+        "%{wks.location}/vendor/zstd-v1.5.7/lib"
     }
 
     links
@@ -41,7 +43,8 @@ project "GameLib"
         "OpenGL32.lib",
         "ImGui",
         "JoltPhysics",
-        "lua54.lib"
+        "lua54.lib",
+        "libzstd_static.lib"
     }
 
     local inputAssets  = "%{wks.location}/Game/assets"
