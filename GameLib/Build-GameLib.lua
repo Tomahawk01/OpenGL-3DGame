@@ -44,7 +44,7 @@ project "GameLib"
         "ImGui",
         "JoltPhysics",
         "lua54.lib",
-        "libzstd_static.lib"
+        "zstd_static.lib"
     }
 
     local inputAssets  = "%{wks.location}/Game/assets"

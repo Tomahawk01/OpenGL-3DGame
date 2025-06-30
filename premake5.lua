@@ -32,7 +32,7 @@ group "Dependencies"
 group ""
 
 group "Tools"
-include "Tools/ResourcePacker/Build-ResourcePacker.lua"
+    include "Tools/ResourcePacker/Build-ResourcePacker.lua"
 group ""
 
 include "GameLib/Build-GameLib.lua"
