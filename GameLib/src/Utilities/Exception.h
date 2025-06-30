@@ -2,13 +2,18 @@
 
 #include <stacktrace>
 #include <stdexcept>
+#include <format>
 
 namespace Game {
 
 	class Exception
 	{
 	public:
-		Exception(std::string what, uint32_t skip = 1u);
+		template<class ...Args>
+		Exception(std::format_string<Args...> msg, Args&&... args)
+			: m_What(std::format(msg, std::forward<Args>(args)...))
+			, m_Trace(std::stacktrace::current(1))
+		{}
 
 		std::string Stacktrace() const;
 

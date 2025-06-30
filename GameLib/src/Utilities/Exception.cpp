@@ -4,11 +4,6 @@
 
 namespace Game {
 
-	Exception::Exception(std::string what, uint32_t skip)
-		: m_What(std::move(what))
-		, m_Trace(std::stacktrace::current(skip))
-	{}
-
 	std::string Exception::Stacktrace() const
 	{
 		return std::to_string(m_Trace);

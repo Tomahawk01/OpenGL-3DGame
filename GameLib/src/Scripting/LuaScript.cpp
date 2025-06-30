@@ -80,7 +80,7 @@ namespace Game {
 			const auto res = ::lua_tostring(m_Lua.get(), -1);
 			::lua_pop(m_Lua.get(), 1);
 
-			throw Exception(std::format("Failed to execute ({})", res));
+			throw Exception("Failed to execute ({})", res);
 		}
 	}
 

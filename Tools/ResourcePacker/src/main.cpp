@@ -26,10 +26,10 @@ namespace {
 	{
 		switch (numChannels)
 		{
-		case 3: return Game::TextureFormat::RGB;
-		case 4: return Game::TextureFormat::RGBA;
-		default:
-			throw Game::Exception(std::format("Unsupported number of channels: {}", numChannels));
+			case 3: return Game::TextureFormat::RGB;
+			case 4: return Game::TextureFormat::RGBA;
+			default:
+				throw Game::Exception("Unsupported number of channels: {}", numChannels);
 		}
 	}
 
@@ -40,7 +40,7 @@ namespace {
 		else if (path.contains(".srgb"))
 			return Game::TextureUsage::SRGB;
 		
-		throw Game::Exception(std::format("Unsupported usage type: {}", path));
+		throw Game::Exception("Unsupported usage type: {}", path);
 	}
 
 }
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 
 				::Assimp::Importer importer{};
 				const auto* scene = importer.ReadFile(path.c_str(), ::aiProcess_Triangulate | ::aiProcess_FlipUVs | ::aiProcess_CalcTangentSpace);
-				Game::Ensure(scene != nullptr, std::format("Failed to load model {}", path));
+				Game::Ensure(scene != nullptr,"Failed to load model {}", path);
 
 				const std::span<::aiMesh*> loadedMeshes{ scene->mMeshes, scene->mMeshes + scene->mNumMeshes };
 

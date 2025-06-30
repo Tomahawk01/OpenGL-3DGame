@@ -14,7 +14,7 @@ namespace Game {
 		Ensure(m_Handle, "Failed to open file");
 
 		m_Mapping.Reset(::CreateFileMappingA(m_Handle, nullptr, PAGE_READWRITE, 0, 0, nullptr));
-		Ensure(m_Mapping, std::format("Failed to map file: error code {}", ::GetLastError()));
+		Ensure(m_Mapping, "Failed to map file: error code {}", ::GetLastError());
 
 		m_MapView.reset(::MapViewOfFile(m_Mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0));
 		Ensure(m_MapView, "Failed to get map view");

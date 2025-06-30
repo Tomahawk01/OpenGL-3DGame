@@ -28,7 +28,7 @@ namespace {
 		const void*)
 	{
 		if (type == GL_DEBUG_TYPE_ERROR)
-			throw Game::Exception(std::format("{} {} {} {} {}", src, type, id, severity, message));
+			throw Game::Exception("{} {} {} {} {}", src, type, id, severity, message);
 	}
 
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
