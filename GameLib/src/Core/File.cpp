@@ -2,24 +2,60 @@
 
 #include "Utilities/Error.h"
 
+#include <tuple>
+
+namespace {
+
+	auto Init(const std::filesystem::path& path, size_t size)
+	{
+		Game::AutoRelease<HANDLE, INVALID_HANDLE_VALUE> handle{
+			::CreateFileA(path.string().c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, size != 0u ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr),
+			::CloseHandle
+		};
+		Game::Ensure(handle, "Failed to open file");
+
+		Game::AutoRelease<HANDLE, reinterpret_cast<HANDLE>(NULL)> mapping{
+			::CreateFileMappingA(handle, nullptr, PAGE_READWRITE, 0, static_cast<DWORD>(size), nullptr),
+			::CloseHandle
+		};
+		Game::Ensure(mapping, "Failed to map file: error code {}", ::GetLastError());
+
+		std::unique_ptr<void, decltype(&::UnmapViewOfFile)> mapView{
+			::MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0),
+			::UnmapViewOfFile
+		};
+		Game::Ensure(mapView, "Failed to get map view");
+
+		return std::make_tuple(std::move(handle), std::move(mapping), std::move(mapView));
+	}
+
+}
+
 namespace Game {
 
-	File::File(const std::filesystem::path& path, CreationMode mode)
+	File::File(const std::filesystem::path& path)
 		: m_Handle{ INVALID_HANDLE_VALUE, ::CloseHandle }
 		, m_Mapping{ NULL, ::CloseHandle }
 		, m_MapView{ nullptr, ::UnmapViewOfFile }
 		, m_Size{}
 	{
-		m_Handle.Reset(::CreateFileA(path.string().c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, mode == CreationMode::OPEN ? OPEN_EXISTING : OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
-		Ensure(m_Handle, "Failed to open file");
-
-		m_Mapping.Reset(::CreateFileMappingA(m_Handle, nullptr, PAGE_READWRITE, 0, 0, nullptr));
-		Ensure(m_Mapping, "Failed to map file: error code {}", ::GetLastError());
-
-		m_MapView.reset(::MapViewOfFile(m_Mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0));
-		Ensure(m_MapView, "Failed to get map view");
-
+		auto [handle, mapping, mapView] = Init(path, 0u);
+		m_Handle = std::move(handle);
+		m_Mapping = std::move(mapping);
+		m_MapView = std::move(mapView);
 		m_Size = ::GetFileSize(m_Handle, nullptr);
+	}
+
+	File::File(const std::filesystem::path& path, size_t size)
+		: m_Handle{ INVALID_HANDLE_VALUE, ::CloseHandle }
+		, m_Mapping{ NULL, ::CloseHandle }
+		, m_MapView{ nullptr, ::UnmapViewOfFile }
+		, m_Size{ size }
+	{
+		auto [handle, mapping, mapView] = Init(path, size);
+		m_Handle = std::move(handle);
+		m_Mapping = std::move(mapping);
+		m_MapView = std::move(mapView);
 	}
 
 	std::string_view File::AsString() const

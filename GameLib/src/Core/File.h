@@ -11,16 +11,11 @@
 
 namespace Game {
 
-	enum class CreationMode
-	{
-		OPEN,
-		CREATE
-	};
-
 	class File
 	{
 	public:
-		File(const std::filesystem::path& path, CreationMode mode = CreationMode::OPEN);
+		File(const std::filesystem::path& path);
+		File(const std::filesystem::path& path, size_t size);
 
 		template <class T>
 		void Write(const T& data) requires(sizeof(std::ranges::range_value_t<T>) == 1)

@@ -149,8 +149,8 @@ int main(int argc, char** argv)
 
 		Game::Logger::Info("Writing resource {} -> {} bytes", resourceData.size(), compressed.size());
 
-		std::ofstream out{ argv[2], std::ios::binary };
-		out.write(reinterpret_cast<const char*>(compressed.data()), compressed.size());
+		auto out = Game::File{ argv[2], compressed.size() };
+		out.Write(compressed);
 	}
 	catch (Game::Exception& e)
 	{
