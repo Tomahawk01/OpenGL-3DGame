@@ -2,6 +2,7 @@
 
 #include "Utilities/Exception.h"
 #include "Utilities/Logger.h"
+#include "Utilities/Decompress.h"
 #include "UI/DebugUI.h"
 #include "Core/Window.h"
 #include "Core/Entity.h"
@@ -104,9 +105,14 @@ namespace Game {
 		MeshLoader meshLoader{ resourceLoader };
 		DefaultCache resourceCache{};
 
-		const File tlvFile{ resourceLoader.Load("resources") };
-		const TLVReader reader{ tlvFile.AsData() };
 		const Sampler* sampler{ resourceCache.Insert<Sampler>("default") };
+
+		const auto tlvFile = [&resourceLoader]
+		{
+			const File compressedTLVFile{ resourceLoader.Load("resources") };
+			return Decompress(compressedTLVFile.AsData());
+		}();
+		const TLVReader reader{ tlvFile };
 
 		resourceCache.Insert<Texture>("barrel_albedo", reader, "barrel_Albedo", sampler);
 		resourceCache.Insert<Texture>("barrel_specular", reader, "barrel_Specular", sampler);
