@@ -1,6 +1,7 @@
 #include "Utilities/Error.h"
 #include "Utilities/AutoRelease.h"
 #include "Utilities/Logger.h"
+#include "Utilities/Compress.h"
 #include "TLV/TLVWriter.h"
 #include "Core/File.h"
 
@@ -143,10 +144,13 @@ int main(int argc, char** argv)
 
 		const auto resourceData = writer.yield();
 
-		Game::Logger::Info("Writing resource {} bytes", resourceData.size());
+		Game::Logger::Info("Compressing...");
+		const auto compressed = Game::Compress(resourceData);
+
+		Game::Logger::Info("Writing resource {} -> {} bytes", resourceData.size(), compressed.size());
 
 		std::ofstream out{ argv[2], std::ios::binary };
-		out.write(reinterpret_cast<const char*>(resourceData.data()), resourceData.size());
+		out.write(reinterpret_cast<const char*>(compressed.data()), compressed.size());
 	}
 	catch (Game::Exception& e)
 	{
