@@ -66,6 +66,14 @@ namespace Game {
 		Ensure(::lua_pcall(m_Lua.get(), 0, 0, 0) == LUA_OK, "Failed to initialize script!\n{}", *this);
 	}
 
+	bool LuaScript::HasFunction(const std::string& name) const
+	{
+		const auto result = ::lua_getglobal(m_Lua.get(), name.c_str()) == LUA_TFUNCTION;
+		::lua_pop(m_Lua.get(), -1);
+
+		return result;
+	}
+
 	void LuaScript::SetFunction(const std::string& name) const
 	{
 		const auto retType = ::lua_getglobal(m_Lua.get(), name.c_str());

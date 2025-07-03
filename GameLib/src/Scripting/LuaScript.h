@@ -14,6 +14,7 @@ namespace Game {
 	public:
 		LuaScript(std::string_view source);
 
+		bool HasFunction(const std::string& name) const;
 		void SetFunction(const std::string& name) const;
 		void Execute(uint32_t numArgs, uint32_t numResults) const;
 
