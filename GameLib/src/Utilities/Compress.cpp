@@ -12,11 +12,12 @@ namespace Game {
 		auto compressedBuffer = std::vector<std::byte>(compressedBufferSize);
 
 		const auto compressedSize = ZSTD_compress(compressedBuffer.data(), compressedBuffer.size(), data.data(), data.size_bytes(), 1);
-
 		if (ZSTD_isError(compressedSize))
 		{
 			throw Exception("Failed to compress data: {}", ZSTD_getErrorName(compressedSize));
 		}
+
+		compressedBuffer.resize(compressedSize);
 
 		return compressedBuffer;
 	}
