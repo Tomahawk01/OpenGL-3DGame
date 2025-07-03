@@ -2,13 +2,31 @@
 
 #include "Formatter.h"
 
+#include "Game/config.h"
+
 #include <filesystem>
 #include <format>
+#include <fstream>
 #include <print>
 #include <source_location>
 #include <string_view>
 
 namespace Game::Logger {
+
+	namespace Impl {
+
+		inline static auto logFile = []
+		{
+			std::ofstream f{ "log.txt", std::ios::app };
+			if (!f)
+			{
+				std::terminate();
+			}
+
+			return f;
+		}();
+
+	}
 
 	enum class Level
 	{
@@ -35,7 +53,14 @@ namespace Game::Logger {
 
 			const std::filesystem::path path{ loc.file_name() };
 
-			std::println("[{}] {}:{} {}", c, path.filename().string(), loc.line(), std::format(msg, std::forward<Args>(args)...));
+			const auto logLine = std::format("[{}] {}:{} {}", c, path.filename().string(), loc.line(), std::format(msg, std::forward<Args>(args)...));
+
+			std::println("{}", logLine);
+
+			if constexpr (Config::logToFile)
+			{
+				Impl::logFile << logLine << std::endl;
+			}
 		}
 	};
 

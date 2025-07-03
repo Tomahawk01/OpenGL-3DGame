@@ -13,3 +13,4 @@ bin-int/
 imgui.ini
 resources
 **/config.h
+**/log.txt

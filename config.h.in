@@ -7,3 +7,13 @@ namespace Game::Version {
     static constexpr auto PATCH = @OpenGL_Game_VERSION_PATCH@;
 
 }
+
+namespace Game::Config {
+
+#if DEBUG
+    static constexpr bool logToFile = true;
+#else
+    static constexpr bool logToFile = false;
+#endif
+
+}
