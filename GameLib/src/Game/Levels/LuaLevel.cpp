@@ -64,8 +64,10 @@ namespace Game {
 			);
 		}
 
-		const auto ambientVec = runner.Execute<vec3>("get_ambient");
-		const auto [directionalLightDir, directionalLightColor] = runner.Execute<vec3, vec3>("get_directional_light");
+		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.4f };
+		const auto [directionalLightDir, directionalLightColor] = m_Script.HasFunction("get_directional_light")
+			? runner.Execute<vec3, vec3>("get_directional_light")
+			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
@@ -184,8 +186,10 @@ namespace Game {
 			} break;
 		}
 
-		const auto ambientVec = runner.Execute<vec3>("get_ambient");
-		const auto [directionalLightDir, directionalLightColor] = runner.Execute<vec3, vec3>("get_directional_light");
+		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.4f };
+		const auto [directionalLightDir, directionalLightColor] = m_Script.HasFunction("get_directional_light")
+			? runner.Execute<vec3, vec3>("get_directional_light")
+			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
 		m_Scene.ambient = { ambientVec.x, ambientVec.y, ambientVec.z };
 		m_Scene.directionalLight = {
 			.direction = directionalLightDir,

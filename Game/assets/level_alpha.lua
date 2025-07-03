@@ -1,6 +1,11 @@
+PLAYING = 0
+COMPLETE = 1
+LOST = 2
+
 barrels = {}
 last_player_position = vec3(0.0, 0.0, 0.0)
 original_last_player_position = vec3(0.0, 0.0, 0.0)
+current_level_state = PLAYING
 
 function init_level(player_position)
 	original_last_player_position = player_position
@@ -8,10 +13,18 @@ function init_level(player_position)
 end
 
 function update_level(player_position)
+	if current_level_state ~= PLAYING then
+		return
+	end
+
 	if barrels[2].visibility then
 		barrels[2].position = barrels[2].position + (player_position - last_player_position)
 	end
 	last_player_position = player_position
+
+	if distance(barrels[1].position, barrels[2].position) < 1.0 then
+		current_level_state = COMPLETE
+	end
 end
 
 function restart_level()
@@ -32,10 +45,11 @@ function restart_level()
 		collision_mask = 2,
 	}
 	last_player_position = original_last_player_position
+	current_level_state = PLAYING
 end
 
-function is_complete()
-	return distance(barrels[1].position, barrels[2].position) < 1.0
+function level_state()
+	return current_level_state
 end
 
 function barrel_count()
@@ -57,3 +71,5 @@ end
 function set_barrel_position(index, position)
 	barrels[index].position = position
 end
+
+function handle_entity_intersect(index_a, index_b) end
