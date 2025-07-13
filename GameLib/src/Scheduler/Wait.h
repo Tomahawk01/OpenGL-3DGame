@@ -4,21 +4,16 @@
 
 #include <coroutine>
 #include <cstdint>
-#include <chrono>
-#include <variant>
 
 namespace Game {
 
-	struct Wait
+	template <class T>
+	class Wait
 	{
-		Wait(Scheduler& scheduler, uint32_t waitTicks)
-			: WaitObject{ waitTicks }
-			, Scheduler{ scheduler }
-		{}
-
-		Wait(Scheduler& scheduler, std::chrono::nanoseconds waitTime)
-			: WaitObject{ waitTime }
-			, Scheduler{ scheduler }
+	public:
+		Wait(Scheduler& scheduler, T waitObject)
+			: m_WaitObject{ std::move(waitObject) }
+			, m_Scheduler{ scheduler }
 		{}
 
 		bool await_ready()
@@ -28,22 +23,16 @@ namespace Game {
 
 		auto await_suspend(std::coroutine_handle<> h)
 		{
-			if (const auto* v_uint = std::get_if<uint32_t>(&WaitObject); v_uint)
-			{
-				Scheduler.Reschedule(h, *v_uint);
-			}
-			else if (const auto* v_nano = std::get_if<std::chrono::nanoseconds>(&WaitObject); v_nano)
-			{
-				Scheduler.Reschedule(h, *v_nano);
-			}
+			m_Scheduler.Reschedule(h, m_WaitObject);
 		}
 
 		auto await_resume()
 		{
 		}
 
-		std::variant<uint32_t, std::chrono::nanoseconds> WaitObject;
-		Scheduler& Scheduler;
+	private:
+		T m_WaitObject;
+		Scheduler& m_Scheduler;
 	};
 
 }
