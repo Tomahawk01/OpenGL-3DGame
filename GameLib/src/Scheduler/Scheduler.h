@@ -2,7 +2,7 @@
 
 #include "Task.h"
 
-#include <deque>
+#include <vector>
 #include <optional>
 #include <chrono>
 #include <variant>
@@ -26,7 +26,7 @@ namespace Game {
 			std::optional<std::variant<uint32_t, std::chrono::nanoseconds>> target;
 		};
 
-		std::deque<WaitTask> m_Queue;
+		std::vector<WaitTask> m_Queue;
 		uint32_t m_TickCount;
 		std::chrono::nanoseconds m_Elapsed;
 	};

@@ -13,7 +13,7 @@ namespace Game {
 
 	void Scheduler::Add(Task task)
 	{
-		m_Queue.push_front({ std::move(task), std::nullopt });
+		m_Queue.push_back({ std::move(task), std::nullopt });
 	}
 
 	void Scheduler::Reschedule(std::coroutine_handle<> handle, uint32_t waitTicks)
@@ -66,9 +66,7 @@ namespace Game {
 				}
 			}
 
-			m_Queue.erase(
-				std::remove_if(std::begin(m_Queue), std::end(m_Queue), [](const auto& e) { return !e.task.CanResume(); }),
-				std::end(m_Queue));
+			std::erase_if(m_Queue, [](const auto& e) { return !e.task.CanResume(); });
 
 			m_TickCount++;
 			m_Elapsed += std::chrono::steady_clock::now() - start;
