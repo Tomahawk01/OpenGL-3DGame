@@ -13,7 +13,7 @@ namespace Game {
 
 	void Scheduler::Add(Task task)
 	{
-		m_Queue.push_back({ std::move(task), std::nullopt });
+		m_Queue.push_back({ std::move(task), nullptr });
 	}
 
 	void Scheduler::Reschedule(std::coroutine_handle<> handle, uint32_t waitTicks)
@@ -21,7 +21,12 @@ namespace Game {
 		auto task = std::ranges::find_if(m_Queue, [handle](const auto& e) { return e.task.IsThisTask(handle); });
 		Expect(task != std::ranges::end(m_Queue), "Could not find task");
 
-		task->target = waitTicks + m_TickCount;
+		const auto futureTick = waitTicks + m_TickCount;
+
+		task->CheckResume = [futureTick, this] {
+			Expect(m_TickCount <= futureTick, "Tick count out of sync with await");
+			return m_TickCount == futureTick;
+		};
 	}
 
 	void Scheduler::Reschedule(std::coroutine_handle<> handle, std::chrono::nanoseconds waitTime)
@@ -29,7 +34,12 @@ namespace Game {
 		auto task = std::ranges::find_if(m_Queue, [handle](const auto& e) { return e.task.IsThisTask(handle); });
 		Expect(task != std::ranges::end(m_Queue), "Could not find task");
 
-		task->target = waitTime + m_Elapsed;
+		const auto futureTime = waitTime + m_Elapsed;
+
+		task->CheckResume = [futureTime, this]
+		{
+			return m_Elapsed >= futureTime;
+		};
 	}
 
 	void Scheduler::Run()
@@ -38,29 +48,11 @@ namespace Game {
 		{
 			const auto start = std::chrono::steady_clock::now();
 
-			for (auto& [task, tickTarget] : m_Queue)
+			for (auto& [task, CheckResume] : m_Queue)
 			{
 				Expect(task.CanResume(), "Bad task in queue");
 
-				if (tickTarget)
-				{
-					if (const auto* v_uint = std::get_if<uint32_t>(&*tickTarget); v_uint)
-					{
-						Expect(*v_uint >= m_TickCount, "Invalid tick target");
-						if (*v_uint == m_TickCount)
-						{
-							task.Resume();
-						}
-					}
-					else if (const auto* v_nano = std::get_if<std::chrono::nanoseconds>(&*tickTarget); v_nano)
-					{
-						if (m_Elapsed >= *v_nano)
-						{
-							task.Resume();
-						}
-					}
-				}
-				else
+				if (!CheckResume || CheckResume())
 				{
 					task.Resume();
 				}

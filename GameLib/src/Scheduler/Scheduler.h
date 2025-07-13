@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <optional>
+#include <functional>
 #include <chrono>
 #include <variant>
 
@@ -23,7 +24,7 @@ namespace Game {
 		struct WaitTask
 		{
 			Task task;
-			std::optional<std::variant<uint32_t, std::chrono::nanoseconds>> target;
+			std::function<bool()> CheckResume;
 		};
 
 		std::vector<WaitTask> m_Queue;
