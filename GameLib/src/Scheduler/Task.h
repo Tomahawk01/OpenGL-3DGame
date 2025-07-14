@@ -69,6 +69,11 @@ namespace Game {
 			m_Handle.resume();
 		}
 
+		std::coroutine_handle<> NativeHandle() const
+		{
+			return m_Handle;
+		}
+
 	private:
 		explicit Task(std::coroutine_handle<promise_type> handle)
 			: m_Handle(handle)
