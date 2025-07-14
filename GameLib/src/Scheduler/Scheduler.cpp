@@ -64,12 +64,12 @@ namespace Game {
 
 				if (!CheckResume || CheckResume())
 				{
+					task.Resume();
+
 					if (parentCounter)
 					{
 						--(*parentCounter);
 					}
-
-					task.Resume();
 				}
 			}
 

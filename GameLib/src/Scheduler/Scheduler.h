@@ -2,7 +2,7 @@
 
 #include "Task.h"
 
-#include <vector>
+#include <deque>
 #include <functional>
 #include <chrono>
 #include <memory>
@@ -29,7 +29,7 @@ namespace Game {
 			uint32_t* parentWaitCount;
 		};
 
-		std::vector<WaitTask> m_Queue;
+		std::deque<WaitTask> m_Queue;
 		uint32_t m_TickCount;
 		std::chrono::nanoseconds m_Elapsed;
 	};

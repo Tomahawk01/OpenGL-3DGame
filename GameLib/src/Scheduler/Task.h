@@ -1,8 +1,8 @@
 #pragma once
 
 #include <coroutine>
-#include <utility>
 #include <ranges>
+#include <stdexcept>
 
 namespace Game {
 
@@ -30,7 +30,11 @@ namespace Game {
 			}
 
 			auto unhandled_exception()
-			{}
+			{
+				ExceptionPtr = std::current_exception();
+			}
+
+			std::exception_ptr ExceptionPtr = nullptr;
 		};
 		
 		~Task()
@@ -67,6 +71,11 @@ namespace Game {
 		void Resume()
 		{
 			m_Handle.resume();
+
+			if (m_Handle && m_Handle.promise().ExceptionPtr)
+			{
+				std::rethrow_exception(m_Handle.promise().ExceptionPtr);
+			}
 		}
 
 		std::coroutine_handle<> NativeHandle() const
