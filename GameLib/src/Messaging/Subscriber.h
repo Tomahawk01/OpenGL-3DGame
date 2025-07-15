@@ -32,6 +32,11 @@ namespace Game {
 		{
 			Logger::Warn("Unhandled message!");
 		}
+
+		virtual void HandleQuit()
+		{
+			Logger::Warn("Unhandled message!");
+		}
 	};
 
 }

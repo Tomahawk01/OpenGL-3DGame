@@ -54,4 +54,9 @@ namespace Game {
 		_PostMessage(MessageType::RESTART_LEVEL, m_Subscribers, [](auto* sub) { sub->HandleRestartLevel(); });
 	}
 
+	void MessageBus::PostQuit()
+	{
+		_PostMessage(MessageType::QUIT, m_Subscribers, [](auto* sub) { sub->HandleQuit(); });
+	}
+
 }

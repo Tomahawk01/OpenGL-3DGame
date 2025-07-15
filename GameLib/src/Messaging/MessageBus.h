@@ -18,7 +18,8 @@ namespace Game {
 		MOUSE_MOVE,
 		LEVEL_COMPLETE,
 		ENTITY_INTERSECT,
-		RESTART_LEVEL
+		RESTART_LEVEL,
+		QUIT
 	};
 
 	class MessageBus
@@ -31,6 +32,7 @@ namespace Game {
 		void PostLevelComplete(std::string_view levelName);
 		void PostEntityIntersect(const Entity* a, const Entity* b);
 		void PostRestartLevel();
+		void PostQuit();
 
 	private:
 		std::unordered_map<MessageType, std::vector<Subscriber*>> m_Subscribers;
