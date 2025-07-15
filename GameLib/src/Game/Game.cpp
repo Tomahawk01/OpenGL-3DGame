@@ -76,11 +76,28 @@ namespace {
 		};
 	}
 
+	uint32_t GetArg(std::string_view argName, const std::vector<std::string_view>& args)
+	{
+		const auto arg = std::ranges::find(args, argName);
+		if (arg == std::ranges::cend(args))
+		{
+			return 0u;
+		}
+
+		const auto index = static_cast<size_t>(std::ranges::distance(std::ranges::cbegin(args), arg));
+		if (index + 1u >= args.size())
+		{
+			return 0u;
+		}
+
+		return std::stol(std::string{ args[index + 1u] });
+	}
+
 }
 
 namespace Game {
 
-	Game::Game()
+	Game::Game(const std::vector<std::string_view>& args)
 		: m_Running{ true }
 		, m_LevelNames{
 			"level_alpha.lua",
@@ -93,7 +110,7 @@ namespace Game {
 		, m_Level{}
 		, m_LevelNum{ 0u }
 		, m_Bus{}
-		, m_Window{ 1280u, 720u, 640u, 360u }
+		, m_Window{ 1280u, 720u, GetArg("-x", args), GetArg("-y", args) }
 		, m_Player{ m_Bus, CreateCamera(m_Window) }
 	{
 		m_Bus.Subscribe(MessageType::LEVEL_COMPLETE, this);

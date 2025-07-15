@@ -49,12 +49,12 @@ project "Game"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
-        debugargs { "assets" }
+        debugargs { "assets -x 640 -y 360" }
         runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
         defines { "RELEASE" }
-        debugargs { "assets" }
+        debugargs { "assets -x 640 -y 360" }
         runtime "Release"
         optimize "On"

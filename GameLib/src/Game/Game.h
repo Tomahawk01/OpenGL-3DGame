@@ -14,7 +14,7 @@ namespace Game {
 	class Game : public Subscriber
 	{
 	public:
-		Game();
+		Game(const std::vector<std::string_view>& args);
 
 		void Run(std::string_view resourceRoot);
 

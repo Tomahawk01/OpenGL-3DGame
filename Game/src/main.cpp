@@ -10,11 +10,13 @@ int main(int argc, char** argv)
 {
 	Game::Logger::Info("Starting Game v{}.{}.{}", Game::Version::MAJOR, Game::Version::MINOR, Game::Version::PATCH);
 
+	const auto args = std::vector<std::string_view>(argv + 1u, argv + argc);
+
 	try
 	{
-		const std::string root = (argc == 2) ? std::string{ argv[1] } : ".";
+		const auto root = !args.empty() ? args.front() : ".";
 
-		Game::Game app{};
+		Game::Game app{ args };
 		app.Run(root);
 	}
 	catch (const Game::Exception& err)
