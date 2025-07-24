@@ -6,21 +6,24 @@
 #include "Logger.h"
 
 #include <memory>
+#include <stacktrace>
 
 namespace Game {
 
 	template<class ...Args>
-	constexpr void Expect(bool predicate, std::string_view msg, Args&&... args)
+	constexpr void Expect(bool predicate, std::format_string<Args...> msg, Args&&... args)
 	{
 		if (!predicate)
 		{
-			Logger::Error("{}", std::vformat(msg, std::make_format_args(std::forward<Args>(args)...)));
+			Logger::Error("{}", std::format(msg, std::forward<Args>(args)...));
+			Logger::Error("{}", std::stacktrace::current(1));
 			std::terminate();
+			std::unreachable();
 		}
 	}
 
 	template<class T, class ...Args>
-	constexpr void Expect(std::unique_ptr<T>& obj, std::string_view msg, Args&&... args)
+	constexpr void Expect(std::unique_ptr<T>& obj, std::format_string<Args...> msg, Args&&... args)
 	{
 		Expect(!!obj, msg, std::forward<Args>(args)...);
 	}
