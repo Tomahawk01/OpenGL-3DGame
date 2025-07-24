@@ -1,5 +1,6 @@
 #include "InputRoutine.h"
 
+#include "Utilities/Logger.h"
 #include "Scheduler/Wait.h"
 
 namespace Game {
@@ -50,6 +51,7 @@ namespace Game {
 			}
 			else
 			{
+				Logger::Info("Closing application...");
 				m_Bus.PostQuit();
 			}
 		}

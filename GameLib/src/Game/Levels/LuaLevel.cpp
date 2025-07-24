@@ -34,9 +34,8 @@ namespace Game {
 		, m_Bus{ bus }
 		, m_BarrelInfo{}
 		, m_Shapes{}
+		, m_AutoSub{ m_Bus, {MessageType::ENTITY_INTERSECT}, this }
 	{
-		m_Bus.Subscribe(MessageType::ENTITY_INTERSECT, this);
-
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
 			resourceCache.Get<Texture>("barrel_specular"),

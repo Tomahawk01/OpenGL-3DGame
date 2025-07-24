@@ -2,6 +2,7 @@
 
 #include "Math/Vector3.h"
 #include "Messaging/Subscriber.h"
+#include "Messaging/AutoSubscribe.h"
 #include "Renderer/Camera.h"
 
 #include <unordered_map>
@@ -27,6 +28,7 @@ namespace Game {
 		Camera m_Camera;
 		std::unordered_map<Key, bool> m_KeyState;
 		vec3 m_StartPosition;
+		AutoSubscribe m_AutoSub;
 	};
 
 }

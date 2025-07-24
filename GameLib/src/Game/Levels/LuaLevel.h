@@ -11,6 +11,7 @@
 #include "Scripting/LuaScript.h"
 #include "Messaging/MessageBus.h"
 #include "Messaging/Subscriber.h"
+#include "Messaging/AutoSubscribe.h"
 #include "TLV/TLVReader.h"
 #include "Game/Levels/Level.h"
 #include "Game/Player.h"
@@ -54,9 +55,10 @@ namespace Game {
 		CubeMap m_Skybox;
 		Sampler m_SkyboxSampler;
 		DefaultCache& m_ResourceCache;
-		MessageBus m_Bus;
+		MessageBus& m_Bus;
 		std::unordered_map<const Entity*, BarrelInfo> m_BarrelInfo;
 		std::vector<const Shape*> m_Shapes;
+		AutoSubscribe m_AutoSub;
 	};
 
 }

@@ -2,6 +2,7 @@
 
 #include "Messaging/MessageBus.h"
 #include "Messaging/Subscriber.h"
+#include "Messaging/AutoSubscribe.h"
 #include "Scheduler/Scheduler.h"
 #include "Core/Window.h"
 #include "TLV/TLVReader.h"
@@ -34,6 +35,7 @@ namespace Game {
 		Renderer m_Renderer;
 		WireframeRenderer m_WireframeRenderer;
 		bool m_Running;
+		AutoSubscribe m_AutoSub;
 	};
 
 }

@@ -13,9 +13,8 @@ namespace Game {
 		, m_Renderer{ reader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() }
 		, m_WireframeRenderer{}
 		, m_Running{ true }
-	{
-		m_Bus.Subscribe(MessageType::QUIT, this);
-	}
+		, m_AutoSub{ m_Bus, {MessageType::QUIT}, this }
+	{}
 
 	Task RenderRoutine::CreateTask()
 	{

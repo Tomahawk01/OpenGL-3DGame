@@ -2,6 +2,7 @@
 
 #include "Messaging/MessageBus.h"
 #include "Messaging/Subscriber.h"
+#include "Messaging/AutoSubscribe.h"
 #include "Scheduler/Scheduler.h"
 #include "Core/Window.h"
 #include "Core/ResourceCache.h"
@@ -38,6 +39,7 @@ namespace Game {
 		size_t m_LevelNum;
 		std::unique_ptr<LuaLevel> m_Level;
 		bool m_Running;
+		AutoSubscribe m_AutoSub;
 	};
 
 }

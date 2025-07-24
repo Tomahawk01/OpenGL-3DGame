@@ -10,11 +10,8 @@ namespace Game {
 		: m_Camera{ std::move(camera) }
 		, m_KeyState{}
 		, m_StartPosition{ m_Camera.GetPosition() }
-	{
-		bus.Subscribe(MessageType::KEY_PRESS, this);
-		bus.Subscribe(MessageType::MOUSE_MOVE, this);
-		bus.Subscribe(MessageType::RESTART_LEVEL, this);
-	}
+		, m_AutoSub{ bus, {MessageType::KEY_PRESS, MessageType::MOUSE_MOVE, MessageType::RESTART_LEVEL}, this }
+	{}
 
 	void Player::Update()
 	{

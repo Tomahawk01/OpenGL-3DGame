@@ -72,8 +72,9 @@ namespace Game {
 		, m_LevelNum{ 0u }
 		, m_Level{ std::make_unique<LuaLevel>(levelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus) }
 		, m_Running{ true }
+		, m_AutoSub{ m_Bus, {MessageType::LEVEL_COMPLETE, MessageType::QUIT}, this }
 	{
-		m_Bus.Subscribe(MessageType::LEVEL_COMPLETE, this);
+		m_Window.SetTitle(levelNames[m_LevelNum]);
 	}
 
 	Task LevelRoutine::CreateTask()
