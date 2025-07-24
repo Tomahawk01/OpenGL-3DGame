@@ -37,6 +37,7 @@ namespace Game {
 		DefaultCache& m_ResourceCache;
 		const TLVReader& m_Reader;
 		size_t m_LevelNum;
+		std::vector<std::string> m_LevelNames;
 		std::unique_ptr<LuaLevel> m_Level;
 		bool m_Running;
 		AutoSubscribe m_AutoSub;
