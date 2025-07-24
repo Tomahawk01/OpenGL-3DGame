@@ -29,6 +29,15 @@ namespace Game {
 		subscribers.push_back(subscriber);
 	}
 
+	void MessageBus::Unsubscribe(MessageType type, Subscriber* subscriber)
+	{
+		auto& subscribers = m_Subscribers[type];
+
+		Expect(std::ranges::contains(subscribers, subscriber), "Subscriber not subscribed");
+
+		std::erase(subscribers, subscriber);
+	}
+
 	void MessageBus::PostKeyPress(const KeyEvent& event)
 	{
 		_PostMessage(MessageType::KEY_PRESS, m_Subscribers, [](auto* sub, const auto& event) { sub->HandleKeyPress(event); }, event);

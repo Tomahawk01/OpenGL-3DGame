@@ -25,7 +25,16 @@ namespace Game {
 	class MessageBus
 	{
 	public:
+		MessageBus() = default;
+		~MessageBus() = default;
+
+		MessageBus(const MessageBus&) = delete;
+		MessageBus& operator=(const MessageBus&) = delete;
+		MessageBus(MessageBus&&) = default;
+		MessageBus& operator=(MessageBus&&) = default;
+
 		void Subscribe(MessageType type, Subscriber* subscriber);
+		void Unsubscribe(MessageType type, Subscriber* subscriber);
 
 		void PostKeyPress(const KeyEvent& event);
 		void PostMouseMove(const MouseEvent& event);
