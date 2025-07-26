@@ -14,9 +14,9 @@ using namespace std::literals;
 
 namespace Game {
 
-	LuaLevel::LuaLevel(std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
+	LuaLevel::LuaLevel(const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
 		: m_PS{}
-		, m_Script{ GetFile(reader, scriptName).Data }
+		, m_Script{ loader.Load() }
 		, m_Entities{}
 		, m_Floor{
 			resourceCache.Get<Mesh>("floor"),

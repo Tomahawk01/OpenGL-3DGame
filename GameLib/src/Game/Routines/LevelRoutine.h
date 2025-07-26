@@ -4,6 +4,7 @@
 #include "Messaging/Subscriber.h"
 #include "Messaging/AutoSubscribe.h"
 #include "Scheduler/Scheduler.h"
+#include "Scripting/ScriptLoader.h"
 #include "Core/Window.h"
 #include "Core/ResourceCache.h"
 #include "TLV/TLVReader.h"
@@ -37,7 +38,7 @@ namespace Game {
 		DefaultCache& m_ResourceCache;
 		const TLVReader& m_Reader;
 		size_t m_LevelNum;
-		std::vector<std::string> m_LevelNames;
+		std::vector<ScriptLoader> m_LevelLoaders;
 		std::unique_ptr<LuaLevel> m_Level;
 		bool m_Running;
 		AutoSubscribe m_AutoSub;

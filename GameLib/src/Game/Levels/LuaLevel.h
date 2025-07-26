@@ -9,10 +9,12 @@
 #include "Renderer/LineData.h"
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/LuaScript.h"
+#include "Scripting/ScriptLoader.h"
 #include "Messaging/MessageBus.h"
 #include "Messaging/Subscriber.h"
 #include "Messaging/AutoSubscribe.h"
 #include "TLV/TLVReader.h"
+
 #include "Game/Levels/Level.h"
 #include "Game/Player.h"
 
@@ -39,7 +41,7 @@ namespace Game {
 			float tintAmount;
 		};
 
-		LuaLevel(std::string_view scriptName, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
+		LuaLevel(const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 
 		void Update(const Player& player) override;
 		void Restart() override;

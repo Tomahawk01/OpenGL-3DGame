@@ -50,9 +50,9 @@ namespace {
 		};
 	}
 
-	std::vector<std::string> GetLevelNames(const Game::TLVReader& reader)
+	std::vector<Game::ScriptLoader> GetLevelLoaders(const Game::TLVReader& reader)
 	{
-		std::vector<std::string> customLevelNames{};
+		std::vector<Game::ScriptLoader> customLevelNames{};
 
 		if (std::filesystem::exists("levels"))
 		{
@@ -65,6 +65,7 @@ namespace {
 					return e.path().string();
 				})
 				| std::views::filter([](const auto& e) { return e.ends_with(".lua"); })
+				| std::views::transform([](const auto& e) { return Game::ScriptLoader{ e }; })
 				| std::ranges::to<std::vector>();
 		}
 
@@ -78,10 +79,10 @@ namespace {
 				}
 				return false;
 			})
-		| std::views::transform([](const auto& entry) { return entry.textFileValue().Name; })
-		| std::ranges::to<std::vector>();
+			| std::views::transform([&reader](const auto& entry) { return Game::ScriptLoader{ entry.textFileValue().Name, reader }; })
+			| std::ranges::to<std::vector>();
 
-		std::vector<std::string> levelNames{};
+		std::vector<Game::ScriptLoader> levelNames{};
 		levelNames.insert_range(std::ranges::end(levelNames), customLevelNames);
 		levelNames.insert_range(std::ranges::end(levelNames), builtinLevelNames);
 
@@ -100,12 +101,12 @@ namespace Game {
 		, m_ResourceCache{ resourceCache }
 		, m_Reader{ reader }
 		, m_LevelNum{ 0u }
-		, m_LevelNames{ GetLevelNames(m_Reader) }
-		, m_Level{ std::make_unique<LuaLevel>(m_LevelNames[m_LevelNum], resourceCache, reader, m_Player, m_Bus) }
+		, m_LevelLoaders{ GetLevelLoaders(m_Reader) }
+		, m_Level{ std::make_unique<LuaLevel>(m_LevelLoaders[m_LevelNum], resourceCache, reader, m_Player, m_Bus) }
 		, m_Running{ true }
 		, m_AutoSub{ m_Bus, {MessageType::LEVEL_COMPLETE, MessageType::QUIT}, this }
 	{
-		m_Window.SetTitle(m_LevelNames[m_LevelNum]);
+		m_Window.SetTitle(m_LevelLoaders[m_LevelNum].GetName());
 	}
 
 	Task LevelRoutine::CreateTask()
@@ -118,10 +119,10 @@ namespace Game {
 			{
 				m_Player.Restart();
 				m_Level.reset(nullptr);
-				m_Level = std::make_unique<LuaLevel>(m_LevelNames[m_LevelNum], m_ResourceCache, m_Reader, m_Player, m_Bus);
+				m_Level = std::make_unique<LuaLevel>(m_LevelLoaders[m_LevelNum], m_ResourceCache, m_Reader, m_Player, m_Bus);
 				currentLevel = m_LevelNum;
 
-				m_Window.SetTitle(m_LevelNames[m_LevelNum]);
+				m_Window.SetTitle(m_LevelLoaders[m_LevelNum].GetName());
 			}
 
 			Expect(m_Level, "Level cannot be nullptr");
@@ -151,7 +152,7 @@ namespace Game {
 	void LevelRoutine::HandleLevelComplete(std::string_view levelName)
 	{
 		Logger::Info("Level complete: {}", levelName);
-		m_LevelNum = (m_LevelNum + 1) % m_LevelNames.size();
+		m_LevelNum = (m_LevelNum + 1) % m_LevelLoaders.size();
 	}
 
 	void LevelRoutine::HandleQuit()
