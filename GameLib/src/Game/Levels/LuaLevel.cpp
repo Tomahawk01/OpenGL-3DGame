@@ -36,6 +36,8 @@ namespace Game {
 		, m_Shapes{}
 		, m_AutoSub{ m_Bus, {MessageType::ENTITY_INTERSECT}, this }
 	{
+		Logger::Info("Loading level: {}", loader.GetName());
+
 		const Texture* barrelTextures[]{
 			resourceCache.Get<Texture>("barrel_albedo"),
 			resourceCache.Get<Texture>("barrel_specular"),
