@@ -49,7 +49,7 @@ namespace Game {
 		, m_IndexOffset{}
 	{
 		auto meshData = std::ranges::find_if(reader, [name](const auto& e) { return e.IsMesh(name); });
-		Ensure(meshData != std::ranges::end(reader), "Could not find mesh");
+		Ensure(meshData != std::ranges::end(reader), "Could not find mesh '{}'", name);
 
 		Mesh mesh{ (*meshData).meshValue() };
 
