@@ -86,16 +86,21 @@ namespace Game {
 
 		resourceCache.Insert<Texture>("sponza_bricks_a_albedo", reader, "spnza_bricks_a_Albedo", sampler);
 		resourceCache.Insert<Texture>("sponza_bricks_a_normal", reader, "spnza_bricks_a_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_floor_a_albedo", reader, "sponza_floor_a_Albedo", sampler);
+		resourceCache.Insert<Texture>("sponza_floor_a_normal", reader, "sponza_floor_a_Normal", sampler);
 
 		Logger::Info("Textures loaded successfully");
 
 		const TextFile basicVertFile = GetFile(reader, "basic.vert");
+		const TextFile basicFragFile = GetFile(reader, "basic.frag");
 		const TextFile barrelFragFile = GetFile(reader, "barrel.frag");
 		const TextFile checkerboardFragFile = GetFile(reader, "checkerboard.frag");
 
 		const Shader vertexShader{ basicVertFile.Data, ShaderType::VERTEX };
+		const Shader basicFragmentShader{ basicFragFile.Data, ShaderType::FRAGMENT };
 		const Shader barrelFragmentShader{ barrelFragFile.Data, ShaderType::FRAGMENT };
 		const Shader checkerboardShader{ checkerboardFragFile.Data, ShaderType::FRAGMENT };
+
 		resourceCache.Insert<Mesh>("barrel", reader, "Barrel");
 		resourceCache.Insert<Mesh>("sponza_bricks_05", reader, "sponza_05_sponza_05_bricks");
 		resourceCache.Insert<Mesh>("sponza_bricks_06", reader, "sponza_06_sponza_06_bricks");
@@ -394,8 +399,10 @@ namespace Game {
 
 		resourceCache.Insert<Material>("barrel", vertexShader, barrelFragmentShader);
 		resourceCache.Insert<Material>("floor", vertexShader, checkerboardShader);
+		resourceCache.Insert<Material>("basic", vertexShader, basicFragmentShader);
 
-		resourceCache.Insert<Texture>("floor_albedo",
+		resourceCache.Insert<Texture>(
+			"checkerboard",
 			TextureDescription{
 				.width = 1u,
 				.height = 1u,

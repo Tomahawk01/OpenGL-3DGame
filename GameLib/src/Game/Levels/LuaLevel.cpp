@@ -1,6 +1,7 @@
 #include "LuaLevel.h"
 
 #include "Utilities/Error.h"
+#include "Utilities/StringMap.h"
 #include "Scripting/ScriptRunner.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
@@ -385,18 +386,33 @@ namespace Game {
 			"sponza_bricks_382"sv
 		};
 
+		const StringMap<std::tuple<std::string_view, std::string_view>> textureLookup{
+			{ "sponza_bricks_06", std::make_tuple("sponza_bricks_a_albedo"sv, "sponza_bricks_a_normal"sv) },
+			{ "sponza_floor_117", std::make_tuple("sponza_floor_a_albedo"sv, "sponza_floor_a_normal"sv) },
+		};
+
 		m_LevelEntities = levelEntityNames | std::views::transform(
 			[&](const auto e)
 			{
+				auto* material = m_ResourceCache.Get<Material>("floor");
+				auto* albedo = m_ResourceCache.Get<Texture>("checkerboard");
+				auto* normal = m_ResourceCache.Get<Texture>("sponza_floor_a_normal");
+
+				if (const auto lookup = textureLookup.find(e); lookup != std::ranges::cend(textureLookup))
+				{
+					const auto& textures = lookup->second;
+
+					material = m_ResourceCache.Get<Material>("basic");
+					albedo = m_ResourceCache.Get<Texture>(std::get<0>(textures));
+					normal = m_ResourceCache.Get<Texture>(std::get<1>(textures));
+				}
+
 				return Entity{ 
 					resourceCache.Get<Mesh>(e),
-					e == "sponza_bricks_06"sv ? resourceCache.Get<Material>("barrel") : resourceCache.Get<Material>("floor"),
+					material,
 					{ 0.0f, -2.0f, 0.0f },
 					{ 0.05f },
-					std::vector<const Texture*>{
-						e == "sponza_bricks_06"sv ? resourceCache.Get<Texture>("sponza_bricks_a_albedo") : resourceCache.Get<Texture>("floor_albedo"),
-						e == "sponza_bricks_06"sv ? resourceCache.Get<Texture>("sponza_bricks_a_normal") : resourceCache.Get<Texture>("floor_albedo")
-					},
+					std::vector<const Texture*>{ albedo, normal },
 					{ m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}} },
 					0u,
 					0u
