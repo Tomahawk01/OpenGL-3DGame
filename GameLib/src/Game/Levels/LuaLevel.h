@@ -53,7 +53,7 @@ namespace Game {
 		PhysicsSystem m_PS;
 		LuaScript m_Script;
 		std::vector<Entity> m_Entities;
-		Entity m_Floor;
+		std::vector<Entity> m_LevelEntities;
 		CubeMap m_Skybox;
 		Sampler m_SkyboxSampler;
 		DefaultCache& m_ResourceCache;

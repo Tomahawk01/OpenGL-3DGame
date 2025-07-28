@@ -18,16 +18,7 @@ namespace Game {
 		: m_PS{}
 		, m_Script{ loader.Load() }
 		, m_Entities{}
-		, m_Floor{
-			resourceCache.Get<Mesh>("floor"),
-			resourceCache.Get<Material>("floor"),
-			{0.0f, -2.0f, 0.0f},
-			{100.0f, 1.0f, 100.0f},
-			std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")},
-			{m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}}},
-			0u,
-			0u
-		}
+		, m_LevelEntities{}
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_SkyboxSampler{}
 		, m_ResourceCache{ resourceCache }
@@ -101,7 +92,103 @@ namespace Game {
 			.skyboxSampler = &m_SkyboxSampler
 		};
 
-		m_Scene.entities.push_back(&m_Floor);
+		const std::vector levelEntityNames = {
+			"sponza_bricks_05"sv,
+			"sponza_bricks_06"sv,
+			"sponza_arch_07"sv,
+			"sponza_ceiling_08"sv,
+			"sponza_column_a_09"sv,
+			"sponza_column_a_10"sv,
+			"sponza_column_a_11"sv,
+			"sponza_column_a_12"sv,
+			"sponza_column_a_13"sv,
+			"sponza_column_a_14"sv,
+			"sponza_column_a_15"sv,
+			"sponza_column_a_16"sv,
+			"sponza_arch_17"sv,
+			"sponza_floor_18"sv,
+			"sponza_ceiling_19"sv,
+			"sponza_arch_20"sv,
+			"sponza_arch_21"sv,
+			"sponza_column_c_22"sv,
+			"sponza_column_c_23"sv,
+			"sponza_column_c_24"sv,
+			"sponza_column_c_25"sv,
+			"sponza_column_c_26"sv,
+			"sponza_column_c_27"sv,
+			"sponza_column_c_28"sv,
+			"sponza_column_c_29"sv,
+			"sponza_column_c_30"sv,
+			"sponza_column_c_31"sv,
+			"sponza_column_c_32"sv,
+			"sponza_column_c_33"sv,
+			"sponza_bricks_34"sv,
+			"sponza_ceiling_35"sv,
+			"sponza_bricks_36"sv,
+			"sponza_arch_37"sv,
+			"sponza_ceiling_38"sv,
+			"sponza_arch_39"sv,
+			"sponza_ceiling_40"sv,
+			"sponza_arch_41"sv,
+			"sponza_ceiling_42"sv,
+			"sponza_arch_43"sv,
+			"sponza_ceiling_44"sv,
+			"sponza_arch_45"sv,
+			"sponza_ceiling_46"sv,
+			"sponza_arch_47"sv,
+			"sponza_ceiling_48"sv,
+			"sponza_arch_49"sv,
+			"sponza_ceiling_50"sv,
+			"sponza_arch_51"sv,
+			"sponza_ceiling_52"sv,
+			"sponza_arch_53"sv,
+			"sponza_ceiling_54"sv,
+			"sponza_arch_55"sv,
+			"sponza_arch_56"sv,
+			"sponza_arch_57"sv,
+			"sponza_arch_58"sv,
+			"sponza_arch_59"sv,
+			"sponza_arch_60"sv,
+			"sponza_arch_61"sv,
+			"sponza_arch_62"sv,
+			"sponza_arch_63"sv,
+			"sponza_arch_64"sv,
+			"sponza_arch_65"sv,
+			"sponza_bricks_66"sv,
+			"sponza_arch_67"sv,
+			"sponza_bricks_68"sv,
+
+			"sponza_bricks_69"sv,
+			"sponza_floor_117"sv,
+			"sponza_column_a_118"sv,
+			"sponza_column_a_119"sv,
+			"sponza_column_a_120"sv,
+			"sponza_column_a_121"sv,
+			"sponza_bricks_379"sv,
+			"sponza_roof_380"sv,
+			"sponza_roof_381"sv,
+		};
+
+		m_LevelEntities = levelEntityNames | std::views::transform(
+			[&](const auto e)
+			{
+				return Entity{ 
+					resourceCache.Get<Mesh>(e),
+					resourceCache.Get<Material>("floor"),
+					{ 0.0f, -2.0f, 0.0f },
+					{ 0.05f },
+					std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")},
+					{ m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}} },
+					0u,
+					0u
+				};
+			}
+		) | std::ranges::to<std::vector>();
+
+		for (auto& ent : m_LevelEntities)
+		{
+			m_Scene.entities.push_back(&ent);
+		}
 
 		Restart();
 	}
