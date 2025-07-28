@@ -40,7 +40,7 @@ namespace {
 	Game::Camera CreateCamera(const Game::Window& window)
 	{
 		return {
-			{0.0f, 5.0f, 30.0f},
+			{0.0f, 5.0f, 20.0f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
