@@ -84,8 +84,8 @@ namespace Game {
 		resourceCache.Insert<Texture>("barrel_specular", reader, "barrel_Specular", sampler);
 		resourceCache.Insert<Texture>("barrel_normal", reader, "barrel_Normal", sampler);
 
-		//resourceCache.Insert<Texture>("warehouse_albedo", reader, "warehouse_Albedo", sampler);
-		//resourceCache.Insert<Texture>("warehouse_normal", reader, "warehouse_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_bricks_a_albedo", reader, "spnza_bricks_a_Albedo", sampler);
+		resourceCache.Insert<Texture>("sponza_bricks_a_normal", reader, "spnza_bricks_a_Normal", sampler);
 
 		Logger::Info("Textures loaded successfully");
 

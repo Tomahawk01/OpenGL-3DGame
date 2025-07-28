@@ -390,10 +390,13 @@ namespace Game {
 			{
 				return Entity{ 
 					resourceCache.Get<Mesh>(e),
-					resourceCache.Get<Material>("floor"),
+					e == "sponza_bricks_06"sv ? resourceCache.Get<Material>("barrel") : resourceCache.Get<Material>("floor"),
 					{ 0.0f, -2.0f, 0.0f },
 					{ 0.05f },
-					std::vector<const Texture*>{resourceCache.Get<Texture>("floor_albedo"), resourceCache.Get<Texture>("floor_albedo")},
+					std::vector<const Texture*>{
+						e == "sponza_bricks_06"sv ? resourceCache.Get<Texture>("sponza_bricks_a_albedo") : resourceCache.Get<Texture>("floor_albedo"),
+						e == "sponza_bricks_06"sv ? resourceCache.Get<Texture>("sponza_bricks_a_normal") : resourceCache.Get<Texture>("floor_albedo")
+					},
 					{ m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}} },
 					0u,
 					0u
