@@ -63,7 +63,9 @@ namespace Game {
 		: m_Running{ true }
 		, m_Bus{}
 		, m_Window{ 1280u, 720u, GetArg("-x", args), GetArg("-y", args) }
-	{}
+	{
+		Ensure(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED) == S_OK, "Failed to initialize com");
+	}
 
 	void Game::Run(std::string_view resourceRoot)
 	{
