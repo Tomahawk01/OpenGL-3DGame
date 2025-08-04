@@ -5,11 +5,12 @@
 namespace Game {
 
 	class Texture;
+	class Sampler;
 
 	class TextFactory
 	{
 	public:
-		Texture* Create(std::string_view text) const;
+		Texture Create(std::string_view text, const Sampler* sampler) const;
 
 	private:
 	};
