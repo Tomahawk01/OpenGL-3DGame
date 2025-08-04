@@ -2,6 +2,8 @@
 
 #include "Utilities/Error.h"
 #include "Utilities/StringMap.h"
+#include "Renderer/TextFactory.h"
+#include "Renderer/UI/Label.h"
 #include "Scripting/ScriptRunner.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
@@ -62,6 +64,9 @@ namespace Game {
 			? runner.Execute<vec3, vec3>("get_directional_light")
 			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
 
+		const TextFactory textFactory{};
+		static auto textTest = textFactory.Create("Hello world", &m_SkyboxSampler);
+
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
 			.ambient = {ambientVec.x, ambientVec.y, ambientVec.z},
@@ -90,7 +95,10 @@ namespace Game {
 			},
 			.debugLines = {},
 			.skybox = &m_Skybox,
-			.skyboxSampler = &m_SkyboxSampler
+			.skyboxSampler = &m_SkyboxSampler,
+			.labels = {
+				{&textTest, 0, 0}
+			}
 		};
 
 		const std::vector levelEntityNames = {

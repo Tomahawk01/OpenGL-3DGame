@@ -6,6 +6,7 @@
 #include "Renderer/Buffer.h"
 #include "Renderer/CubeMap.h"
 #include "Renderer/Sampler.h"
+#include "Renderer/UI/Label.h"
 #include "Physics/DebugLines.h"
 
 #include <vector>
@@ -39,6 +40,7 @@ namespace Game {
 		std::optional<DebugLines> debugLines;
 		const CubeMap* skybox;
 		const Sampler* skyboxSampler;
+		std::vector<Label> labels;
 	};
 
 }
