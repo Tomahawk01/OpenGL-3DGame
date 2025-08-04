@@ -29,6 +29,7 @@ namespace Game {
 		FrameBuffer m_FB;
 		Mesh m_PostProcessSprite;
 		Material m_PostProcessMaterial;
+		Material m_LabelMaterial;
 	};
 
 }

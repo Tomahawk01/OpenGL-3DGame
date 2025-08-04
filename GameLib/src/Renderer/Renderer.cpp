@@ -53,6 +53,16 @@ namespace {
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
+	Game::Material CreateLabelMaterial(const Game::TLVReader& reader)
+	{
+		const Game::TextFile vertFile{ GetFile(reader, "label.vert") };
+		const Game::TextFile fragFile{ GetFile(reader, "label.frag") };
+
+		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
+		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
+		return Game::Material{ vertexShader, fragmentShader };
+	}
+
 }
 
 namespace Game {
@@ -66,6 +76,7 @@ namespace Game {
 		, m_FB(width, height)
 		, m_PostProcessSprite(meshLoader.Sprite())
 		, m_PostProcessMaterial(CreatePostProcessMaterial(reader))
+		, m_LabelMaterial(CreateLabelMaterial(reader))
 	{}
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
@@ -152,6 +163,28 @@ namespace Game {
 		m_PostProcessMaterial.BindTexture(0, &m_FB.GetColorTexture(), scene.skyboxSampler);
 		m_PostProcessMaterial.SetUniform("gamma", gamma);
 		::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
+		m_PostProcessSprite.UnBind();
+
+		// NOTE: Render UI
+		static const Camera orthCamera{ 1920u, 1080u, 1000u };
+
+		m_LabelMaterial.Use();
+		m_PostProcessSprite.Bind();
+		for (const auto& [texture, x, y] : scene.labels)
+		{
+			{
+				BufferWriter writer{ m_CameraBuffer };
+				writer.Write(orthCamera.GetView());
+				writer.Write(orthCamera.GetProjection());
+				writer.Write(orthCamera.GetPosition());
+			}
+			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
+
+			const mat4 model{ vec3{static_cast<float>(x), static_cast<float>(y), 0.0f}, vec3{static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()), 1.0f} };
+			m_LabelMaterial.SetUniform("model", model);
+			m_LabelMaterial.BindTexture(0, texture);
+			::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
+		}
 		m_PostProcessSprite.UnBind();
 	}
 
