@@ -46,10 +46,14 @@ namespace Game {
 
 		::GLuint GetNativeHandle() const;
 		const Sampler* GetSampler() const;
+		uint32_t GetWidth() const;
+		uint32_t GetHeight() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;
 		const Sampler* m_Sampler;
+		uint32_t m_Width;
+		uint32_t m_Height;
 	};
 
 	std::string to_string(const TextureDescription& obj);

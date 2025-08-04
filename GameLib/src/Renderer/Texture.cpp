@@ -32,6 +32,8 @@ namespace Game {
 	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t width, uint32_t height, const Sampler* sampler)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 		, m_Sampler(sampler)
+		, m_Width{ width }
+		, m_Height{ height }
 	{
 		TextureUsage validUsage[] = { TextureUsage::SRGB, TextureUsage::DATA };
 		Ensure(std::ranges::contains(validUsage, usage), "Invalid usage");
@@ -70,6 +72,8 @@ namespace Game {
 	Texture::Texture(const TextureDescription& description, const Sampler* sampler)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 		, m_Sampler(sampler)
+		, m_Width{ description.width }
+		, m_Height{ description.height }
 	{
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
@@ -91,6 +95,8 @@ namespace Game {
 
 	Texture::Texture(TextureUsage usage, uint32_t width, uint32_t height)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+		, m_Width{ width }
+		, m_Height{ height }
 	{
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 		switch (usage)
@@ -114,6 +120,16 @@ namespace Game {
 	const Sampler* Texture::GetSampler() const
 	{
 		return m_Sampler;
+	}
+
+	uint32_t Texture::GetWidth() const
+	{
+		return m_Width;
+	}
+
+	uint32_t Texture::GetHeight() const
+	{
+		return m_Height;
 	}
 
 	std::string to_string(const TextureDescription& obj)
