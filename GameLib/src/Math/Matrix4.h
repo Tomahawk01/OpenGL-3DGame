@@ -82,6 +82,7 @@ namespace Game {
 
 		static mat4 LookAt(const vec3& eye, const vec3& lookAt, const vec3& up);
 		static mat4 Perspective(float fov, float width, float height, float nearPlane, float farPlane);
+		static mat4 Orthographic(float width, float height, float depth);
 
 		constexpr std::span<const float> data() const { return m_Elements; }
 
@@ -180,6 +181,26 @@ namespace Game {
 			 (r + l) / (r - l), (t + b) / (t - b), -(farPlane + nearPlane) / (farPlane - nearPlane), -1.0f,
 			 0.0f, 0.0f, -(2.0f * farPlane * nearPlane) / (farPlane - nearPlane), 0.0f}
 		};
+
+		return m;
+	}
+
+	inline mat4 mat4::Orthographic(float width, float height, float depth)
+	{
+		const float right = width / 2.0f;
+		const float left = -right;
+		const float top = height / 2.0f;
+		const float bottom = -top;
+		const float far_ = depth;
+		const float near_ = 0.0f;
+
+		mat4 m{};
+		m.m_Elements = {{
+			2.0f / (right - left), 0.0f, 0.0f, 0.0f,
+			0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
+			0.0f, 0.0f, -2.0f / (far_ - near_), 0.0f,
+			-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(far_ + near_) / (far_ - near_), 1.0f
+		}};
 
 		return m;
 	}
