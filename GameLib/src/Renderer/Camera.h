@@ -19,6 +19,8 @@ namespace Game {
 			   float width, float height,
 			   float nearPlane, float farPlane);
 
+		Camera(float width, float height, float depth);
+
 		void Translate(const vec3& translation);
 
 		void AddYaw(float value);

@@ -42,6 +42,22 @@ namespace Game {
 		AddPitch(0.0f);
 	}
 
+	Camera::Camera(float width, float height, float depth)
+		: m_View(mat4::LookAt(vec3{ 0.0f, 0.0f, 1.0f }, {}, {0.0f, 1.0f, 0.0f}))
+		, m_Projection(mat4::Orthographic(width, height, depth))
+		, m_Position(vec3{0.0f, 0.0f, 1.0f})
+		, m_Direction(vec3{0.0f, 0.0f, -1.0f})
+		, m_Up(vec3{0.0f, 1.0f, 0.0f})
+		, m_Right(vec3::Normalize(vec3::Cross(m_Direction, m_Up)))
+		, m_Pitch{}
+		, m_Yaw{ -std::numbers::pi_v<float> / 2.0f }
+		, m_Fov(0.0f)
+		, m_Width(width)
+		, m_Height(height)
+		, m_NearPlane(0.0f)
+		, m_FarPlane(depth)
+	{}
+
 	void Camera::Translate(const vec3& translation)
 	{
 		m_Position += translation;
