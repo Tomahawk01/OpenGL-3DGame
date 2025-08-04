@@ -53,6 +53,11 @@ project "GameLib"
     filter "system:windows"
         systemversion "latest"
         defines { "WINDOWS" }
+        links
+        {
+            "dwrite",
+            "d2d1"
+        }
 
     filter "configurations:Debug"
         defines { "DEBUG" }
