@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <span>
+#include <ranges>
 #include <Windows.h>
 #include <wincodec.h>
 #include <dwrite.h>
@@ -70,13 +71,13 @@ namespace Game {
 			imageFactory->CreateBitmap(
 				width,
 				height,
-				GUID_WICPixelFormat32bppRGBA,
+				GUID_WICPixelFormat32bppPBGRA,
 				WICBitmapCacheOnDemand,
 				&bitmap) == S_OK, "Failed to create bitmap");
 
 		const auto properties = D2D1::RenderTargetProperties(
 			D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_STRAIGHT),
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
 			0.0f,
 			0.0f,
 			D2D1_RENDER_TARGET_USAGE_NONE);
@@ -90,16 +91,13 @@ namespace Game {
 		const auto release = [](auto* obj) { obj->Release(); };
 		auto renderTarget = std::unique_ptr<ID2D1RenderTarget, decltype(release)>{};
 
-		Ensure(
-			direct2dFactory->CreateWicBitmapRenderTarget(
-				bitmap,
-				&properties,
-				std::out_ptr(renderTarget)) == S_OK, "Failed to create render target");
+		const auto res = direct2dFactory->CreateWicBitmapRenderTarget(bitmap, &properties, std::out_ptr(renderTarget));
+		Ensure(res == S_OK, "Failed to create render target: {}", res);
 
 		auto brush = std::unique_ptr<ID2D1SolidColorBrush, decltype(release)>{};
 		Ensure(
 			renderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::Black, 1.0f),
+				D2D1::ColorF(D2D1::ColorF::White, 1.0f),
 				std::out_ptr(brush)) == S_OK, "Failed to create brush");
 
 		const auto origin = D2D1::Point2F(0.0f, 0.0f);
@@ -133,13 +131,18 @@ namespace Game {
 
 		auto pixelData = std::span(buffer, buffer + bufferSize);
 
-		return {
-			TextureUsage::SRGB,
-			pixelData,
-			bitmapWidth,
-			bitmapHeight,
-			sampler
-		};
+		for (auto pixels : pixelData | std::views::chunk(4u))
+		{
+			std::ranges::swap(pixels[0], pixels[2]);
+			const auto alpha = static_cast<float>(pixels[3]) / 255.0f;
+
+			for (auto rgb : pixels | std::views::take(3))
+			{
+				rgb = static_cast<std::byte>((static_cast<float>(rgb) / alpha) * 255.0f);
+			}
+		}
+
+		return { TextureUsage::SRGB, pixelData, 4u, bitmapWidth, bitmapHeight, sampler };
 	}
 
 }
