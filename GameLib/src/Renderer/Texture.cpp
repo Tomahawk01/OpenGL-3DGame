@@ -69,6 +69,34 @@ namespace Game {
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
 	}
 
+	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t numChannels, uint32_t width, uint32_t height, const Sampler* sampler)
+		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
+		, m_Sampler(sampler)
+		, m_Width{ width }
+		, m_Height{ height }
+	{
+		TextureUsage validUsage[] = { TextureUsage::SRGB, TextureUsage::DATA };
+		Ensure(std::ranges::contains(validUsage, usage), "Invalid usage");
+
+		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
+
+		::GLenum format{};
+		switch (usage)
+		{
+			case TextureUsage::SRGB:
+				format = numChannels == 4 ? GL_SRGB8_ALPHA8 : GL_SRGB8;
+				break;
+			case TextureUsage::DATA:
+				format = numChannels == 4 ? GL_RGBA8 : GL_RGB8;
+				break;
+			default:
+				break;
+		}
+
+		::glTextureStorage2D(m_Handle, 1, format, width, height);
+		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data.data());
+	}
+
 	Texture::Texture(const TextureDescription& description, const Sampler* sampler)
 		: m_Handle{ 0u, [](auto texture) { ::glDeleteTextures(1u, &texture); } }
 		, m_Sampler(sampler)
