@@ -166,7 +166,8 @@ namespace Game {
 		m_PostProcessSprite.UnBind();
 
 		// NOTE: Render UI
-		static const Camera orthCamera{ 1920u, 1080u, 1000u };
+		static Camera orthCamera{ 1920u, 1080u, 1000u };
+		orthCamera.SetPosition({ 960.0f, -560.0f, 0.0f });
 
 		m_LabelMaterial.Use();
 		m_PostProcessSprite.Bind();
@@ -180,7 +181,10 @@ namespace Game {
 			}
 			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
 
-			const mat4 model{ vec3{static_cast<float>(x), static_cast<float>(y), 0.0f}, vec3{static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()), 1.0f} };
+			const mat4 model{ 
+				vec3{static_cast<float>(x) + texture->GetWidth(), static_cast<float>(y) - texture->GetHeight(), 0.0f},
+				vec3{static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight()), 1.0f}
+			};
 			m_LabelMaterial.SetUniform("model", model);
 			m_LabelMaterial.BindTexture(0, texture);
 			::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
