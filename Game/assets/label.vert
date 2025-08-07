@@ -19,5 +19,5 @@ layout(std140, binding = 0) uniform camera
 void main()
 {
     gl_Position = projection * view * model * vec4(in_position, 1.0);
-    tex_coord = in_uv;
+    tex_coord = vec2(in_uv.x, -in_uv.y);
 }
