@@ -77,7 +77,10 @@ namespace Game {
 		, m_PostProcessSprite(meshLoader.Sprite())
 		, m_PostProcessMaterial(CreatePostProcessMaterial(reader))
 		, m_LabelMaterial(CreateLabelMaterial(reader))
-	{}
+		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
+	{
+		m_OrthCamera.SetPosition({ width / 2.0f, height / -2.0f, 0.0f });
+	}
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
 	{
@@ -166,18 +169,15 @@ namespace Game {
 		m_PostProcessSprite.UnBind();
 
 		// NOTE: Render UI
-		static Camera orthCamera{ 1920u, 1080u, 1000u };
-		orthCamera.SetPosition({ 960.0f, -540.0f, 0.0f });
-
 		m_LabelMaterial.Use();
 		m_PostProcessSprite.Bind();
 		for (const auto& [texture, x, y] : scene.labels)
 		{
 			{
 				BufferWriter writer{ m_CameraBuffer };
-				writer.Write(orthCamera.GetView());
-				writer.Write(orthCamera.GetProjection());
-				writer.Write(orthCamera.GetPosition());
+				writer.Write(m_OrthCamera.GetView());
+				writer.Write(m_OrthCamera.GetProjection());
+				writer.Write(m_OrthCamera.GetPosition());
 			}
 			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
 

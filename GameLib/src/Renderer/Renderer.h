@@ -2,7 +2,6 @@
 
 #include "TLV/Utilities.h"
 #include "Core/Scene.h"
-#include "Core/ResourceLoader.h"
 #include "Buffer.h"
 #include "FrameBuffer.h"
 #include "CubeMap.h"
@@ -30,6 +29,7 @@ namespace Game {
 		Mesh m_PostProcessSprite;
 		Material m_PostProcessMaterial;
 		Material m_LabelMaterial;
+		Camera m_OrthCamera;
 	};
 
 }
