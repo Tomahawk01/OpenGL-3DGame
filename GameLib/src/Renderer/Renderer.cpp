@@ -74,7 +74,7 @@ namespace Game {
 		, m_SkyboxMaterial(CreateSkyboxMaterial(reader))
 		, m_DebugLineMaterial(CreateDebugLineMaterial(reader))
 		, m_FB(width, height)
-		, m_PostProcessSprite(meshLoader.Sprite())
+		, m_Sprite(meshLoader.Sprite())
 		, m_PostProcessMaterial(CreatePostProcessMaterial(reader))
 		, m_LabelMaterial(CreateLabelMaterial(reader))
 		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
@@ -162,15 +162,15 @@ namespace Game {
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		m_PostProcessMaterial.Use();
-		m_PostProcessSprite.Bind();
+		m_Sprite.Bind();
 		m_PostProcessMaterial.BindTexture(0, &m_FB.GetColorTexture(), scene.skyboxSampler);
 		m_PostProcessMaterial.SetUniform("gamma", gamma);
-		::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
-		m_PostProcessSprite.UnBind();
+		::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+		m_Sprite.UnBind();
 
 		// NOTE: Render UI
 		m_LabelMaterial.Use();
-		m_PostProcessSprite.Bind();
+		m_Sprite.Bind();
 		for (const auto& [texture, x, y] : scene.labels)
 		{
 			{
@@ -187,9 +187,9 @@ namespace Game {
 			};
 			m_LabelMaterial.SetUniform("model", model);
 			m_LabelMaterial.BindTexture(0, texture);
-			::glDrawElements(GL_TRIANGLES, m_PostProcessSprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_PostProcessSprite.IndexOffset()));
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 		}
-		m_PostProcessSprite.UnBind();
+		m_Sprite.UnBind();
 	}
 
 }
