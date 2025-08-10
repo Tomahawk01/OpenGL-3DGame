@@ -167,7 +167,7 @@ namespace Game {
 
 		// NOTE: Render UI
 		static Camera orthCamera{ 1920u, 1080u, 1000u };
-		orthCamera.SetPosition({ 960.0f, -560.0f, 0.0f });
+		orthCamera.SetPosition({ 960.0f, -540.0f, 0.0f });
 
 		m_LabelMaterial.Use();
 		m_PostProcessSprite.Bind();
