@@ -23,7 +23,6 @@ namespace Game {
 		, m_Entities{}
 		, m_LevelEntities{}
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
-		, m_SkyboxSampler{}
 		, m_ResourceCache{ resourceCache }
 		, m_Bus{ bus }
 		, m_BarrelInfo{}
@@ -65,7 +64,7 @@ namespace Game {
 			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
 
 		const TextFactory textFactory{};
-		static auto textTest = textFactory.Create("Hello world", &m_SkyboxSampler);
+		static auto textTest = textFactory.Create("Hello world", resourceCache.Get<Sampler>("ui"));
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
@@ -95,7 +94,7 @@ namespace Game {
 			},
 			.debugLines = {},
 			.skybox = &m_Skybox,
-			.skyboxSampler = &m_SkyboxSampler,
+			.skyboxSampler = resourceCache.Get<Sampler>("sky_box"),
 			.labels = {
 				{&textTest, 0, 0}
 			}

@@ -55,7 +55,6 @@ namespace Game {
 		std::vector<Entity> m_Entities;
 		std::vector<Entity> m_LevelEntities;
 		CubeMap m_Skybox;
-		Sampler m_SkyboxSampler;
 		DefaultCache& m_ResourceCache;
 		MessageBus& m_Bus;
 		std::unordered_map<const Entity*, BarrelInfo> m_BarrelInfo;

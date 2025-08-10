@@ -445,6 +445,9 @@ namespace Game {
 			}, sampler);
 		resourceCache.Insert<Mesh>("floor", meshLoader.Cube());
 
+		resourceCache.Insert<Sampler>("sky_box", Sampler{});
+		resourceCache.Insert<Sampler>("ui", Sampler{});
+
 		Scheduler scheduler{};
 
 		InputRoutine inputRoutine{ m_Window, m_Bus, scheduler };
