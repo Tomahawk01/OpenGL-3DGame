@@ -134,12 +134,6 @@ namespace Game {
 		for (auto pixels : pixelData | std::views::chunk(4u))
 		{
 			std::ranges::swap(pixels[0], pixels[2]);
-			const auto alpha = static_cast<float>(pixels[3]) / 255.0f;
-
-			for (auto rgb : pixels | std::views::take(3))
-			{
-				rgb = static_cast<std::byte>((static_cast<float>(rgb) / alpha) * 255.0f);
-			}
 		}
 
 		return { TextureUsage::SRGB, pixelData, 4u, bitmapWidth, bitmapHeight, sampler };
