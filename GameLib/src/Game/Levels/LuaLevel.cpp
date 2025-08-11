@@ -64,7 +64,7 @@ namespace Game {
 			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
 
 		const TextFactory textFactory{};
-		static auto textTest = textFactory.Create("Hello world ❤️ 叶 💩", resourceCache.Get<Sampler>("ui"));
+		static auto textTest = textFactory.Create("Hello world ❤️ 叶 💩", resourceCache.Get<Sampler>("ui"), 32u, Colors::Azure);
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
