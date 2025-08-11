@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Math/Color.h"
+
 #include <string_view>
 
 namespace Game {
@@ -10,9 +12,7 @@ namespace Game {
 	class TextFactory
 	{
 	public:
-		Texture Create(std::string_view text, const Sampler* sampler) const;
-
-	private:
+		Texture Create(std::string_view text, const Sampler* sampler, uint32_t fontSize = 24u, const Color& color = Colors::White) const;
 	};
 
 }

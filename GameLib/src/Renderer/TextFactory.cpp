@@ -16,7 +16,7 @@
 
 namespace Game {
 
-	Texture TextFactory::Create(std::string_view text, const Sampler* sampler) const
+	Texture TextFactory::Create(std::string_view text, const Sampler* sampler, uint32_t fontSize, const Color& color) const
 	{
 		Logger::Trace("Creating text for: {}", text);
 
@@ -35,7 +35,7 @@ namespace Game {
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
 				DWRITE_FONT_STRETCH_NORMAL,
-				10.0f * (96.0f / 72.0f),
+				static_cast<float>(fontSize),
 				L"en-CA",
 				&textFormat) == S_OK, "Failed to create text format");
 
@@ -94,10 +94,12 @@ namespace Game {
 		const auto res = direct2dFactory->CreateWicBitmapRenderTarget(bitmap, &properties, std::out_ptr(renderTarget));
 		Ensure(res == S_OK, "Failed to create render target: {}", res);
 
+		const D2D1::ColorF d2d1Color{ color.r, color.g, color.b, 1.0f };
+
 		auto brush = std::unique_ptr<ID2D1SolidColorBrush, decltype(release)>{};
 		Ensure(
 			renderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::White, 1.0f),
+				d2d1Color,
 				std::out_ptr(brush)) == S_OK, "Failed to create brush");
 
 		const auto origin = D2D1::Point2F(0.0f, 0.0f);
@@ -136,7 +138,7 @@ namespace Game {
 			std::ranges::swap(pixels[0], pixels[2]);
 		}
 
-		return { TextureUsage::SRGB, pixelData, 4u, bitmapWidth, bitmapHeight, sampler };
+		return { TextureUsage::SRGB, pixelData, 4u, width, height, sampler };
 	}
 
 }
