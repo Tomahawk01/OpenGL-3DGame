@@ -22,7 +22,7 @@ workspace "OpenGL_Game"
     }
 
     filter "system:windows"
-        buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+        buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus", "/utf-8" }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
