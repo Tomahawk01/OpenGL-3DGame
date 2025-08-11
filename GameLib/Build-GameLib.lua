@@ -56,7 +56,8 @@ project "GameLib"
         links
         {
             "dwrite",
-            "d2d1"
+            "d2d1",
+            "shcore"
         }
 
     filter "configurations:Debug"
