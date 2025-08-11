@@ -1,40 +1,12 @@
 #include "Game.h"
 
-#include "Utilities/Exception.h"
-#include "Utilities/Logger.h"
 #include "Utilities/Decompress.h"
-#include "UI/DebugUI.h"
-#include "Core/Window.h"
-#include "Core/Entity.h"
-#include "Core/Scene.h"
-#include "Core/ResourceLoader.h"
-#include "Core/ResourceCache.h"
-#include "Math/FrustumPlane.h"
-#include "Physics/BoxShape.h"
-#include "Physics/TransformedShape.h"
-#include "Renderer/Texture.h"
-#include "Renderer/Sampler.h"
-#include "Renderer/Material.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Mesh.h"
-#include "Renderer/MeshLoader.h"
-#include "Renderer/Camera.h"
-#include "Renderer/WireframeRenderer.h"
-#include "TLV/Utilities.h"
 
-#include "Game/Player.h"
 #include "Game/Routines/InputRoutine.h"
 #include "Game/Routines/LevelRoutine.h"
 #include "Game/Routines/RenderRoutine.h"
 
-#include <iostream>
-#include <print>
-#include <cmath>
-#include <type_traits>
-#include <ranges>
-#include <unordered_map>
-#include <random>
+#include <ShellScalingApi.h>
 
 namespace {
 
@@ -65,6 +37,7 @@ namespace Game {
 		, m_Window{ 1280u, 720u, GetArg("-x", args), GetArg("-y", args) }
 	{
 		Ensure(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED) == S_OK, "Failed to initialize com");
+		Ensure(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE) == S_OK, "Failed to set dpi aware");
 	}
 
 	void Game::Run(std::string_view resourceRoot)
