@@ -8,6 +8,8 @@ namespace Game {
 	class Subscriber
 	{
 	public:
+		virtual ~Subscriber() = default;
+
 		virtual void HandleKeyPress(const KeyEvent&)
 		{
 			Logger::Warn("Unhandled message!");
@@ -34,6 +36,11 @@ namespace Game {
 		}
 
 		virtual void HandleQuit()
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleStateChange(GameState)
 		{
 			Logger::Warn("Unhandled message!");
 		}

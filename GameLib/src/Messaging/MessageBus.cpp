@@ -68,4 +68,9 @@ namespace Game {
 		_PostMessage(MessageType::QUIT, m_Subscribers, [](auto* sub) { sub->HandleQuit(); });
 	}
 
+	void MessageBus::PostStateChange(GameState state)
+	{
+		_PostMessage(MessageType::STATE_CHANGE, m_Subscribers, [state](auto* sub) { sub->HandleStateChange(state); });
+	}
+
 }

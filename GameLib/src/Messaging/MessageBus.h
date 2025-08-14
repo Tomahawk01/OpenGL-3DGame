@@ -3,6 +3,8 @@
 #include "Events/KeyEvent.h"
 #include "Events/MouseEvent.h"
 
+#include "Game/GameState.h"
+
 #include <string_view>
 #include <unordered_map>
 #include <vector>
@@ -19,7 +21,8 @@ namespace Game {
 		LEVEL_COMPLETE,
 		ENTITY_INTERSECT,
 		RESTART_LEVEL,
-		QUIT
+		QUIT,
+		STATE_CHANGE,
 	};
 
 	class MessageBus
@@ -42,6 +45,7 @@ namespace Game {
 		void PostEntityIntersect(const Entity* a, const Entity* b);
 		void PostRestartLevel();
 		void PostQuit();
+		void PostStateChange(GameState state);
 
 	private:
 		std::unordered_map<MessageType, std::vector<Subscriber*>> m_Subscribers;
