@@ -5,8 +5,11 @@
 
 namespace Game {
 
-	Scheduler::Scheduler()
-		: m_Queue{}
+	Scheduler::Scheduler(MessageBus& bus)
+		: Subscriber()
+		, m_Bus{ bus }
+		, m_AutoSub{ m_Bus, {MessageType::STATE_CHANGE}, this }
+		, m_Queue{}
 		, m_TickCount{}
 		, m_Elapsed{}
 	{}
@@ -52,6 +55,14 @@ namespace Game {
 		task->CheckResume = [counter = std::move(counter)] { return *counter == 0; };
 	}
 
+	void Scheduler::Reschedule(std::coroutine_handle<> handle, GameState state)
+	{
+		auto task = std::ranges::find_if(m_Queue, [handle](const auto& e) { return e.task.IsThisTask(handle); });
+		Expect(task != std::ranges::end(m_Queue), "Could not find task");
+
+		task->CheckResume = [state, this] { return (m_State == state) || (m_State == GameState::EXITING); };
+	}
+
 	void Scheduler::Run()
 	{
 		while (!m_Queue.empty())
@@ -75,9 +86,15 @@ namespace Game {
 
 			std::erase_if(m_Queue, [](const auto& e) { return !e.task.CanResume(); });
 
-			m_TickCount++;
+			++m_TickCount;
 			m_Elapsed += std::chrono::steady_clock::now() - start;
+			m_State = m_NextState;
 		}
+	}
+
+	void Scheduler::HandleStateChange(GameState state)
+	{
+		m_NextState = state;
 	}
 
 }
