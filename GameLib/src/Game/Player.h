@@ -9,17 +9,18 @@
 
 namespace Game {
 
-	class Player : public Subscriber
+	class Player
 	{
 	public:
-		Player(MessageBus& bus, Camera camera);
+		Player(Camera camera);
 
 		void Update();
 		void Restart();
 
-		void HandleKeyPress(const KeyEvent& event) override;
-		void HandleMouseMove(const MouseEvent& event) override;
-		void HandleRestartLevel() override;
+		// NOTE: These are sent from LevelRoutine instead of MessageBus
+		void HandleKeyPress(const KeyEvent& event);
+		void HandleMouseMove(const MouseEvent& event);
+		void HandleRestartLevel();
 
 		const Camera& GetCamera() const;
 		vec3 GetPosition() const;
@@ -28,7 +29,6 @@ namespace Game {
 		Camera m_Camera;
 		std::unordered_map<Key, bool> m_KeyState;
 		vec3 m_StartPosition;
-		AutoSubscribe m_AutoSub;
 	};
 
 }
