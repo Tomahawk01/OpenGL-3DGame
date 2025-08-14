@@ -6,18 +6,17 @@
 namespace Game {
 
 	InputRoutine::InputRoutine(const Window& window, MessageBus& bus, Scheduler& scheduler)
-		: m_Window(window)
-		, m_Bus(bus)
+		: Routine(bus, {})
+		, m_Window(window)
 		, m_Scheduler(scheduler)
 	{}
 
 	Task InputRoutine::CreateTask()
 	{
-		bool running = true;
-		while (running)
+		while (m_State != GameState::EXITING)
 		{
 			auto event = m_Window.PollEvent();
-			while (event && running)
+			while (event && m_State != GameState::EXITING)
 			{
 				std::visit(
 					[&](auto&& arg)
@@ -26,15 +25,10 @@ namespace Game {
 
 						if constexpr (std::same_as<T, StopEvent>)
 						{
-							running = false;
+							m_Bus.PostStateChange(GameState::EXITING);
 						}
 						else if constexpr (std::same_as<T, KeyEvent>)
 						{
-							if (arg.GetKey() == Key::ESC)
-							{
-								running = false;
-							}
-
 							m_Bus.PostKeyPress(arg);
 						}
 						else if constexpr (std::same_as<T, MouseEvent>)
@@ -45,15 +39,7 @@ namespace Game {
 				event = m_Window.PollEvent();
 			}
 
-			if (running)
-			{
-				co_await Wait{ m_Scheduler, 1u };
-			}
-			else
-			{
-				Logger::Info("Closing application...");
-				m_Bus.PostQuit();
-			}
+			co_await Wait{ m_Scheduler, 1u };
 		}
 	}
 

@@ -421,7 +421,7 @@ namespace Game {
 		resourceCache.Insert<Sampler>("sky_box", Sampler{});
 		resourceCache.Insert<Sampler>("ui", Sampler{});
 
-		Scheduler scheduler{};
+		Scheduler scheduler{ m_Bus };
 
 		InputRoutine inputRoutine{ m_Window, m_Bus, scheduler };
 		LevelRoutine levelRoutine{ m_Window, m_Bus, scheduler, resourceCache, reader };

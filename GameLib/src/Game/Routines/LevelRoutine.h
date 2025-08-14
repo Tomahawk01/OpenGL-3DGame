@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Messaging/MessageBus.h"
-#include "Messaging/Subscriber.h"
-#include "Messaging/AutoSubscribe.h"
 #include "Scheduler/Scheduler.h"
 #include "Scripting/ScriptLoader.h"
 #include "Core/Window.h"
 #include "Core/ResourceCache.h"
+#include "Events/KeyEvent.h"
 #include "TLV/TLVReader.h"
 
 #include "Game/Levels/LuaLevel.h"
+#include "Game/Routines/Routine.h"
 #include "Game/Player.h"
 
 namespace Game {
 
-	class LevelRoutine : public Subscriber
+	class LevelRoutine : public Routine
 	{
 	public:
 		LevelRoutine(const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader);
@@ -28,11 +28,11 @@ namespace Game {
 		LuaLevel& GetLevel() const;
 
 		void HandleLevelComplete(std::string_view levelName) override;
-		void HandleQuit() override;
+		void HandleKeyPress(const KeyEvent& event) override;
+		void HandleMouseMove(const MouseEvent& event) override;
 
 	private:
 		const Window& m_Window;
-		MessageBus& m_Bus;
 		Scheduler& m_Scheduler;
 		Player m_Player;
 		DefaultCache& m_ResourceCache;
@@ -40,8 +40,6 @@ namespace Game {
 		size_t m_LevelNum;
 		std::vector<ScriptLoader> m_LevelLoaders;
 		std::unique_ptr<LuaLevel> m_Level;
-		bool m_Running;
-		AutoSubscribe m_AutoSub;
 	};
 
 }

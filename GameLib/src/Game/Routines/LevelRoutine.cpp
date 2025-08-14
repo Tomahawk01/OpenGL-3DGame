@@ -94,17 +94,15 @@ namespace {
 namespace Game {
 
 	LevelRoutine::LevelRoutine(const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader)
-		: m_Window{ window }
-		, m_Bus{ bus }
+		: Routine(bus, {MessageType::KEY_PRESS, MessageType::MOUSE_MOVE, MessageType::LEVEL_COMPLETE, MessageType::QUIT})
+		, m_Window{ window }
 		, m_Scheduler{ scheduler }
-		, m_Player{ m_Bus, CreateCamera(window) }
+		, m_Player{ CreateCamera(window) }
 		, m_ResourceCache{ resourceCache }
 		, m_Reader{ reader }
 		, m_LevelNum{ 0u }
 		, m_LevelLoaders{ GetLevelLoaders(m_Reader) }
 		, m_Level{ std::make_unique<LuaLevel>(m_LevelLoaders[m_LevelNum], resourceCache, reader, m_Player, m_Bus) }
-		, m_Running{ true }
-		, m_AutoSub{ m_Bus, {MessageType::LEVEL_COMPLETE, MessageType::QUIT}, this }
 	{
 		m_Window.SetTitle(m_LevelLoaders[m_LevelNum].GetName());
 	}
@@ -113,8 +111,13 @@ namespace Game {
 	{
 		auto currentLevel = m_LevelNum;
 
-		while (m_Running)
+		while (m_State != GameState::EXITING)
 		{
+			if (m_State != GameState::RUNNING)
+			{
+				co_await Wait{ m_Scheduler, GameState::RUNNING };
+			}
+
 			if (currentLevel != m_LevelNum)
 			{
 				m_Player.Restart();
@@ -155,9 +158,39 @@ namespace Game {
 		m_LevelNum = (m_LevelNum + 1) % m_LevelLoaders.size();
 	}
 
-	void LevelRoutine::HandleQuit()
+	void LevelRoutine::HandleKeyPress(const KeyEvent& event)
 	{
-		m_Running = false;
+		if (m_State == GameState::RUNNING)
+		{
+			m_Player.HandleKeyPress(event);
+		}
+		else if (m_State == GameState::PAUSED)
+		{
+			if (event.GetKey() == Key::ESC)
+			{
+				m_Bus.PostStateChange(GameState::EXITING);
+			}
+		}
+
+		if (event.GetKey() == Key::SPACE && event.GetState() == KeyState::DOWN)
+		{
+			if (m_State == GameState::RUNNING)
+			{
+				m_Bus.PostStateChange(GameState::PAUSED);
+			}
+			else if (m_State == GameState::PAUSED)
+			{
+				m_Bus.PostStateChange(GameState::RUNNING);
+			}
+		}
+	}
+
+	void LevelRoutine::HandleMouseMove(const MouseEvent& event)
+	{
+		if (m_State == GameState::RUNNING)
+		{
+			m_Player.HandleMouseMove(event);
+		}
 	}
 
 }
