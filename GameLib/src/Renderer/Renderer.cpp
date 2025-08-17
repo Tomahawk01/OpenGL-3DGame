@@ -43,10 +43,10 @@ namespace {
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
-	Game::Material CreatePostProcessMaterial(const Game::TLVReader& reader)
+	Game::Material CreateHDRMaterial(const Game::TLVReader& reader)
 	{
-		const Game::TextFile vertFile{ GetFile(reader, "postProcess.vert") };
-		const Game::TextFile fragFile{ GetFile(reader, "postProcess.frag") };
+		const Game::TextFile vertFile{ GetFile(reader, "hdr.vert") };
+		const Game::TextFile fragFile{ GetFile(reader, "hdr.frag") };
 
 		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
@@ -75,7 +75,7 @@ namespace Game {
 		, m_DebugLineMaterial(CreateDebugLineMaterial(reader))
 		, m_FB(width, height)
 		, m_Sprite(meshLoader.Sprite())
-		, m_PostProcessMaterial(CreatePostProcessMaterial(reader))
+		, m_HDRMaterial(CreateHDRMaterial(reader))
 		, m_LabelMaterial(CreateLabelMaterial(reader))
 		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
 	{
@@ -161,10 +161,10 @@ namespace Game {
 
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_PostProcessMaterial.Use();
+		m_HDRMaterial.Use();
 		m_Sprite.Bind();
-		m_PostProcessMaterial.BindTexture(0, &m_FB.GetColorTexture(), scene.skyboxSampler);
-		m_PostProcessMaterial.SetUniform("gamma", gamma);
+		m_HDRMaterial.BindTexture(0, &m_FB.GetColorTexture(), scene.skyboxSampler);
+		m_HDRMaterial.SetUniform("gamma", gamma);
 		::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 		m_Sprite.UnBind();
 
