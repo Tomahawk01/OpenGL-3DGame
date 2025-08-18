@@ -2,6 +2,8 @@
 
 #include "Utilities/Error.h"
 #include "Subscriber.h"
+#include "Renderer/Camera.h"
+#include "Core/Scene.h"
 
 #include <ranges>
 
@@ -71,6 +73,16 @@ namespace Game {
 	void MessageBus::PostStateChange(GameState state)
 	{
 		_PostMessage(MessageType::STATE_CHANGE, m_Subscribers, [state](auto* sub) { sub->HandleStateChange(state); });
+	}
+
+	void MessageBus::PostNewCamera(Camera* camera)
+	{
+		_PostMessage(MessageType::NEW_CAMERA, m_Subscribers, [camera](auto* sub) { sub->HandleNewCamera(camera); });
+	}
+
+	void MessageBus::PostNewScene(Scene* scene)
+	{
+		_PostMessage(MessageType::NEW_SCENE, m_Subscribers, [scene](auto* sub) { sub->HandleNewScene(scene); });
 	}
 
 }

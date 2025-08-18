@@ -13,6 +13,8 @@ namespace Game {
 
 	class Subscriber;
 	class Entity;
+	class Camera;
+	struct Scene;
 
 	enum class MessageType
 	{
@@ -23,6 +25,8 @@ namespace Game {
 		RESTART_LEVEL,
 		QUIT,
 		STATE_CHANGE,
+		NEW_CAMERA,
+		NEW_SCENE,
 	};
 
 	class MessageBus
@@ -46,6 +50,8 @@ namespace Game {
 		void PostRestartLevel();
 		void PostQuit();
 		void PostStateChange(GameState state);
+		void PostNewCamera(Camera* camera);
+		void PostNewScene(Scene* scene);
 
 	private:
 		std::unordered_map<MessageType, std::vector<Subscriber*>> m_Subscribers;

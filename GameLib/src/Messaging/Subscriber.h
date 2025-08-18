@@ -5,6 +5,10 @@
 
 namespace Game {
 
+	class Entity;
+	class Camera;
+	struct Scene;
+
 	class Subscriber
 	{
 	public:
@@ -41,6 +45,16 @@ namespace Game {
 		}
 
 		virtual void HandleStateChange(GameState)
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleNewCamera(Camera*)
+		{
+			Logger::Warn("Unhandled message!");
+		}
+
+		virtual void HandleNewScene(Scene*)
 		{
 			Logger::Warn("Unhandled message!");
 		}

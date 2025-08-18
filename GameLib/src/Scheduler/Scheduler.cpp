@@ -12,6 +12,8 @@ namespace Game {
 		, m_Queue{}
 		, m_TickCount{}
 		, m_Elapsed{}
+		, m_State{ GameState::MAIN_MENU }
+		, m_NextState{ m_State }
 	{}
 
 	void Scheduler::Add(Task task)
