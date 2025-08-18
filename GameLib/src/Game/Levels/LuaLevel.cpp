@@ -97,6 +97,10 @@ namespace Game {
 			.skyboxSampler = resourceCache.Get<Sampler>("sky_box"),
 			.labels = {
 				{&textTest, 0, 0}
+			},
+			.effects = {
+				.hdr = true,
+				.grayScale = false
 			}
 		};
 

@@ -166,20 +166,22 @@ namespace Game {
 		}
 		else if (m_State == GameState::PAUSED)
 		{
-			if (event.GetKey() == Key::ESC)
+			if (event.GetKey() == Key::Q)
 			{
 				m_Bus.PostStateChange(GameState::EXITING);
 			}
 		}
 
-		if (event.GetKey() == Key::SPACE && event.GetState() == KeyState::DOWN)
+		if (event.GetKey() == Key::ESC && event.GetState() == KeyState::DOWN)
 		{
 			if (m_State == GameState::RUNNING)
 			{
+				m_Level->GetScene().effects.grayScale = true;
 				m_Bus.PostStateChange(GameState::PAUSED);
 			}
 			else if (m_State == GameState::PAUSED)
 			{
+				m_Level->GetScene().effects.grayScale = false;
 				m_Bus.PostStateChange(GameState::RUNNING);
 			}
 		}
