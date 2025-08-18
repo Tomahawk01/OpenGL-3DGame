@@ -31,6 +31,12 @@ namespace Game {
 		float quadAttenuation;
 	};
 
+	struct PostProcessingEffects
+	{
+		bool hdr;
+		bool grayScale;
+	};
+
 	struct Scene
 	{
 		std::vector<Entity*> entities;
@@ -41,6 +47,7 @@ namespace Game {
 		const CubeMap* skybox;
 		const Sampler* skyboxSampler;
 		std::vector<Label> labels;
+		PostProcessingEffects effects;
 	};
 
 }
