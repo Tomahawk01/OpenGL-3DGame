@@ -23,40 +23,10 @@ namespace {
 		int numPoints;
 	};
 
-	Game::Material CreateSkyboxMaterial(const Game::TLVReader& reader)
+	Game::Material CreateMaterial(const Game::TLVReader& reader, std::string_view vertName, std::string_view fragName)
 	{
-		const Game::TextFile vertFile{ GetFile(reader, "cubeMap.vert") };
-		const Game::TextFile fragFile{ GetFile(reader, "cubeMap.frag") };
-
-		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
-		return Game::Material{ vertexShader, fragmentShader };
-	}
-
-	Game::Material CreateDebugLineMaterial(const Game::TLVReader& reader)
-	{
-		const Game::TextFile vertFile{ GetFile(reader, "line.vert") };
-		const Game::TextFile fragFile{ GetFile(reader, "line.frag") };
-
-		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX};
-		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT};
-		return Game::Material{ vertexShader, fragmentShader };
-	}
-
-	Game::Material CreateHDRMaterial(const Game::TLVReader& reader)
-	{
-		const Game::TextFile vertFile{ GetFile(reader, "hdr.vert") };
-		const Game::TextFile fragFile{ GetFile(reader, "hdr.frag") };
-
-		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
-		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
-		return Game::Material{ vertexShader, fragmentShader };
-	}
-
-	Game::Material CreateLabelMaterial(const Game::TLVReader& reader)
-	{
-		const Game::TextFile vertFile{ GetFile(reader, "label.vert") };
-		const Game::TextFile fragFile{ GetFile(reader, "label.frag") };
+		const Game::TextFile vertFile{ GetFile(reader, vertName) };
+		const Game::TextFile fragFile{ GetFile(reader, fragName) };
 
 		const Game::Shader vertexShader{ vertFile.Data, Game::ShaderType::VERTEX };
 		const Game::Shader fragmentShader{ fragFile.Data, Game::ShaderType::FRAGMENT };
@@ -71,12 +41,14 @@ namespace Game {
 		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3))
 		, m_LightBuffer(10240u)
 		, m_SkyboxCube(meshLoader.Cube())
-		, m_SkyboxMaterial(CreateSkyboxMaterial(reader))
-		, m_DebugLineMaterial(CreateDebugLineMaterial(reader))
-		, m_FB(width, height)
+		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
+		, m_DebugLineMaterial(CreateMaterial(reader, "line.vert", "line.frag"))
+		, m_FB1(width, height)
+		, m_FB2(width, height)
 		, m_Sprite(meshLoader.Sprite())
-		, m_HDRMaterial(CreateHDRMaterial(reader))
-		, m_LabelMaterial(CreateLabelMaterial(reader))
+		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
+		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
+		, m_LabelMaterial(CreateMaterial(reader, "label.vert", "label.frag"))
 		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
 	{
 		m_OrthCamera.SetPosition({ width / 2.0f, height / -2.0f, 0.0f });
@@ -84,7 +56,7 @@ namespace Game {
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
 	{
-		m_FB.Bind();
+		m_FB1.Bind();
 
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -157,16 +129,39 @@ namespace Game {
 			dbl->UnBind();
 		}
 
-		m_FB.UnBind();
+		m_FB1.UnBind();
 
-		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		auto* readFB = &m_FB1;
+		auto* writeFB = &m_FB2;
 
-		m_HDRMaterial.Use();
-		m_Sprite.Bind();
-		m_HDRMaterial.BindTexture(0, &m_FB.GetColorTexture(), scene.skyboxSampler);
-		m_HDRMaterial.SetUniform("gamma", gamma);
-		::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		m_Sprite.UnBind();
+		if (scene.effects.hdr)
+		{
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_HDRMaterial.Use();
+			m_Sprite.Bind();
+			m_HDRMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			m_HDRMaterial.SetUniform("gamma", gamma);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+
+			std::ranges::swap(readFB, writeFB);
+		}
+
+		if (scene.effects.grayScale)
+		{
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_GreyScaleMaterial.Use();
+			m_Sprite.Bind();
+			m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+
+			std::ranges::swap(readFB, writeFB);
+		}
 
 		// NOTE: Render UI
 		m_LabelMaterial.Use();
@@ -190,6 +185,20 @@ namespace Game {
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 		}
 		m_Sprite.UnBind();
+
+		::glBlitNamedFramebuffer(
+			readFB->GetNativeHandle(),
+			0u,
+			0u,
+			0u,
+			m_FB1.GetWidth(),
+			m_FB1.GetHeight(),
+			0u,
+			0u,
+			m_FB1.GetWidth(),
+			m_FB1.GetHeight(),
+			GL_COLOR_BUFFER_BIT,
+			GL_NEAREST);
 	}
 
 }
