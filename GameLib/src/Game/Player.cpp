@@ -67,7 +67,7 @@ namespace Game {
 		Restart();
 	}
 
-	const Camera& Player::GetCamera() const
+	Camera& Player::GetCamera()
 	{
 		return m_Camera;
 	}

@@ -22,7 +22,7 @@ namespace Game {
 		void HandleMouseMove(const MouseEvent& event);
 		void HandleRestartLevel();
 
-		const Camera& GetCamera() const;
+		Camera& GetCamera();
 		vec3 GetPosition() const;
 
 	private:
