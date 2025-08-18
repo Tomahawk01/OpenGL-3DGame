@@ -30,6 +30,7 @@ namespace Game {
 		Mesh m_Sprite;
 		Material m_HDRMaterial;
 		Material m_GreyScaleMaterial;
+		Material m_BlurMaterial;
 		Material m_LabelMaterial;
 		Camera m_OrthCamera;
 	};

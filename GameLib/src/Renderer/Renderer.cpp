@@ -48,6 +48,7 @@ namespace Game {
 		, m_Sprite(meshLoader.Sprite())
 		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
 		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
+		, m_BlurMaterial(CreateMaterial(reader, "blur.vert", "blur.frag"))
 		, m_LabelMaterial(CreateMaterial(reader, "label.vert", "label.frag"))
 		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
 	{
@@ -157,6 +158,20 @@ namespace Game {
 			m_GreyScaleMaterial.Use();
 			m_Sprite.Bind();
 			m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+
+			std::ranges::swap(readFB, writeFB);
+		}
+
+		if (scene.effects.blur)
+		{
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_BlurMaterial.Use();
+			m_Sprite.Bind();
+			m_BlurMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 
