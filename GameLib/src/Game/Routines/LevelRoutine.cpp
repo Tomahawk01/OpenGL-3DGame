@@ -116,6 +116,8 @@ namespace Game {
 			if (m_State != GameState::RUNNING)
 			{
 				co_await Wait{ m_Scheduler, GameState::RUNNING };
+				m_Bus.PostNewCamera(&m_Player.GetCamera());
+				m_Bus.PostNewScene(&m_Level->GetScene());
 			}
 
 			if (currentLevel != m_LevelNum)
