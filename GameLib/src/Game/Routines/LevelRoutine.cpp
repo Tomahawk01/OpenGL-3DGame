@@ -177,11 +177,13 @@ namespace Game {
 			if (m_State == GameState::RUNNING)
 			{
 				m_Level->GetScene().effects.grayScale = true;
+				m_Level->GetScene().effects.blur = true;
 				m_Bus.PostStateChange(GameState::PAUSED);
 			}
 			else if (m_State == GameState::PAUSED)
 			{
 				m_Level->GetScene().effects.grayScale = false;
+				m_Level->GetScene().effects.blur = false;
 				m_Bus.PostStateChange(GameState::RUNNING);
 			}
 		}
