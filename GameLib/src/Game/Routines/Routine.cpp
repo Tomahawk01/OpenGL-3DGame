@@ -15,7 +15,7 @@ namespace Game {
 	Routine::Routine(MessageBus& bus, std::set<MessageType> types)
 		: Subscriber()
 		, m_Bus{ bus }
-		, m_State{ GameState::RUNNING }
+		, m_State{ GameState::MAIN_MENU }
 		, m_AutoSub{ m_Bus, EnrichTypes(std::move(types)), this }
 	{}
 
