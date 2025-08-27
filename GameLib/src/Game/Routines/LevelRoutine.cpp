@@ -93,8 +93,9 @@ namespace {
 
 namespace Game {
 
-	LevelRoutine::LevelRoutine(const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader)
+	LevelRoutine::LevelRoutine(PhysicsSystem& ps, const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader)
 		: Routine(bus, {MessageType::KEY_PRESS, MessageType::MOUSE_MOVE, MessageType::LEVEL_COMPLETE, MessageType::QUIT})
+		, m_PS{ ps }
 		, m_Window{ window }
 		, m_Scheduler{ scheduler }
 		, m_Player{ CreateCamera(window) }
@@ -102,7 +103,7 @@ namespace Game {
 		, m_Reader{ reader }
 		, m_LevelNum{ 0u }
 		, m_LevelLoaders{ GetLevelLoaders(m_Reader) }
-		, m_Level{ std::make_unique<LuaLevel>(m_LevelLoaders[m_LevelNum], resourceCache, reader, m_Player, m_Bus) }
+		, m_Level{ std::make_unique<LuaLevel>(m_PS, m_LevelLoaders[m_LevelNum], resourceCache, reader, m_Player, m_Bus) }
 	{
 		m_Window.SetTitle(m_LevelLoaders[m_LevelNum].GetName());
 	}
@@ -124,7 +125,7 @@ namespace Game {
 			{
 				m_Player.Restart();
 				m_Level.reset(nullptr);
-				m_Level = std::make_unique<LuaLevel>(m_LevelLoaders[m_LevelNum], m_ResourceCache, m_Reader, m_Player, m_Bus);
+				m_Level = std::make_unique<LuaLevel>(m_PS, m_LevelLoaders[m_LevelNum], m_ResourceCache, m_Reader, m_Player, m_Bus);
 				currentLevel = m_LevelNum;
 
 				m_Window.SetTitle(m_LevelLoaders[m_LevelNum].GetName());

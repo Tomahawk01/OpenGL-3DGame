@@ -17,8 +17,8 @@ using namespace std::literals;
 
 namespace Game {
 
-	LuaLevel::LuaLevel(const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
-		: m_PS{}
+	LuaLevel::LuaLevel(PhysicsSystem& ps, const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus)
+		: m_PS{ ps }
 		, m_Script{ loader.Load() }
 		, m_Entities{}
 		, m_LevelEntities{}

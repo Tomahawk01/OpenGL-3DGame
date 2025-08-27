@@ -422,12 +422,14 @@ namespace Game {
 		resourceCache.Insert<Sampler>("sky_box", Sampler{});
 		resourceCache.Insert<Sampler>("ui", Sampler{});
 
+		PhysicsSystem ps{};
+
 		Scheduler scheduler{ m_Bus };
 
 		InputRoutine inputRoutine{ m_Window, m_Bus, scheduler };
-		LevelRoutine levelRoutine{ m_Window, m_Bus, scheduler, resourceCache, reader };
+		LevelRoutine levelRoutine{ ps, m_Window, m_Bus, scheduler, resourceCache, reader };
 		RenderRoutine renderRoutine{ m_Window, m_Bus, scheduler, meshLoader, reader };
-		MainMenuRoutine mainMenuRoutine{ m_Window, m_Bus, scheduler, resourceCache, reader };
+		MainMenuRoutine mainMenuRoutine{ ps, m_Window, m_Bus, scheduler, resourceCache, reader };
 
 		scheduler.Add(inputRoutine.CreateTask());
 		scheduler.Add(mainMenuRoutine.CreateTask());

@@ -5,6 +5,7 @@
 #include "Scripting/ScriptLoader.h"
 #include "Core/Window.h"
 #include "Core/ResourceCache.h"
+#include "Physics/PhysicsSystem.h"
 #include "Events/KeyEvent.h"
 #include "TLV/TLVReader.h"
 
@@ -17,7 +18,7 @@ namespace Game {
 	class LevelRoutine : public Routine
 	{
 	public:
-		LevelRoutine(const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader);
+		LevelRoutine(PhysicsSystem& ps, const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader);
 
 		LevelRoutine(const LevelRoutine&) = delete;
 		LevelRoutine& operator=(const LevelRoutine&) = delete;
@@ -32,6 +33,7 @@ namespace Game {
 		void HandleMouseMove(const MouseEvent& event) override;
 
 	private:
+		PhysicsSystem& m_PS;
 		const Window& m_Window;
 		Scheduler& m_Scheduler;
 		Player m_Player;

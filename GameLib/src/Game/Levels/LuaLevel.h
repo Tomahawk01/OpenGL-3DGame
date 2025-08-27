@@ -1,12 +1,10 @@
 #pragma once
 
 #include "Core/ResourceCache.h"
-#include "Core/ResourceLoader.h"
 #include "Core/Entity.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
-#include "Renderer/LineData.h"
 #include "Physics/PhysicsSystem.h"
 #include "Scripting/LuaScript.h"
 #include "Scripting/ScriptLoader.h"
@@ -18,7 +16,6 @@
 #include "Game/Levels/Level.h"
 #include "Game/Player.h"
 
-#include <string_view>
 #include <vector>
 #include <unordered_map>
 #include <span>
@@ -41,7 +38,7 @@ namespace Game {
 			float tintAmount;
 		};
 
-		LuaLevel(const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
+		LuaLevel(PhysicsSystem& ps, const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 
 		void Update(const Player& player) override;
 		void Restart() override;
@@ -50,7 +47,7 @@ namespace Game {
 		std::span<const Entity> GetEntities() const;
 
 	private:
-		PhysicsSystem m_PS;
+		PhysicsSystem &m_PS;
 		LuaScript m_Script;
 		std::vector<Entity> m_Entities;
 		std::vector<Entity> m_LevelEntities;
