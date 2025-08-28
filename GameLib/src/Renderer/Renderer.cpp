@@ -195,7 +195,7 @@ namespace Game {
 			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
 
 			const mat4 model{ 
-				vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
+				vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
 				vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
 			};
 			m_LabelMaterial.SetUniform("model", model);

@@ -3,9 +3,13 @@
 #include "Scheduler/Wait.h"
 #include "Renderer/Material.h"
 #include "Renderer/Mesh.h"
+#include "Renderer/TextFactory.h"
 #include "Physics/BoxShape.h"
 
+#include "Game/config.h"
+
 #include <numbers>
+#include <format>
 
 using namespace std::literals;
 
@@ -41,6 +45,7 @@ namespace Game {
 		, m_Reader{ reader }
 		, m_Camera{ CreateCamera(window) }
 		, m_Scene{}
+		, m_Labels{}
 	{
 		Logger::Info("Loading main menu");
 
@@ -68,6 +73,13 @@ namespace Game {
 
 		const auto ambientVec = vec3{ 0.4f };
 		const auto [directionalLightDir, directionalLightColor] = std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
+
+		const TextFactory textFactory{};
+		m_Labels.push_back(textFactory.Create("Press any key to start", resourceCache.Get<Sampler>("ui"), 32u, Colors::White));
+
+		m_Labels.push_back(textFactory.Create(std::format("v{}.{}.{}", Version::MAJOR, Version::MINOR, Version::PATCH), resourceCache.Get<Sampler>("ui"), 24u, Colors::White));
+
+		m_Labels.push_back(textFactory.Create("Press ESC to quit", resourceCache.Get<Sampler>("ui"), 28u, Colors::White));
 
 		m_Scene = Scene{
 			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
@@ -98,7 +110,11 @@ namespace Game {
 			.debugLines = {},
 			.skybox = nullptr,
 			.skyboxSampler = resourceCache.Get<Sampler>("sky_box"),
-			.labels = {},
+			.labels = {
+				{&m_Labels[0], static_cast<uint32_t>((m_Window.GetWidth() / 2.0f) - (m_Labels[0].GetWidth() / 2.0f)), static_cast<uint32_t>(m_Window.GetHeight() * 0.75f)},
+				{&m_Labels[1], 5u, static_cast<uint32_t>(m_Window.GetHeight() - m_Labels[1].GetHeight() - 5.0f)},
+				{&m_Labels[2], static_cast<uint32_t>((m_Window.GetWidth() / 2.0f) - (m_Labels[2].GetWidth() / 2.0f)), static_cast<uint32_t>((m_Window.GetHeight() * 0.75f) + 40.0f)},
+			},
 			.effects = {
 				.hdr = true,
 				.grayScale = false,
@@ -736,7 +752,7 @@ namespace Game {
 			static const float radius = 15.0f;
 			static const vec3 center{ 83.5f, 15.0f, -5.0f };
 			static const float delta = 0.005f;
-			static float theta{ 0.0f };
+			static float theta = 0.0f;
 
 			const float x = std::sin(theta) * radius;
 			const float z = std::cos(theta) * radius;

@@ -7,6 +7,7 @@
 #include "Core/Scene.h"
 #include "Core/Entity.h"
 #include "Renderer/Camera.h"
+#include "Renderer/Texture.h"
 #include "Physics/PhysicsSystem.h"
 #include "Events/KeyEvent.h"
 #include "TLV/TLVReader.h"
@@ -40,6 +41,7 @@ namespace Game {
 		const TLVReader& m_Reader;
 		Camera m_Camera;
 		Scene m_Scene;
+		std::vector<Texture> m_Labels;
 	};
 
 }
