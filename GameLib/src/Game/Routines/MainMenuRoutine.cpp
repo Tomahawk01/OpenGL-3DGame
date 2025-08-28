@@ -11,11 +11,13 @@ using namespace std::literals;
 
 namespace {
 
+	static constexpr Game::vec3 barrelCenter{ 83.5f, 10.0f, -5.0f };
+
 	Game::Camera CreateCamera(const Game::Window& window)
 	{
 		return {
-			{0.0f, 5.0f, 20.0f},
-			{0.0f, 0.0f, 0.0f},
+			barrelCenter - Game::vec3{15.0f, 0.0f, 15.0f},
+			barrelCenter,
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
 			static_cast<float>(window.GetWidth()),
@@ -34,18 +36,41 @@ namespace Game {
 		, m_Window{ window }
 		, m_Scheduler{ scheduler }
 		, m_ResourceCache{ resourceCache }
+		, m_Entities{}
 		, m_LevelEntities{}
 		, m_Reader{ reader }
 		, m_Camera{ CreateCamera(window) }
 		, m_Scene{}
 	{
+		Logger::Info("Loading main menu");
+
+		m_Camera.AddPitch(-std::numbers::pi_v<float> / 8.0f);
+
 		m_Window.SetTitle("Barrel Game");
+
+		const Texture* barrelTextures[]{
+			resourceCache.Get<Texture>("barrel_albedo"),
+			resourceCache.Get<Texture>("barrel_specular"),
+			resourceCache.Get<Texture>("barrel_normal")
+		};
+
+		auto* shape = m_PS.CreateShape<BoxShape>(vec3{ 0.6f, 1.0f, 0.6f });
+
+		m_Entities.emplace_back(
+			resourceCache.Get<Mesh>("barrel"),
+			resourceCache.Get<Material>("barrel"),
+			barrelCenter, vec3{ 2.0f },
+			barrelTextures,
+			TransformedShape{ shape, {barrelCenter, {1.0f}, {}} },
+			0u,
+			0u
+		);
 
 		const auto ambientVec = vec3{ 0.4f };
 		const auto [directionalLightDir, directionalLightColor] = std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.5f });
 
 		m_Scene = Scene{
-			.entities = {},
+			.entities = m_Entities | std::views::transform([](auto& e) { return std::addressof(e); }) | std::ranges::to<std::vector>(),
 			.ambient = {ambientVec.x, ambientVec.y, ambientVec.z},
 			.directionalLight = {
 				.direction = directionalLightDir,
@@ -707,6 +732,19 @@ namespace Game {
 			{
 				co_await Wait{ m_Scheduler, GameState::MAIN_MENU };
 			}
+
+			static const float radius = 15.0f;
+			static const vec3 center{ 83.5f, 15.0f, -5.0f };
+			static const float delta = 0.005f;
+			static float theta{ 0.0f };
+
+			const float x = std::sin(theta) * radius;
+			const float z = std::cos(theta) * radius;
+
+			m_Camera.SetPosition(center + vec3{ x, 0.0f, z });
+			m_Camera.SetYaw(-theta - (std::numbers::pi_v<float> / 2.0f));
+
+			theta += delta;
 
 			co_await Wait{ m_Scheduler, 16ms };
 		}
