@@ -6,6 +6,7 @@
 #include "Game/Routines/LevelRoutine.h"
 #include "Game/Routines/RenderRoutine.h"
 #include "Game/Routines/MainMenuRoutine.h"
+#include "Game/Routines/SoundRoutine.h"
 
 #include <ShellScalingApi.h>
 
@@ -427,11 +428,13 @@ namespace Game {
 		Scheduler scheduler{ m_Bus };
 
 		InputRoutine inputRoutine{ m_Window, m_Bus, scheduler };
+		SoundRoutine soundRoutine{ m_Bus, scheduler };
 		LevelRoutine levelRoutine{ ps, m_Window, m_Bus, scheduler, resourceCache, reader };
 		RenderRoutine renderRoutine{ m_Window, m_Bus, scheduler, meshLoader, reader };
 		MainMenuRoutine mainMenuRoutine{ ps, m_Window, m_Bus, scheduler, resourceCache, reader };
 
 		scheduler.Add(inputRoutine.CreateTask());
+		scheduler.Add(soundRoutine.CreateTask());
 		scheduler.Add(mainMenuRoutine.CreateTask());
 		scheduler.Add(levelRoutine.CreateTask());
 		scheduler.Add(renderRoutine.CreateTask());
