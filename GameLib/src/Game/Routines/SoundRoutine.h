@@ -5,6 +5,8 @@
 #include "Scheduler/Scheduler.h"
 #include "Core/Window.h"
 
+#include <memory>
+
 namespace Game {
 
 	class SoundRoutine : public Routine
@@ -12,7 +14,7 @@ namespace Game {
 	public:
 		SoundRoutine(MessageBus& bus, Scheduler& scheduler);
 
-		~SoundRoutine() override = default;
+		~SoundRoutine() override;
 		SoundRoutine(const SoundRoutine&) = delete;
 		SoundRoutine& operator=(const SoundRoutine&) = delete;
 		SoundRoutine(SoundRoutine&&) = default;
@@ -20,6 +22,8 @@ namespace Game {
 		Task CreateTask();
 
 	private:
+		struct implementation;
+		std::unique_ptr<implementation> m_Impl;
 		Scheduler& m_Scheduler;
 	};
 
