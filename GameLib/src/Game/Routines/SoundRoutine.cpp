@@ -50,7 +50,13 @@ namespace Game {
 		const XAUDIO2_BUFFER xaudioBuffer{
 			.Flags = XAUDIO2_END_OF_STREAM,
 			.AudioBytes = static_cast<UINT32>(mainTheme->data.size_bytes()),
-			.pAudioData = reinterpret_cast<const BYTE*>(m_Impl->soundData.data())
+			.pAudioData = reinterpret_cast<const BYTE*>(m_Impl->soundData.data()),
+			.PlayBegin = 0,
+			.PlayLength = 0,
+			.LoopBegin = 0,
+			.LoopLength = 0,
+			.LoopCount = XAUDIO2_LOOP_INFINITE,
+			.pContext = nullptr
 		};
 
 		m_Impl->xaudio->CreateSourceVoice(std::out_ptr(m_Impl->sourceVoice), reinterpret_cast<WAVEFORMATEX*>(&wfx));
