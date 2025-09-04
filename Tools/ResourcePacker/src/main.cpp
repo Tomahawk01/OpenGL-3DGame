@@ -45,6 +45,21 @@ namespace {
 		throw Game::Exception("Unsupported usage type: {}", path);
 	}
 
+	std::span<const std::byte> ParseChunk(std::span<const std::byte> source, std::span<const std::byte> controlCode)
+	{
+		const auto chunkHeader = std::ranges::search(source, controlCode);
+		Game::Ensure(!chunkHeader.empty(), "Could not find control code in chunk");
+
+		const auto headerOffset = std::ranges::distance(std::ranges::cbegin(source), std::ranges::cbegin(chunkHeader));
+
+		uint32_t chunkSize{};
+		std::memcpy(&chunkSize, source.data() + headerOffset + chunkHeader.size(), sizeof(chunkSize));
+
+		Game::Logger::Trace("headerOffset: {:x} | chunkSize: {:x}", headerOffset, chunkSize);
+
+		return { source.data() + headerOffset + chunkHeader.size() + sizeof(chunkSize), chunkSize };
+	}
+
 }
 
 int main(int argc, char** argv)
@@ -143,6 +158,27 @@ int main(int argc, char** argv)
 				const auto shaderFile = Game::File{ path };
 
 				writer.Write(filename, shaderFile.AsString());
+			}
+			else if (ext == ".wav")
+			{
+				Game::Logger::Info("Packing {}", filename);
+
+				const Game::File audioFile{ path };
+				const auto data = audioFile.AsData();
+
+				const std::byte riffCC[]{ std::byte{'R'}, std::byte{'I'}, std::byte{'F'}, std::byte{'F'} };
+				const auto riffChunk = ParseChunk(data, riffCC);
+
+				const std::byte waveCC[]{ std::byte{'W'}, std::byte{'A'}, std::byte{'V'}, std::byte{'E'} };
+				ParseChunk(riffChunk, waveCC);
+
+				const std::byte fmtCC[]{ std::byte{'f'}, std::byte{'m'}, std::byte{'t'}, std::byte{' '} };
+				const auto fmtChunk = ParseChunk(data, fmtCC);
+
+				const std::byte dataCC[]{ std::byte{'d'}, std::byte{'a'}, std::byte{'t'}, std::byte{'a'} };
+				const auto dataChunk = ParseChunk(data, dataCC);
+
+				writer.Write(assetName, fmtChunk, dataChunk);
 			}
 		}
 
