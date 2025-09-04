@@ -3,6 +3,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/VertexData.h"
 #include "Renderer/MeshData.h"
+#include "Sound/SoundData.h"
 
 #include <cstdint>
 #include <cstddef>
@@ -34,7 +35,8 @@ namespace Game {
 
 		TEXTURE_DESCRIPTION,
 		MESH_DATA,
-		TEXT_FILE
+		TEXT_FILE,
+		SOUND_DATA
 	};
 
 	class TLVEntry
@@ -56,6 +58,8 @@ namespace Game {
 		bool IsMesh(std::string_view name) const;
 		TextFile textFileValue() const;
 		bool IsTextFile(std::string_view name) const;
+		SoundData SoundDataValue() const;
+		bool IsSoundData(std::string_view name) const;
 
 		TLVType Type() const;
 		uint32_t Size() const;

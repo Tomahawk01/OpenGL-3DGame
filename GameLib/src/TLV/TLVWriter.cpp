@@ -154,4 +154,19 @@ namespace Game {
 		WriteEntry(m_Buffer, type, length, value);
 	}
 
+	void TLVWriter::Write(std::string_view name, std::span<const std::byte> format, std::span<const std::byte> data)
+	{
+		TLVWriter writer{};
+
+		writer.Write(name);
+		writer.Write(format);
+		writer.Write(data);
+
+		const auto value = writer.yield();
+		const auto type = TLVType::SOUND_DATA;
+		const auto length = static_cast<uint32_t>(value.size());
+
+		WriteEntry(m_Buffer, type, length, value);
+	}
+
 }

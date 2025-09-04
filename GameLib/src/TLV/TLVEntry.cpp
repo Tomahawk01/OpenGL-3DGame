@@ -205,6 +205,42 @@ namespace Game {
 		return textFileName == name;
 	}
 
+	SoundData TLVEntry::SoundDataValue() const
+	{
+		Ensure(m_Type == TLVType::SOUND_DATA, "Incorrect type");
+
+		const TLVReader reader{ m_Value };
+		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
+
+		Ensure((*readerCursor).Type() == TLVType::STRING, "First member not string");
+		++readerCursor;
+
+		Ensure((*readerCursor).Type() == TLVType::BYTE_ARRAY, "Second member not byte array");
+		const std::span<const std::byte> format{ (*readerCursor).m_Value.data(), (*readerCursor).m_Value.size() };
+		++readerCursor;
+
+		Ensure((*readerCursor).Type() == TLVType::BYTE_ARRAY, "Third member not byte array");
+		const std::span<const std::byte> data{ (*readerCursor).m_Value.data(), (*readerCursor).m_Value.size() };
+		++readerCursor;
+
+		Ensure(readerCursor == std::ranges::end(reader), "Sound data TLV is too large");
+
+		return { format, data };
+	}
+
+	bool TLVEntry::IsSoundData(std::string_view name) const
+	{
+		if (m_Type != TLVType::SOUND_DATA)
+			return false;
+
+		const TLVReader reader{ m_Value };
+		TLVReader::Iterator readerCursor = std::ranges::begin(reader);
+
+		const std::string meshName = (*readerCursor).stringValue();
+
+		return meshName == name;
+	}
+
 	std::string to_string(const TLVType& obj)
 	{
 		auto str = "unknown"sv;
@@ -223,6 +259,7 @@ namespace Game {
 		case TLVType::TEXTURE_DESCRIPTION: str = "TEXTURE_DESCRIPTION"sv; break;
 		case TLVType::MESH_DATA: str = "MESH_DATA"sv; break;
 		case TLVType::TEXT_FILE: str = "TEXT_FILE"sv; break;
+		case TLVType::SOUND_DATA: str = "SOUND_DATA"sv; break;
 		}
 
 		return std::format("{}", str);

@@ -3,6 +3,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/VertexData.h"
 #include "Renderer/MeshData.h"
+#include "Sound/SoundData.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -34,6 +35,7 @@ namespace Game {
 			std::span<const std::byte> data);
 		void Write(std::string_view name, std::span<const VertexData> vertices, std::span<const uint32_t> indices);
 		void Write(std::string_view name, std::string_view data);
+		void Write(std::string_view name, std::span<const std::byte> format, std::span<const std::byte> data);
 
 	private:
 		std::vector<std::byte> m_Buffer;
