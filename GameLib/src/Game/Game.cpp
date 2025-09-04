@@ -423,12 +423,16 @@ namespace Game {
 		resourceCache.Insert<Sampler>("sky_box", Sampler{});
 		resourceCache.Insert<Sampler>("ui", Sampler{});
 
+		const auto mainThemeData = std::ranges::find_if(reader, [](const auto& entry) { return entry.IsSoundData("main_theme"); });
+		Ensure(mainThemeData != std::ranges::cend(reader), "Could not find main theme");
+		resourceCache.Insert<SoundData>("main_theme", (*mainThemeData).SoundDataValue());
+
 		PhysicsSystem ps{};
 
 		Scheduler scheduler{ m_Bus };
 
 		InputRoutine inputRoutine{ m_Window, m_Bus, scheduler };
-		SoundRoutine soundRoutine{ m_Bus, scheduler };
+		SoundRoutine soundRoutine{ m_Bus, scheduler, resourceCache };
 		LevelRoutine levelRoutine{ ps, m_Window, m_Bus, scheduler, resourceCache, reader };
 		RenderRoutine renderRoutine{ m_Window, m_Bus, scheduler, meshLoader, reader };
 		MainMenuRoutine mainMenuRoutine{ ps, m_Window, m_Bus, scheduler, resourceCache, reader };
