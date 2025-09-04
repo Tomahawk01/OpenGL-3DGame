@@ -42,6 +42,8 @@ namespace Game {
 	{
 		std::unique_ptr<IXAudio2, decltype(release)> xaudio;
 		std::unique_ptr<IXAudio2MasteringVoice, decltype(destroyVoice)> masteringVoice;
+		std::unique_ptr<IXAudio2SourceVoice, decltype(destroyVoice)> sourceVoice;
+		std::vector<std::byte> soundData;
 	};
 
 	SoundRoutine::SoundRoutine(MessageBus& bus, Scheduler& scheduler)
@@ -59,13 +61,30 @@ namespace Game {
 		const auto riffChunk = ParseChunk(data, riffCC);
 
 		const std::byte waveCC[]{ std::byte{'W'}, std::byte{'A'}, std::byte{'V'}, std::byte{'E'} };
-		const auto waveChunk = ParseChunk(riffChunk, waveCC);
+		ParseChunk(riffChunk, waveCC);
 
 		const std::byte fmtCC[]{ std::byte{'f'}, std::byte{'m'}, std::byte{'t'}, std::byte{' '} };
 		const auto fmtChunk = ParseChunk(data, fmtCC);
 
+		WAVEFORMATEXTENSIBLE wfx{};
+
+		std::memcpy(&wfx, fmtChunk.data(), std::min(sizeof(wfx), fmtChunk.size_bytes()));
+
 		const std::byte dataCC[]{ std::byte{'d'}, std::byte{'a'}, std::byte{'t'}, std::byte{'a'} };
 		const auto dataChunk = ParseChunk(data, dataCC);
+
+		m_Impl->soundData = dataChunk | std::ranges::to<std::vector>();
+
+		const XAUDIO2_BUFFER xaudioBuffer{
+			.Flags = XAUDIO2_END_OF_STREAM,
+			.AudioBytes = static_cast<UINT32>(dataChunk.size_bytes()),
+			.pAudioData = reinterpret_cast<const BYTE*>(m_Impl->soundData.data())
+		};
+
+		m_Impl->xaudio->CreateSourceVoice(std::out_ptr(m_Impl->sourceVoice), reinterpret_cast<WAVEFORMATEX*>(&wfx));
+
+		Ensure(m_Impl->sourceVoice->SubmitSourceBuffer(&xaudioBuffer) == S_OK, "Failed to submit sound buffer");
+		Ensure(m_Impl->sourceVoice->Start(0) == S_OK, "Failed to start sound");
 	}
 
 	SoundRoutine::~SoundRoutine() = default;
