@@ -2,6 +2,7 @@
 
 #include "Utilities/StringMap.h"
 #include "Utilities/Error.h"
+#include "Sound/SoundData.h"
 
 #include <string_view>
 #include <ranges>
@@ -53,6 +54,6 @@ namespace Game {
 		std::tuple<StringMap<T>...> m_Maps;
 	};
 
-	using DefaultCache = ResourceCache<Mesh, Material, Texture, Sampler>;
+	using DefaultCache = ResourceCache<Mesh, Material, Texture, Sampler, SoundData>;
 
 }
