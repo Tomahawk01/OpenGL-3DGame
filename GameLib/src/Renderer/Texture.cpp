@@ -65,8 +65,9 @@ namespace Game {
 			break;
 		}
 
-		::glTextureStorage2D(m_Handle, 1, format, width, height);
+		::glTextureStorage2D(m_Handle, 1 + static_cast<::GLint>(std::floor(std::log(std::max(m_Width, m_Height)))), format, width, height);
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, rawData.get());
+		::glGenerateTextureMipmap(m_Handle);
 	}
 
 	Texture::Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t numChannels, uint32_t width, uint32_t height, const Sampler* sampler)
@@ -93,8 +94,9 @@ namespace Game {
 				break;
 		}
 
-		::glTextureStorage2D(m_Handle, 1, format, width, height);
+		::glTextureStorage2D(m_Handle, 1 + static_cast<::GLint>(std::floor(std::log(std::max(m_Width, m_Height)))), format, width, height);
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, width, height, numChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data.data());
+		::glGenerateTextureMipmap(m_Handle);
 	}
 
 	Texture::Texture(const TextureDescription& description, const Sampler* sampler)
@@ -105,8 +107,9 @@ namespace Game {
 	{
 		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 
-		::glTextureStorage2D(m_Handle, 1, toOpenGL(description.usage, description.format), description.width, description.height);
+		::glTextureStorage2D(m_Handle, 1 + static_cast<::GLint>(std::floor(std::log(std::max(m_Width, m_Height)))), toOpenGL(description.usage, description.format), description.width, description.height);
 		::glTextureSubImage2D(m_Handle, 0, 0, 0, description.width, description.height, description.format == TextureFormat::RGBA ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, description.data.data());
+		::glGenerateTextureMipmap(m_Handle);
 	}
 
 	Texture::Texture(const TLVReader& reader, std::string_view name, const Sampler* sampler)
