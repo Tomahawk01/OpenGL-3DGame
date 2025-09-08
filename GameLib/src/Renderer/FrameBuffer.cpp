@@ -9,9 +9,15 @@ namespace Game {
 		, m_ColorTexture(TextureUsage::FRAMEBUFFER, width, height)
 		, m_DepthTexture(TextureUsage::DEPTH, width, height)
 	{
+		::GLuint rb{};
+		::glCreateRenderbuffers(1u, &rb);
+		::glNamedRenderbufferStorageMultisample(rb, 8, GL_RGB16F, width, height);
+
 		::glCreateFramebuffers(1, &m_Handle);
-		::glNamedFramebufferTexture(m_Handle, GL_COLOR_ATTACHMENT0, m_ColorTexture.GetNativeHandle(), 0);
+		//::glNamedFramebufferTexture(m_Handle, GL_COLOR_ATTACHMENT0, m_ColorTexture.GetNativeHandle(), 0);
 		::glNamedFramebufferTexture(m_Handle, GL_DEPTH_ATTACHMENT, m_DepthTexture.GetNativeHandle(), 0);
+
+		::glNamedFramebufferRenderbuffer(m_Handle, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rb);
 	}
 
 	void FrameBuffer::Bind() const

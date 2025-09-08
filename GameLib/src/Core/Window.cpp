@@ -165,6 +165,8 @@ namespace {
 			WGL_COLOR_BITS_ARB, 32,
 			WGL_DEPTH_BITS_ARB, 24,
 			WGL_STENCIL_BITS_ARB, 8,
+			WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+			WGL_SAMPLES_ARB, 8,
 			0
 		};
 
@@ -270,6 +272,7 @@ namespace Game {
 
 		::glEnable(GL_DEPTH_TEST);
 		::glEnable(GL_BLEND);
+		::glEnable(GL_MULTISAMPLE);
 		::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		Logger::Info("Created new window (dpi: {})", ::GetDpiForWindow(m_Window));

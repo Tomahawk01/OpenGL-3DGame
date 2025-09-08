@@ -129,15 +129,20 @@ namespace Game {
 		, m_Width{ width }
 		, m_Height{ height }
 	{
-		::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
 		switch (usage)
 		{
-		case TextureUsage::FRAMEBUFFER:
-			::glTextureStorage2D(m_Handle, 1, GL_RGB16F, width, height);
-			break;
-		case TextureUsage::DEPTH:
-			::glTextureStorage2D(m_Handle, 1, GL_DEPTH_COMPONENT24, width, height);
-			break;
+			case TextureUsage::FRAMEBUFFER:
+			{
+				::glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_Handle);
+				::glTextureStorage2DMultisample(m_Handle, 8, GL_RGB16F, width, height, GL_FALSE);
+				break;
+			}
+			case TextureUsage::DEPTH:
+			{
+				::glCreateTextures(GL_TEXTURE_2D, 1, &m_Handle);
+				::glTextureStorage2D(m_Handle, 1, GL_DEPTH_COMPONENT24, width, height);
+				break;
+			}
 		default:
 			break;
 		}

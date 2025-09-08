@@ -135,77 +135,77 @@ namespace Game {
 
 		m_FB1.UnBind();
 
-		auto* readFB = &m_FB1;
-		auto* writeFB = &m_FB2;
-
-		if (scene.effects.hdr)
-		{
-			writeFB->Bind();
-			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			m_HDRMaterial.Use();
-			m_Sprite.Bind();
-			m_HDRMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
-			m_HDRMaterial.SetUniform("gamma", gamma);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
-
-			std::ranges::swap(readFB, writeFB);
-		}
-
-		if (scene.effects.grayScale)
-		{
-			writeFB->Bind();
-			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			m_GreyScaleMaterial.Use();
-			m_Sprite.Bind();
-			m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
-
-			std::ranges::swap(readFB, writeFB);
-		}
-
-		if (scene.effects.blur)
-		{
-			writeFB->Bind();
-			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			m_BlurMaterial.Use();
-			m_Sprite.Bind();
-			m_BlurMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
-
-			std::ranges::swap(readFB, writeFB);
-		}
-
-		// NOTE: Render UI
-		m_LabelMaterial.Use();
-		m_Sprite.Bind();
-		for (const auto& [texture, x, y] : scene.labels)
-		{
-			{
-				BufferWriter writer{ m_CameraBuffer };
-				writer.Write(m_OrthCamera.GetView());
-				writer.Write(m_OrthCamera.GetProjection());
-				writer.Write(m_OrthCamera.GetPosition());
-			}
-			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
-
-			const mat4 model{ 
-				vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
-				vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
-			};
-			m_LabelMaterial.SetUniform("model", model);
-			m_LabelMaterial.BindTexture(0, texture);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		}
-		m_Sprite.UnBind();
+		//auto* readFB = &m_FB1;
+		//auto* writeFB = &m_FB2;
+		//
+		//if (scene.effects.hdr)
+		//{
+		//	writeFB->Bind();
+		//	::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//
+		//	m_HDRMaterial.Use();
+		//	m_Sprite.Bind();
+		//	m_HDRMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+		//	m_HDRMaterial.SetUniform("gamma", gamma);
+		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+		//	m_Sprite.UnBind();
+		//
+		//	std::ranges::swap(readFB, writeFB);
+		//}
+		//
+		//if (scene.effects.grayScale)
+		//{
+		//	writeFB->Bind();
+		//	::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//
+		//	m_GreyScaleMaterial.Use();
+		//	m_Sprite.Bind();
+		//	m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+		//	m_Sprite.UnBind();
+		//
+		//	std::ranges::swap(readFB, writeFB);
+		//}
+		//
+		//if (scene.effects.blur)
+		//{
+		//	writeFB->Bind();
+		//	::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//
+		//	m_BlurMaterial.Use();
+		//	m_Sprite.Bind();
+		//	m_BlurMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+		//	m_Sprite.UnBind();
+		//
+		//	std::ranges::swap(readFB, writeFB);
+		//}
+		//
+		//// NOTE: Render UI
+		//m_LabelMaterial.Use();
+		//m_Sprite.Bind();
+		//for (const auto& [texture, x, y] : scene.labels)
+		//{
+		//	{
+		//		BufferWriter writer{ m_CameraBuffer };
+		//		writer.Write(m_OrthCamera.GetView());
+		//		writer.Write(m_OrthCamera.GetProjection());
+		//		writer.Write(m_OrthCamera.GetPosition());
+		//	}
+		//	::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
+		//
+		//	const mat4 model{ 
+		//		vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
+		//		vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
+		//	};
+		//	m_LabelMaterial.SetUniform("model", model);
+		//	m_LabelMaterial.BindTexture(0, texture);
+		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+		//}
+		//m_Sprite.UnBind();
 
 		::glBlitNamedFramebuffer(
-			readFB->GetNativeHandle(),
+			m_FB1.GetNativeHandle(),
 			0u,
 			0u,
 			0u,
