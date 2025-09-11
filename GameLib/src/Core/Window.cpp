@@ -257,6 +257,10 @@ namespace Game {
 		::ShowWindow(m_Window, SW_SHOW);
 		::UpdateWindow(m_Window);
 
+		::GetWindowRect(m_Window, &rect);
+		::ClipCursor(&rect);
+		::ShowCursor(FALSE);
+
 		const ::RAWINPUTDEVICE rid{
 			.usUsagePage = HID_USAGE_PAGE_GENERIC,
 			.usUsage = HID_USAGE_GENERIC_MOUSE,
@@ -300,6 +304,10 @@ namespace Game {
 	void Window::Swap() const
 	{
 		::SwapBuffers(m_DeviceCtx);
+
+		auto rect = ::RECT{};
+		::GetWindowRect(m_Window, &rect);
+		::SetCursorPos(rect.left + m_Width / 2, rect.top + m_Height / 2);
 	}
 
 	void Window::SetTitle(const std::string& title) const
