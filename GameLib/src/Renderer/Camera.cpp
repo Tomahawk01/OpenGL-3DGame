@@ -85,6 +85,8 @@ namespace Game {
 	void Camera::AddPitch(float value)
 	{
 		m_Pitch += value;
+		constexpr float pitchEpsilon = 0.0001f;
+		m_Pitch = std::clamp(m_Pitch, (-std::numbers::pi_v<float> / 2.0f) + pitchEpsilon, (std::numbers::pi_v<float> / 2.0f) - pitchEpsilon);
 		m_Direction = CreateDirection(m_Pitch, m_Yaw);
 
 		const vec3 worldUp{ 0.0f, 1.0f, 0.0f };
