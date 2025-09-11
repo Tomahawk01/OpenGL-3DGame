@@ -1,23 +1,21 @@
 #include "FrameBuffer.h"
 
+#include "Utilities/Error.h"
+
 namespace Game {
 
-	FrameBuffer::FrameBuffer(uint32_t width, uint32_t height)
+	FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, uint8_t samples)
 		: m_Handle(0u, [](const auto buffer) { ::glDeleteFramebuffers(1u, &buffer); })
 		, m_Width(width)
 		, m_Height(height)
-		, m_ColorTexture(TextureUsage::FRAMEBUFFER, width, height)
-		, m_DepthTexture(TextureUsage::DEPTH, width, height)
+		, m_ColorTexture(TextureUsage::FRAMEBUFFER, width, height, samples)
+		, m_DepthTexture(TextureUsage::DEPTH, width, height, samples)
 	{
-		::GLuint rb{};
-		::glCreateRenderbuffers(1u, &rb);
-		::glNamedRenderbufferStorageMultisample(rb, 8, GL_RGB16F, width, height);
-
 		::glCreateFramebuffers(1, &m_Handle);
-		//::glNamedFramebufferTexture(m_Handle, GL_COLOR_ATTACHMENT0, m_ColorTexture.GetNativeHandle(), 0);
+		::glNamedFramebufferTexture(m_Handle, GL_COLOR_ATTACHMENT0, m_ColorTexture.GetNativeHandle(), 0);
 		::glNamedFramebufferTexture(m_Handle, GL_DEPTH_ATTACHMENT, m_DepthTexture.GetNativeHandle(), 0);
 
-		::glNamedFramebufferRenderbuffer(m_Handle, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rb);
+		Expect(::glCheckNamedFramebufferStatus(m_Handle, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is not complete");
 	}
 
 	void FrameBuffer::Bind() const

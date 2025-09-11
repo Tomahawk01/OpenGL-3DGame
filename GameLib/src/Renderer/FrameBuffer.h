@@ -11,7 +11,7 @@ namespace Game {
 	class FrameBuffer
 	{
 	public:
-		FrameBuffer(uint32_t width, uint32_t height);
+		FrameBuffer(uint32_t width, uint32_t height, uint8_t samples);
 
 		void Bind() const;
 		void UnBind() const;
