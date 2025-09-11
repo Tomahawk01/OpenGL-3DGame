@@ -48,7 +48,9 @@ namespace Game {
 		MeshLoader meshLoader{ resourceLoader };
 		DefaultCache resourceCache{};
 
-		const Sampler* sampler{ resourceCache.Insert<Sampler>("default") };
+		resourceCache.Insert<Sampler>("sky_box", Sampler{ FilterType::NEAREST, FilterType::NEAREST });
+		resourceCache.Insert<Sampler>("ui", Sampler{ FilterType::NEAREST, FilterType::NEAREST });
+		const auto* mipmap = resourceCache.Insert<Sampler>("mipmap", Sampler{ FilterType::LINEAR_MIPMAP, FilterType::LINEAR, 16.0f });
 
 		const auto tlvFile = [&resourceLoader]
 		{
@@ -57,45 +59,45 @@ namespace Game {
 		}();
 		const TLVReader reader{ tlvFile };
 
-		resourceCache.Insert<Texture>("barrel_albedo", reader, "barrel_Albedo", sampler);
-		resourceCache.Insert<Texture>("barrel_specular", reader, "barrel_Specular", sampler);
-		resourceCache.Insert<Texture>("barrel_normal", reader, "barrel_Normal", sampler);
+		resourceCache.Insert<Texture>("barrel_albedo", reader, "barrel_Albedo", mipmap);
+		resourceCache.Insert<Texture>("barrel_specular", reader, "barrel_Specular", mipmap);
+		resourceCache.Insert<Texture>("barrel_normal", reader, "barrel_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_bricks_a_albedo", reader, "spnza_bricks_a_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_bricks_a_normal", reader, "spnza_bricks_a_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_bricks_a_albedo", reader, "spnza_bricks_a_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_bricks_a_normal", reader, "spnza_bricks_a_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_arch_albedo", reader, "sponza_arch_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_arch_normal", reader, "sponza_arch_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_arch_albedo", reader, "sponza_arch_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_arch_normal", reader, "sponza_arch_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_column_a_albedo", reader, "sponza_column_a_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_column_a_normal", reader, "sponza_column_a_Normal", sampler);
-		resourceCache.Insert<Texture>("sponza_column_b_albedo", reader, "sponza_column_b_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_column_b_normal", reader, "sponza_column_b_Normal", sampler);
-		resourceCache.Insert<Texture>("sponza_column_c_albedo", reader, "sponza_column_c_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_column_c_normal", reader, "sponza_column_c_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_column_a_albedo", reader, "sponza_column_a_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_column_a_normal", reader, "sponza_column_a_Normal", mipmap);
+		resourceCache.Insert<Texture>("sponza_column_b_albedo", reader, "sponza_column_b_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_column_b_normal", reader, "sponza_column_b_Normal", mipmap);
+		resourceCache.Insert<Texture>("sponza_column_c_albedo", reader, "sponza_column_c_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_column_c_normal", reader, "sponza_column_c_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_floor_a_albedo", reader, "sponza_floor_a_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_floor_a_normal", reader, "sponza_floor_a_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_floor_a_albedo", reader, "sponza_floor_a_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_floor_a_normal", reader, "sponza_floor_a_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_ceiling_a_albedo", reader, "sponza_ceiling_a_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_ceiling_a_normal", reader, "sponza_ceiling_a_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_ceiling_a_albedo", reader, "sponza_ceiling_a_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_ceiling_a_normal", reader, "sponza_ceiling_a_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_roof_albedo", reader, "sponza_roof_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_roof_normal", reader, "sponza_roof_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_roof_albedo", reader, "sponza_roof_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_roof_normal", reader, "sponza_roof_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_details_albedo", reader, "sponza_details_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_details_normal", reader, "sponza_details_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_details_albedo", reader, "sponza_details_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_details_normal", reader, "sponza_details_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_flagpole_albedo", reader, "sponza_flagpole_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_flagpole_normal", reader, "sponza_flagpole_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_flagpole_albedo", reader, "sponza_flagpole_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_flagpole_normal", reader, "sponza_flagpole_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_vase_albedo", reader, "vase_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_vase_normal", reader, "vase_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_vase_albedo", reader, "vase_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_vase_normal", reader, "vase_Normal", mipmap);
 
-		resourceCache.Insert<Texture>("sponza_background_albedo", reader, "background_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_background_normal", reader, "background_Normal", sampler);
-		resourceCache.Insert<Texture>("sponza_lion_albedo", reader, "lion_Albedo", sampler);
-		resourceCache.Insert<Texture>("sponza_lion_normal", reader, "lion_Normal", sampler);
+		resourceCache.Insert<Texture>("sponza_background_albedo", reader, "background_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_background_normal", reader, "background_Normal", mipmap);
+		resourceCache.Insert<Texture>("sponza_lion_albedo", reader, "lion_Albedo", mipmap);
+		resourceCache.Insert<Texture>("sponza_lion_normal", reader, "lion_Normal", mipmap);
 
 		Logger::Info("Textures loaded successfully");
 
@@ -417,11 +419,8 @@ namespace Game {
 				.format = TextureFormat::RGB,
 				.usage = TextureUsage::SRGB,
 				.data = { static_cast<std::byte>(0xff), static_cast<std::byte>(0xff), static_cast<std::byte>(0xff) }
-			}, sampler);
+			}, mipmap);
 		resourceCache.Insert<Mesh>("floor", meshLoader.Cube());
-
-		resourceCache.Insert<Sampler>("sky_box", Sampler{});
-		resourceCache.Insert<Sampler>("ui", Sampler{});
 
 		const auto mainThemeData = std::ranges::find_if(reader, [](const auto& entry) { return entry.IsSoundData("main_theme"); });
 		Ensure(mainThemeData != std::ranges::cend(reader), "Could not find main theme");
