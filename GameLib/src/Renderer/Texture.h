@@ -43,7 +43,7 @@ namespace Game {
 		Texture(TextureUsage usage, std::span<const std::byte> data, uint32_t numChannels, uint32_t width, uint32_t height, const Sampler* sampler);
 		Texture(const TextureDescription& description, const Sampler* sampler);
 		Texture(const TLVReader& reader, std::string_view name, const Sampler* sampler);
-		Texture(TextureUsage usage, uint32_t width, uint32_t height);
+		Texture(TextureUsage usage, uint32_t width, uint32_t height, uint8_t samples);
 
 		::GLuint GetNativeHandle() const;
 		const Sampler* GetSampler() const;
