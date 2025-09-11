@@ -43,8 +43,9 @@ namespace Game {
 		, m_SkyboxCube(meshLoader.Cube())
 		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
 		, m_DebugLineMaterial(CreateMaterial(reader, "line.vert", "line.frag"))
-		, m_FB1(width, height)
-		, m_FB2(width, height)
+		, m_MainFrameBuffer(width, height, 8)
+		, m_PostProcessingFrameBuffer1(width, height, 1)
+		, m_PostProcessingFrameBuffer2(width, height, 1)
 		, m_Sprite(meshLoader.Sprite())
 		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
 		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
@@ -57,7 +58,7 @@ namespace Game {
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
 	{
-		m_FB1.Bind();
+		m_MainFrameBuffer.Bind();
 
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -133,88 +134,102 @@ namespace Game {
 			dbl->UnBind();
 		}
 
-		m_FB1.UnBind();
-
-		//auto* readFB = &m_FB1;
-		//auto* writeFB = &m_FB2;
-		//
-		//if (scene.effects.hdr)
-		//{
-		//	writeFB->Bind();
-		//	::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//
-		//	m_HDRMaterial.Use();
-		//	m_Sprite.Bind();
-		//	m_HDRMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
-		//	m_HDRMaterial.SetUniform("gamma", gamma);
-		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		//	m_Sprite.UnBind();
-		//
-		//	std::ranges::swap(readFB, writeFB);
-		//}
-		//
-		//if (scene.effects.grayScale)
-		//{
-		//	writeFB->Bind();
-		//	::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//
-		//	m_GreyScaleMaterial.Use();
-		//	m_Sprite.Bind();
-		//	m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
-		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		//	m_Sprite.UnBind();
-		//
-		//	std::ranges::swap(readFB, writeFB);
-		//}
-		//
-		//if (scene.effects.blur)
-		//{
-		//	writeFB->Bind();
-		//	::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//
-		//	m_BlurMaterial.Use();
-		//	m_Sprite.Bind();
-		//	m_BlurMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
-		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		//	m_Sprite.UnBind();
-		//
-		//	std::ranges::swap(readFB, writeFB);
-		//}
-		//
-		//// NOTE: Render UI
-		//m_LabelMaterial.Use();
-		//m_Sprite.Bind();
-		//for (const auto& [texture, x, y] : scene.labels)
-		//{
-		//	{
-		//		BufferWriter writer{ m_CameraBuffer };
-		//		writer.Write(m_OrthCamera.GetView());
-		//		writer.Write(m_OrthCamera.GetProjection());
-		//		writer.Write(m_OrthCamera.GetPosition());
-		//	}
-		//	::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
-		//
-		//	const mat4 model{ 
-		//		vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
-		//		vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
-		//	};
-		//	m_LabelMaterial.SetUniform("model", model);
-		//	m_LabelMaterial.BindTexture(0, texture);
-		//	::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		//}
-		//m_Sprite.UnBind();
+		m_MainFrameBuffer.UnBind();
 
 		::glBlitNamedFramebuffer(
-			m_FB1.GetNativeHandle(),
+			m_MainFrameBuffer.GetNativeHandle(),
+			m_PostProcessingFrameBuffer1.GetNativeHandle(),
+			0u,
+			0u,
+			m_MainFrameBuffer.GetWidth(),
+			m_MainFrameBuffer.GetHeight(),
+			0u,
+			0u,
+			m_PostProcessingFrameBuffer1.GetWidth(),
+			m_PostProcessingFrameBuffer1.GetHeight(),
+			GL_COLOR_BUFFER_BIT,
+			GL_NEAREST);
+
+		auto* readFB = &m_PostProcessingFrameBuffer1;
+		auto* writeFB = &m_PostProcessingFrameBuffer2;
+		
+		if (scene.effects.hdr)
+		{
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+			m_HDRMaterial.Use();
+			m_Sprite.Bind();
+			m_HDRMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			m_HDRMaterial.SetUniform("gamma", gamma);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+		
+			std::ranges::swap(readFB, writeFB);
+		}
+		
+		if (scene.effects.grayScale)
+		{
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+			m_GreyScaleMaterial.Use();
+			m_Sprite.Bind();
+			m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+		
+			std::ranges::swap(readFB, writeFB);
+		}
+		
+		if (scene.effects.blur)
+		{
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+			m_BlurMaterial.Use();
+			m_Sprite.Bind();
+			m_BlurMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+		
+			std::ranges::swap(readFB, writeFB);
+		}
+		
+		// NOTE: Render UI
+		m_LabelMaterial.Use();
+		m_Sprite.Bind();
+		for (const auto& [texture, x, y] : scene.labels)
+		{
+			{
+				BufferWriter writer{ m_CameraBuffer };
+				writer.Write(m_OrthCamera.GetView());
+				writer.Write(m_OrthCamera.GetProjection());
+				writer.Write(m_OrthCamera.GetPosition());
+			}
+			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
+		
+			const mat4 model{ 
+				vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
+				vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
+			};
+			m_LabelMaterial.SetUniform("model", model);
+			m_LabelMaterial.BindTexture(0, texture);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+		}
+		m_Sprite.UnBind();
+
+		::glBlitNamedFramebuffer(
+			readFB->GetNativeHandle(),
 			0u,
 			0u,
 			0u,
-			m_FB1.GetWidth(),
-			m_FB1.GetHeight(),
+			readFB->GetWidth(),
+			readFB->GetHeight(),
 			0u,
 			0u,
-			m_FB1.GetWidth(),
-			m_FB1.GetHeight(),
+			readFB->GetWidth(),
+			readFB->GetHeight(),
 			GL_COLOR_BUFFER_BIT,
 			GL_NEAREST);
 	}

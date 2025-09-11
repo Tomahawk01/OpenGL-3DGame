@@ -25,8 +25,9 @@ namespace Game {
 		Mesh m_SkyboxCube;
 		Material m_SkyboxMaterial;
 		Material m_DebugLineMaterial;
-		FrameBuffer m_FB1;
-		FrameBuffer m_FB2;
+		FrameBuffer m_MainFrameBuffer;
+		FrameBuffer m_PostProcessingFrameBuffer1;
+		FrameBuffer m_PostProcessingFrameBuffer2;
 		Mesh m_Sprite;
 		Material m_HDRMaterial;
 		Material m_GreyScaleMaterial;
