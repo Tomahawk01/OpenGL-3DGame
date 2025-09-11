@@ -73,6 +73,8 @@ namespace Game {
 		{
 			co_await Wait{ m_Scheduler, 1u };
 		}
+
+		Ensure(m_Impl->sourceVoice->Stop(0) == S_OK, "Failed to stop sound");
 	}
 
 }
