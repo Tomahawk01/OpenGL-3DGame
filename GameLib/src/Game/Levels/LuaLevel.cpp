@@ -7,6 +7,7 @@
 #include "Scripting/ScriptRunner.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/BoxShape.h"
+#include "Physics/MeshShape.h"
 #include "Physics/TransformedShape.h"
 #include "TLV/Utilities.h"
 
@@ -22,6 +23,7 @@ namespace Game {
 		, m_Script{ loader.Load() }
 		, m_Entities{}
 		, m_LevelEntities{}
+		, m_LevelPhysicsShapes{}
 		, m_Skybox{ reader, {{ "right", "left", "top", "bottom", "front", "back" }} }
 		, m_ResourceCache{ resourceCache }
 		, m_Bus{ bus }
@@ -53,6 +55,7 @@ namespace Game {
 				std::get<0>(info), vec3{ 1.0f },
 				barrelTextures,
 				TransformedShape{ shape, {std::get<0>(info), {1.0f}, {}} },
+				std::nullopt,
 				static_cast<uint32_t>(std::get<3>(info)),
 				static_cast<uint32_t>(std::get<4>(info))
 			);
@@ -701,13 +704,16 @@ namespace Game {
 					normal = m_ResourceCache.Get<Texture>(std::get<1>(textures));
 				}
 
-				return Entity{ 
-					resourceCache.Get<Mesh>(e),
+				const auto* mesh = m_ResourceCache.Get<Mesh>(e);
+
+				return Entity{
+					mesh,
 					material,
 					{ 0.0f, -2.0f, 0.0f },
 					{ 0.09f },
 					std::vector<const Texture*>{ albedo, normal },
 					{ m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}} },
+					std::make_optional(TransformedShape{ m_PS.CreateShape<MeshShape>(mesh->GetMeshData()), {{}, {0.09f}, {}} }),
 					0u,
 					0u
 				};
@@ -813,10 +819,16 @@ namespace Game {
 			.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
 		};
 
-		for (auto i = 0u; i < max; i++)
+		for (const auto& entity : m_Scene.entities)
 		{
-			const TransformedShape& transformShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
-			transformShape.Draw(m_PS.Debug_Renderer());
+			if (const auto staticCollider = entity->GetStaticCollider(); staticCollider)
+			{
+				staticCollider->Draw(m_PS.Debug_Renderer());
+			}
+			else
+			{
+				entity->GetBoundingBox().Draw(m_PS.Debug_Renderer());
+			}
 		}
 
 		m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();

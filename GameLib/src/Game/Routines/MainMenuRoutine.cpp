@@ -67,6 +67,7 @@ namespace Game {
 			barrelCenter, vec3{ 2.0f },
 			barrelTextures,
 			TransformedShape{ shape, {barrelCenter, {1.0f}, {}} },
+			std::nullopt,
 			0u,
 			0u
 		);
@@ -725,6 +726,7 @@ namespace Game {
 					{ 0.09f },
 					std::vector<const Texture*>{ albedo, normal },
 					{ m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}} },
+					{},
 					0u,
 					0u
 				};

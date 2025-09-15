@@ -51,6 +51,7 @@ namespace Game {
 		LuaScript m_Script;
 		std::vector<Entity> m_Entities;
 		std::vector<Entity> m_LevelEntities;
+		std::vector<Shape*> m_LevelPhysicsShapes;
 		CubeMap m_Skybox;
 		DefaultCache& m_ResourceCache;
 		MessageBus& m_Bus;
