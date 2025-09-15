@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <tuple>
+#include <optional>
 
 namespace Game {
 
@@ -25,6 +26,7 @@ namespace Game {
 			   const vec3& scale,
 			   std::span<const Texture* const> textures,
 			   TransformedShape boundingBox,
+			   std::optional<TransformedShape> staticCollider,
 			   uint32_t collisionLayer,
 			   uint32_t collisionMask);
 
@@ -36,6 +38,7 @@ namespace Game {
 		bool IsVisible() const;
 		void SetVisibility(bool visible);
 		const TransformedShape& GetBoundingBox() const;
+		const std::optional<TransformedShape> GetStaticCollider() const;
 		uint32_t GetCollisionLayer() const;
 		uint32_t GetCollisionMask() const;
 
@@ -52,6 +55,7 @@ namespace Game {
 		Transform m_Transform;
 		bool m_Visible;
 		TransformedShape m_BoundingBox;
+		std::optional<TransformedShape> m_StaticCollider;
 		uint32_t m_CollisionLayer;
 		uint32_t m_CollisionMask;
 	};

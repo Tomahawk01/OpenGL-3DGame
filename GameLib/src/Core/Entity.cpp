@@ -13,6 +13,7 @@ namespace Game {
 				   const vec3& scale,
 				   std::span<const Texture* const> textures,
 				   TransformedShape boundingBox,
+				   std::optional<TransformedShape> staticCollider,
 				   uint32_t collisionLayer,
 				   uint32_t collisionMask)
 		: m_Mesh(mesh)
@@ -21,6 +22,7 @@ namespace Game {
 		, m_Transform(position, scale, {})
 		, m_Visible(true)
 		, m_BoundingBox(std::move(boundingBox))
+		, m_StaticCollider(std::move(staticCollider))
 		, m_CollisionLayer(collisionLayer)
 		, m_CollisionMask(collisionMask)
 	{}
@@ -63,6 +65,11 @@ namespace Game {
 	const TransformedShape& Entity::GetBoundingBox() const
 	{
 		return m_BoundingBox;
+	}
+
+	const std::optional<TransformedShape> Entity::GetStaticCollider() const
+	{
+		return m_StaticCollider;
 	}
 
 	uint32_t Entity::GetCollisionLayer() const
