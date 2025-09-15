@@ -98,7 +98,7 @@ namespace Game {
 		, m_PS{ ps }
 		, m_Window{ window }
 		, m_Scheduler{ scheduler }
-		, m_Player{ CreateCamera(window) }
+		, m_Player{ CreateCamera(window), m_PS.GetCharacterController() }
 		, m_ResourceCache{ resourceCache }
 		, m_Reader{ reader }
 		, m_LevelNum{ 0u }

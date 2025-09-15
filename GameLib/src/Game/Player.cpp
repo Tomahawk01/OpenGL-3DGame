@@ -6,10 +6,11 @@
 
 namespace Game {
 
-	Player::Player(Camera camera)
+	Player::Player(Camera camera, CharacterController& controller)
 		: m_Camera{ std::move(camera) }
 		, m_KeyState{}
 		, m_StartPosition{ m_Camera.GetPosition() }
+		, m_Controller{ controller }
 	{}
 
 	void Player::Update()
@@ -35,9 +36,11 @@ namespace Game {
 
 		walkDirection.y = 0.0f;
 
-		const float speed = 0.5f;
+		const float speed = 20.0f;
 		const vec3 velocity = vec3::Normalize(walkDirection) * speed;
 		m_Camera.Translate(velocity);
+		m_Controller.SetLinearVelocity(velocity);
+		m_Camera.SetPosition(m_Controller.GetPosition() + vec3(0.0f, 5.0f, 0.0f));
 	}
 
 	void Player::Restart()

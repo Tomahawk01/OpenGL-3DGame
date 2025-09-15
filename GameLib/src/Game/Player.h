@@ -4,6 +4,7 @@
 #include "Messaging/Subscriber.h"
 #include "Messaging/AutoSubscribe.h"
 #include "Renderer/Camera.h"
+#include "Physics/CharacterController.h"
 
 #include <unordered_map>
 
@@ -12,7 +13,7 @@ namespace Game {
 	class Player
 	{
 	public:
-		Player(Camera camera);
+		Player(Camera camera, CharacterController& controller);
 
 		void Update();
 		void Restart();
@@ -29,6 +30,7 @@ namespace Game {
 		Camera m_Camera;
 		std::unordered_map<Key, bool> m_KeyState;
 		vec3 m_StartPosition;
+		CharacterController& m_Controller;
 	};
 
 }
