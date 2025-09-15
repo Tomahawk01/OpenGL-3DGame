@@ -813,7 +813,6 @@ namespace Game {
 			.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
 		};
 
-		m_PS.Debug_Renderer().Clear();
 		for (auto i = 0u; i < max; i++)
 		{
 			const TransformedShape& transformShape{ m_Shapes[i], {m_Entities[i].GetPosition(), {1.0f}, {}} };
