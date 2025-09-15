@@ -14,8 +14,8 @@ namespace Game {
 		: m_Character{}
 		, m_TempAlloc{ std::make_unique<::JPH::TempAllocatorImpl>(4 * 1024 * 1024) }
 	{
-		static constexpr float standingHeight = 1.0f;
-		static constexpr float standingRadius = 0.5f;
+		static constexpr float standingHeight = 2.5f;
+		static constexpr float standingRadius = 1.25f;
 
 		::JPH::Ref<::JPH::CharacterVirtualSettings> settings = new ::JPH::CharacterVirtualSettings();
 		settings->mShape = ::JPH::RotatedTranslatedShapeSettings(
