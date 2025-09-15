@@ -9,7 +9,6 @@
 #include <Jolt/Core/Reference.h>
 #include <Jolt/Renderer/DebugRenderer.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/ConvexShape.h>
 #include <Jolt/Physics/Collision/TransformedShape.h>
 
@@ -19,7 +18,8 @@ namespace Game {
 	{
 		BOX,
 		CYLINDER,
-		SPHERE
+		SPHERE,
+		MESH
 	};
 
 	class PhysicsSystem;
