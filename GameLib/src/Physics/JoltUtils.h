@@ -22,5 +22,6 @@ namespace Game {
 	::JPH::Quat ToJolt(const quat& q);
 	::JPH::ObjectLayer ToJolt(RigidBodyType type);
 	::JPH::RMat44 ToJolt(const Transform& transform);
+	::JPH::Color ToJolt(const Color& color);
 
 }

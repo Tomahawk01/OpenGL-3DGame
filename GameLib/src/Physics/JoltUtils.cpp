@@ -43,4 +43,10 @@ namespace Game {
 		return std::bit_cast<::JPH::RMat44>(mat);
 	}
 
+	::JPH::Color ToJolt(const Color& color)
+	{
+		const auto floatToInt = [](const float v) { return static_cast<uint8_t>(v * 255.0f); };
+		return { floatToInt(color.r), floatToInt(color.g), floatToInt(color.b) };
+	}
+
 }
