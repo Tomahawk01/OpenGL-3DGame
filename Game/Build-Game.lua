@@ -50,6 +50,7 @@ project "Game"
     filter "configurations:Debug"
         defines { "DEBUG" }
         debugargs { "assets -x 640 -y 360" }
+        ignoredefaultlibraries { "MSVCRT", "LIBCMT" }
         runtime "Debug"
         symbols "On"
 
