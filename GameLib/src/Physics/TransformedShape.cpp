@@ -59,10 +59,10 @@ namespace Game {
 		return hit;
 	}
 
-	void TransformedShape::Draw(DebugRenderer& debugRenderer) const
+	void TransformedShape::Draw(DebugRenderer& debugRenderer, const Color& color) const
 	{
 		const ::JPH::Vec3 scale{ 1.0f, 1.0f, 1.0f };
-		m_Shape->GetNativeHandle()->Draw(&debugRenderer, ToJolt(m_Transform), scale, ::JPH::Color{ 0xff, 0xff, 0xff }, false, true);
+		m_Shape->GetNativeHandle()->Draw(&debugRenderer, ToJolt(m_Transform), scale, ToJolt(color), false, true);
 	}
 
 	void TransformedShape::Translate(const vec3& translation)

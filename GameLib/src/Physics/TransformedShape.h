@@ -2,6 +2,7 @@
 
 #include "Shape.h"
 #include "Math/Transform.h"
+#include "Math/Color.h"
 #include "DebugRenderer.h"
 
 namespace Game {
@@ -13,7 +14,7 @@ namespace Game {
 
 		bool Intersects(const TransformedShape& shape) const;
 
-		void Draw(DebugRenderer& debugRenderer) const;
+		void Draw(DebugRenderer& debugRenderer, const Color& color) const;
 		void Translate(const vec3& translation);
 
 		const Shape* GetShape() const;
