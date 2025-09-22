@@ -865,6 +865,16 @@ namespace Game {
 			}
 		}
 
+		const TransformedShape playerTransformShape{ player.GetController().GetShape(), {player.GetPosition(), {0.09f}, {}} };
+
+		for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
+		{
+			if (playerTransformShape.Intersects(*staticEntity->GetStaticCollider()))
+			{
+				Logger::Trace("Player collides");
+			}
+		}
+
 		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
 		switch (levelState)
 		{
