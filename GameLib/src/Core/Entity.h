@@ -42,6 +42,8 @@ namespace Game {
 		uint32_t GetCollisionLayer() const;
 		uint32_t GetCollisionMask() const;
 
+		bool HasStaticCollider() const;
+
 		vec3 GetPosition() const;
 		void SetPosition(const vec3& position);
 		void SetRotation(const quat& rotation);

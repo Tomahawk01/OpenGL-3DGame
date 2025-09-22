@@ -82,6 +82,11 @@ namespace Game {
 		return m_CollisionMask;
 	}
 
+	bool Entity::HasStaticCollider() const
+	{
+		return !!m_StaticCollider;
+	}
+
 	vec3 Entity::GetPosition() const
 	{
 		return m_Transform.Position;
