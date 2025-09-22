@@ -4,24 +4,28 @@
 
 #include "JoltUtils.h"
 #include "PhysicsSystem.h"
+#include "CapsuleShape.h"
 
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h>
 
+namespace {
+	constexpr float standingHeight = 3.0f;
+	constexpr float standingRadius = 1.25f;
+}
+
 namespace Game {
 
-	CharacterController::CharacterController(::JPH::PhysicsSystem* physicsSystem, PassKey<PhysicsSystem>)
+	CharacterController::CharacterController(PhysicsSystem& ps, ::JPH::PhysicsSystem* physicsSystem, PassKey<PhysicsSystem>)
 		: m_Character{}
 		, m_TempAlloc{ std::make_unique<::JPH::TempAllocatorImpl>(4 * 1024 * 1024) }
+		, m_Shape{ ps.CreateShape<CapsuleShape>(0.5f * standingHeight, standingRadius) }
 	{
-		static constexpr float standingHeight = 3.0f;
-		static constexpr float standingRadius = 1.25f;
-
 		::JPH::Ref<::JPH::CharacterVirtualSettings> settings = new ::JPH::CharacterVirtualSettings();
 		settings->mShape = ::JPH::RotatedTranslatedShapeSettings(
 								::JPH::Vec3(0, 0.5f * standingHeight + standingRadius, 0),
 								::JPH::Quat::sIdentity(),
-								new ::JPH::CapsuleShape(0.5f * standingHeight, standingRadius))
+								m_Shape->GetNativeHandle())
 								.Create()
 								.Get();
 		settings->mInnerBodyLayer = ToJolt(RigidBodyType::DYNAMIC);
@@ -51,13 +55,18 @@ namespace Game {
 		m_Character->SetLinearVelocity(ToJolt(velocity));
 	}
 
+	const Shape* CharacterController::GetShape()
+	{
+		return m_Shape;
+	}
+
 	void CharacterController::OnContactAdded(
-		[[maybe_unused]] const ::JPH::CharacterVirtual* inCharacter,
-		[[maybe_unused]] const ::JPH::BodyID& inBodyID2,
-		[[maybe_unused]] const ::JPH::SubShapeID& inSubShapeID2,
-		[[maybe_unused]] ::JPH::RVec3Arg inContactPosition,
-		[[maybe_unused]] ::JPH::Vec3Arg inContactNormal,
-		[[maybe_unused]] ::JPH::CharacterContactSettings& ioSettings)
+		const ::JPH::CharacterVirtual* inCharacter,
+		const ::JPH::BodyID& inBodyID2,
+		const ::JPH::SubShapeID& inSubShapeID2,
+		::JPH::RVec3Arg inContactPosition,
+		::JPH::Vec3Arg inContactNormal,
+		::JPH::CharacterContactSettings& ioSettings)
 	{
 		Logger::Trace("Contact {}", inBodyID2.GetIndex());
 	}

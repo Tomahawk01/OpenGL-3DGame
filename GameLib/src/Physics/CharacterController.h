@@ -2,6 +2,7 @@
 
 #include "Utilities/PassKey.h"
 #include "Math/Vector3.h"
+#include "Shape.h"
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -19,7 +20,7 @@ namespace Game {
 	class CharacterController : public JPH::CharacterContactListener
 	{
 	public:
-		CharacterController(::JPH::PhysicsSystem* physicsSystem, PassKey<PhysicsSystem>);
+		CharacterController(PhysicsSystem& ps, ::JPH::PhysicsSystem* physicsSystem, PassKey<PhysicsSystem>);
 
 		vec3 GetPosition() const;
 
@@ -28,6 +29,8 @@ namespace Game {
 		void Update(float delta, const ::JPH::BroadPhaseLayerFilter& broadPhaseLayerFilter, const ::JPH::ObjectLayerFilter& objectLayerFilter, PassKey<PhysicsSystem>);
 
 		void SetLinearVelocity(const vec3& velocity);
+
+		const Shape* GetShape();
 
 		void OnContactAdded(
 			const ::JPH::CharacterVirtual* inCharacter,
@@ -40,6 +43,7 @@ namespace Game {
 	private:
 		::JPH::Ref<::JPH::CharacterVirtual> m_Character;
 		std::unique_ptr<::JPH::TempAllocator> m_TempAlloc;
+		const Shape* m_Shape;
 	};
 
 }
