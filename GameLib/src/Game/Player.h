@@ -26,6 +26,11 @@ namespace Game {
 		Camera& GetCamera();
 		vec3 GetPosition() const;
 
+		auto& GetController(this auto&& self)
+		{
+			return self.m_Controller;
+		}
+
 	private:
 		Camera m_Camera;
 		std::unordered_map<Key, bool> m_KeyState;
