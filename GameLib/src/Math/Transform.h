@@ -4,6 +4,8 @@
 #include "Math/Matrix4.h"
 #include "Math/Quaternion.h"
 
+#include <format>
+
 namespace Game {
 
 	class Transform
@@ -22,5 +24,10 @@ namespace Game {
 		vec3 Scale;
 		quat Rotation;
 	};
+
+	inline std::string to_string(const Transform& transform)
+	{
+		return std::format("pos:{}, scale:{}, rot:{}", transform.Position, transform.Scale, transform.Rotation);
+	}
 
 }
