@@ -699,7 +699,6 @@ namespace Game {
 			"sponza_column_a_15"sv,
 			"sponza_column_a_16"sv,
 			"sponza_arch_17"sv,
-			"sponza_floor_18"sv,
 			"sponza_column_c_22"sv,
 			"sponza_column_c_23"sv,
 			"sponza_column_c_24"sv,
@@ -752,7 +751,6 @@ namespace Game {
 			"sponza_column_c_113"sv,
 			"sponza_column_c_114"sv,
 			"sponza_column_c_115"sv,
-			"sponza_floor_117"sv,
 			"sponza_column_a_118"sv,
 			"sponza_column_a_119"sv,
 			"sponza_column_a_120"sv,
@@ -865,13 +863,14 @@ namespace Game {
 			}
 		}
 
-		const TransformedShape playerTransformShape{ player.GetController().GetShape(), {player.GetPosition(), {0.09f}, {}} };
+		const TransformedShape playerTransformShape{ player.GetController().GetShape(), {player.GetController().GetPosition(), {0.09f}, {}} };
+		static auto counter = 0u;
 
 		for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
 		{
 			if (playerTransformShape.Intersects(*staticEntity->GetStaticCollider()))
 			{
-				Logger::Trace("Player collides");
+				Logger::Trace("{} Player collides with world", ++counter);
 			}
 		}
 

@@ -38,7 +38,6 @@ namespace Game {
 
 		const float speed = 20.0f;
 		const vec3 velocity = vec3::Normalize(walkDirection) * speed;
-		m_Camera.Translate(velocity);
 		m_Controller.SetLinearVelocity(velocity);
 		m_Camera.SetPosition(m_Controller.GetPosition() + vec3(0.0f, 5.0f, 0.0f));
 	}
