@@ -24,6 +24,8 @@ namespace Game {
 
 		vec3 GetPosition() const;
 
+		void Move(const vec3 amount);
+
 		void DebugDraw(::JPH::DebugRenderer* debugRenderer, PassKey<PhysicsSystem>) const;
 
 		void Update(float delta, const ::JPH::BroadPhaseLayerFilter& broadPhaseLayerFilter, const ::JPH::ObjectLayerFilter& objectLayerFilter, PassKey<PhysicsSystem>);

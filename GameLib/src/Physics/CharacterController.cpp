@@ -39,6 +39,11 @@ namespace Game {
 		return ToNative(m_Character->GetPosition());
 	}
 
+	void CharacterController::Move(const vec3 amount)
+	{
+		m_Character->SetPosition(ToJolt(GetPosition() + amount));
+	}
+
 	void CharacterController::DebugDraw(::JPH::DebugRenderer* debugRenderer, PassKey<PhysicsSystem>) const
 	{
 		const auto transform = m_Character->GetCenterOfMassTransform();
