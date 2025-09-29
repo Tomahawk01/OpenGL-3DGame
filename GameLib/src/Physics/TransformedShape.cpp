@@ -11,20 +11,24 @@ namespace {
 
 	struct SimpleCollisionCollector : ::JPH::CollideShapeCollector
 	{
-		SimpleCollisionCollector(bool& hit)
-			: Hit(hit)
+		SimpleCollisionCollector()
 		{}
 
 		void OnBody(const ::JPH::Body&) override
 		{
 		}
 
-		void AddHit(const ResultType&) override
+		void AddHit(const ResultType& joltResult) override
 		{
-			Hit = true;
+			collisionResult = Game::CollisionResult{
+				.contact1 = Game::ToNative(joltResult.mContactPointOn1),
+				.contact2 = Game::ToNative(joltResult.mContactPointOn2),
+				.penetrationAxis = Game::ToNative(joltResult.mPenetrationAxis),
+				.penetrationDepth = joltResult.mPenetrationDepth
+			};
 		}
 
-		bool& Hit;
+		std::optional<Game::CollisionResult> collisionResult = std::nullopt;
 	};
 
 }
@@ -38,11 +42,10 @@ namespace Game {
 		Expect(shape != nullptr, "Must provide a Shape");
 	}
 
-	bool TransformedShape::Intersects(const TransformedShape& shape) const
+	std::optional<CollisionResult> TransformedShape::Intersects(const TransformedShape& shape) const
 	{
 		::JPH::CollideShapeSettings settings{};
-		bool hit = false;
-		SimpleCollisionCollector collector{ hit };
+		SimpleCollisionCollector collector{};
 		const auto transform1 = ToJolt(m_Transform);
 		const auto transform2 = ToJolt(shape.m_Transform);
 		const ::JPH::SubShapeIDCreator subshapeIDCreator1{};
@@ -56,7 +59,7 @@ namespace Game {
 			settings,
 			collector);
 
-		return hit;
+		return collector.collisionResult;
 	}
 
 	void TransformedShape::Draw(DebugRenderer& debugRenderer, const Color& color) const
