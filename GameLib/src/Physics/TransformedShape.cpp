@@ -43,7 +43,6 @@ namespace Game {
 		::JPH::CollideShapeSettings settings{};
 		bool hit = false;
 		SimpleCollisionCollector collector{ hit };
-		const ::JPH::Vec3 scale{ 1.0f, 1.0f, 1.0f };
 		const auto transform1 = ToJolt(m_Transform);
 		const auto transform2 = ToJolt(shape.m_Transform);
 		const ::JPH::SubShapeIDCreator subshapeIDCreator1{};
@@ -51,18 +50,18 @@ namespace Game {
 
 		::JPH::CollisionDispatch::sCollideShapeVsShape(
 			m_Shape->GetNativeHandle(), shape.m_Shape->GetNativeHandle(),
-			scale, scale,
+			ToJolt(m_Transform.Scale), ToJolt(shape.m_Transform.Scale),
 			transform1, transform2,
 			subshapeIDCreator1, subshapeIDCreator2,
-			settings, collector);
+			settings,
+			collector);
 
 		return hit;
 	}
 
 	void TransformedShape::Draw(DebugRenderer& debugRenderer, const Color& color) const
 	{
-		const ::JPH::Vec3 scale{ 1.0f, 1.0f, 1.0f };
-		m_Shape->GetNativeHandle()->Draw(&debugRenderer, ToJolt(m_Transform), scale, ToJolt(color), false, true);
+		m_Shape->GetNativeHandle()->Draw(&debugRenderer, ToJolt(m_Transform), ToJolt(m_Transform.Scale), ToJolt(color), false, true);
 	}
 
 	void TransformedShape::Translate(const vec3& translation)
