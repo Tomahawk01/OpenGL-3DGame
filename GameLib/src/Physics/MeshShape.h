@@ -13,7 +13,7 @@ namespace Game {
 	class MeshShape : public Shape
 	{
 	public:
-		MeshShape(MeshData meshData, PassKey<PhysicsSystem>);
+		MeshShape(MeshData meshData, float meshScale, PassKey<PhysicsSystem>);
 
 		const ::JPH::Shape* GetNativeHandle() const override;
 

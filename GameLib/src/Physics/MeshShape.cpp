@@ -11,10 +11,10 @@
 
 namespace {
 
-	::JPH::Ref<::JPH::Shape> CreateMeshShape(Game::MeshData meshData)
+	::JPH::Ref<::JPH::Shape> CreateMeshShape(Game::MeshData meshData, float meshScale)
 	{
 		const auto joltVertexList = meshData.vertices
-			| std::views::transform([](const auto& e) { return ::JPH::Float3{ e.position.x, e.position.y, e.position.z }; })
+			| std::views::transform([meshScale](const auto& e) { return ::JPH::Float3{ e.position.x * meshScale, e.position.y * meshScale, e.position.z * meshScale }; })
 			| std::ranges::to<::JPH::Array<::JPH::Float3>>();
 		const auto joltIndexList = meshData.indices
 			| std::views::chunk(3u)
@@ -32,9 +32,9 @@ namespace {
 
 namespace Game {
 
-	MeshShape::MeshShape(MeshData meshData, PassKey<PhysicsSystem> passKey)
+	MeshShape::MeshShape(MeshData meshData, float meshScale, PassKey<PhysicsSystem> passKey)
 		: Shape(ShapeType::BOX, passKey)
-		, m_MeshShape{ CreateMeshShape(meshData) }
+		, m_MeshShape{ CreateMeshShape(meshData, meshScale) }
 	{}
 
 	const ::JPH::Shape* MeshShape::GetNativeHandle() const

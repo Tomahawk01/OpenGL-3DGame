@@ -711,46 +711,6 @@ namespace Game {
 			"sponza_column_c_31"sv,
 			"sponza_column_c_32"sv,
 			"sponza_column_c_33"sv,
-			"sponza_column_c_76"sv,
-			"sponza_column_c_77"sv,
-			"sponza_column_c_78"sv,
-			"sponza_column_c_79"sv,
-			"sponza_column_c_80"sv,
-			"sponza_column_c_81"sv,
-			"sponza_column_c_82"sv,
-			"sponza_column_c_83"sv,
-			"sponza_column_c_84"sv,
-			"sponza_column_c_85"sv,
-			"sponza_column_c_86"sv,
-			"sponza_column_c_87"sv,
-			"sponza_column_c_88"sv,
-			"sponza_column_c_89"sv,
-			"sponza_column_c_90"sv,
-			"sponza_column_c_91"sv,
-			"sponza_column_c_92"sv,
-			"sponza_column_c_93"sv,
-			"sponza_column_c_94"sv,
-			"sponza_column_c_95"sv,
-			"sponza_column_c_96"sv,
-			"sponza_column_c_97"sv,
-			"sponza_column_c_98"sv,
-			"sponza_column_c_99"sv,
-			"sponza_column_c_100"sv,
-			"sponza_column_c_101"sv,
-			"sponza_column_c_102"sv,
-			"sponza_column_c_103"sv,
-			"sponza_column_c_104"sv,
-			"sponza_column_c_105"sv,
-			"sponza_column_c_106"sv,
-			"sponza_column_c_107"sv,
-			"sponza_column_c_108"sv,
-			"sponza_column_c_109"sv,
-			"sponza_column_c_110"sv,
-			"sponza_column_c_111"sv,
-			"sponza_column_c_112"sv,
-			"sponza_column_c_113"sv,
-			"sponza_column_c_114"sv,
-			"sponza_column_c_115"sv,
 			"sponza_column_a_118"sv,
 			"sponza_column_a_119"sv,
 			"sponza_column_a_120"sv,
@@ -782,7 +742,8 @@ namespace Game {
 				const auto* mesh = m_ResourceCache.Get<Mesh>(e);
 
 				auto staticCollider = std::ranges::contains(staticGeometryColliders, e)
-					? std::make_optional(TransformedShape{ m_PS.CreateShape<MeshShape>(mesh->GetMeshData()), {{}, {0.09f}, {}} })
+					// NOTE: Need to scale mesh data to Jolt's understanding of world coords to make the collision detection work
+					? std::make_optional(TransformedShape{ m_PS.CreateShape<MeshShape>(mesh->GetMeshData(), 0.09f), {{}, {1.0f}, {}} })
 					: std::nullopt;
 
 				return Entity{
