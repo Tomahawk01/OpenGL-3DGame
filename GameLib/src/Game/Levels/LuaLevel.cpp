@@ -768,7 +768,7 @@ namespace Game {
 		Restart();
 	}
 
-	void LuaLevel::Update(const Player& player)
+	void LuaLevel::Update(Player& player)
 	{
 		const ScriptRunner runner{ m_Script };
 
@@ -824,14 +824,17 @@ namespace Game {
 			}
 		}
 
-		const TransformedShape playerTransformShape{ player.GetController().GetShape(), {player.GetController().GetPosition(), {0.09f}, {}} };
-		static auto counter = 0u;
+		TransformedShape playerTransformShape{ player.GetController().GetShape(), {player.GetController().GetPosition(), {1.0f}, {}} };
 
 		for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
 		{
-			if (playerTransformShape.Intersects(*staticEntity->GetStaticCollider()))
+			auto collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
+			while (collision)
 			{
-				Logger::Trace("{} Player collides with world", ++counter);
+				player.GetController().Move(collision->penetrationAxis * collision->penetrationDepth * 0.5f);
+				playerTransformShape = TransformedShape{ player.GetController().GetShape(), {player.GetController().GetPosition(), {1.0f}, {}} };
+				collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
+				break;
 			}
 		}
 

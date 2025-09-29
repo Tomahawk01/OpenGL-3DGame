@@ -40,7 +40,7 @@ namespace Game {
 
 		LuaLevel(PhysicsSystem& ps, const ScriptLoader& loader, DefaultCache& resourceCache, const TLVReader& reader, const Player& player, MessageBus& bus);
 
-		void Update(const Player& player) override;
+		void Update(Player& player) override;
 		void Restart() override;
 		void HandleEntityIntersect(const Entity* a, const Entity* b) override;
 
