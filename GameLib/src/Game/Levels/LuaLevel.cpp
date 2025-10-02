@@ -751,7 +751,7 @@ namespace Game {
 					material,
 					{ 0.0f, -2.0f, 0.0f },
 					{ 0.09f },
-					std::vector<const Texture*>{ albedo, normal },
+					std::vector<const Texture*>{ albedo, albedo, normal },
 					{ m_PS.CreateShape<BoxShape>(vec3{50.0f, 0.5f, 50.0f}), {{0.0f, -2.0f, 0.0f}, {1.0f}, {}} },
 					std::move(staticCollider),
 					0u,
