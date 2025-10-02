@@ -36,10 +36,10 @@ namespace Game {
 
 		walkDirection.y = 0.0f;
 
-		const float speed = 20.0f;
+		const float speed = 30.0f;
 		const vec3 velocity = vec3::Normalize(walkDirection) * speed;
 		m_Controller.SetLinearVelocity(velocity);
-		m_Camera.SetPosition(m_Controller.GetPosition() + vec3(0.0f, 5.0f, 0.0f));
+		m_Camera.SetPosition(m_Controller.GetTransformedShape().GetTransform().Position + vec3(0.0f, 5.0f, 0.0f));
 	}
 
 	void Player::Restart()

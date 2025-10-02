@@ -133,7 +133,7 @@ namespace Game {
 
 		m_Impl->PhysicsSystem.SetGravity({ 0.0f, -9.8f, 0.0f });
 
-		m_Impl->CharacterController = std::make_unique<CharacterController>(*this, std::addressof(m_Impl->PhysicsSystem), PassKey<PhysicsSystem>());
+		m_Impl->CharacterController = std::make_unique<CharacterController>(*this, PassKey<PhysicsSystem>());
 	}
 
 	PhysicsSystem::~PhysicsSystem() = default;
@@ -142,7 +142,7 @@ namespace Game {
 	{
 		m_Impl->Debug_Renderer.Clear();
 
-		m_Impl->CharacterController->Update(1.0f / 60.0f, m_Impl->PhysicsSystem.GetDefaultBroadPhaseLayerFilter(ToJolt(RigidBodyType::DYNAMIC)), m_Impl->PhysicsSystem.GetDefaultLayerFilter(ToJolt(RigidBodyType::DYNAMIC)), {});
+		m_Impl->CharacterController->Update(1.0f / 60.0f, {});
 
 		m_Impl->PhysicsSystem.Update(1.0f / 60.0f, 1, &m_Impl->TempAllocator, &m_Impl->JobSystem);
 

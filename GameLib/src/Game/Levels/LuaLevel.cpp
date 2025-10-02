@@ -824,7 +824,7 @@ namespace Game {
 			}
 		}
 
-		TransformedShape playerTransformShape{ player.GetController().GetShape(), {player.GetController().GetPosition(), {1.0f}, {}} };
+		TransformedShape playerTransformShape{ player.GetController().GetTransformedShape() };
 
 		for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
 		{
@@ -832,7 +832,7 @@ namespace Game {
 			while (collision)
 			{
 				player.GetController().Move(collision->penetrationAxis * collision->penetrationDepth * 0.5f);
-				playerTransformShape = TransformedShape{ player.GetController().GetShape(), {player.GetController().GetPosition(), {1.0f}, {}} };
+				playerTransformShape = player.GetController().GetTransformedShape();
 				collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
 				break;
 			}
