@@ -6,6 +6,7 @@ layout(location = 2) in vec3 in_tangent;
 layout(location = 3) in vec2 in_uv;
 
 out vec3 normal;
+out vec3 normal_view;
 out vec2 tex_coord;
 out vec4 frag_position;
 out mat3 tbn;
@@ -23,6 +24,7 @@ void main()
 {
     gl_Position = projection * view * model * vec4(in_position, 1.0);
     normal = normalize(transpose(inverse(mat3(model))) * in_normal);
+    normal_view = normalize(transpose(inverse(mat3(view))) * in_normal);
     tex_coord = in_uv;
 
     vec3 t = normalize(vec3(model * vec4(in_tangent, 0.0)));
