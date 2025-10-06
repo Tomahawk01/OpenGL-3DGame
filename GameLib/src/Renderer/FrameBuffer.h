@@ -5,13 +5,14 @@
 #include "OpenGL.h"
 
 #include <cstdint>
+#include <span>
 
 namespace Game {
 
 	class FrameBuffer
 	{
 	public:
-		FrameBuffer(uint32_t width, uint32_t height, uint8_t samples);
+		FrameBuffer(std::span<const Texture*> colorTextures, const Texture* depthTexture);
 
 		void Bind() const;
 		void UnBind() const;
@@ -20,14 +21,12 @@ namespace Game {
 		uint32_t GetHeight() const;
 
 		::GLuint GetNativeHandle() const;
-		const Texture& GetColorTexture() const;
+		std::span<const Texture*> GetColorTextures() const;
 
 	private:
 		AutoRelease<::GLuint> m_Handle;
-		uint32_t m_Width;
-		uint32_t m_Height;
-		Texture m_ColorTexture;
-		Texture m_DepthTexture;
+		std::span<const Texture*> m_ColorTextures;
+		const Texture* m_DepthTexture;
 	};
 
 }
