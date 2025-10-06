@@ -45,6 +45,12 @@ namespace Game {
 		Texture(const TLVReader& reader, std::string_view name, const Sampler* sampler);
 		Texture(TextureUsage usage, uint32_t width, uint32_t height, uint8_t samples);
 
+		Texture(const Texture&) = delete;
+		Texture& operator=(const Texture&) = delete;
+
+		Texture(Texture&&) noexcept = default;
+		Texture& operator=(Texture&&) noexcept = default;
+
 		::GLuint GetNativeHandle() const;
 		const Sampler* GetSampler() const;
 		uint32_t GetWidth() const;

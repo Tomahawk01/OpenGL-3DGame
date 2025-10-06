@@ -43,9 +43,15 @@ namespace Game {
 		, m_SkyboxCube(meshLoader.Cube())
 		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
 		, m_DebugLineMaterial(CreateMaterial(reader, "line.vert", "line.frag"))
-		, m_MainFrameBuffer(width, height, 8)
-		, m_PostProcessingFrameBuffer1(width, height, 1)
-		, m_PostProcessingFrameBuffer2(width, height, 1)
+		, m_MainFrameBuffer(
+			{ TextureUsage::FRAMEBUFFER, width, height, 8 },
+			{ TextureUsage::DEPTH, width, height, 8 })
+		, m_PostProcessingFrameBuffer1(
+			{},
+			{ TextureUsage::DEPTH, width, height, 8 })
+		, m_PostProcessingFrameBuffer2(
+			{},
+			{ TextureUsage::DEPTH, width, height, 8 })
 		, m_Sprite(meshLoader.Sprite())
 		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
 		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
@@ -58,7 +64,7 @@ namespace Game {
 
 	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
 	{
-		m_MainFrameBuffer.Bind();
+		m_MainFrameBuffer.frameBuffer.Bind();
 
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -110,7 +116,7 @@ namespace Game {
 			::glDepthMask(GL_TRUE);
 		}
 
-		for (const Entity* entity : scene.entities)// | std::views::filter([](const auto* e) { return e->IsVisible(); }))
+		for (const Entity* entity : scene.entities)
 		{
 			const Mesh* mesh = entity->GetMesh();
 			const Material* material = entity->GetMaterial();
@@ -134,24 +140,24 @@ namespace Game {
 			dbl->UnBind();
 		}
 
-		m_MainFrameBuffer.UnBind();
+		m_MainFrameBuffer.frameBuffer.UnBind();
 
 		::glBlitNamedFramebuffer(
-			m_MainFrameBuffer.GetNativeHandle(),
-			m_PostProcessingFrameBuffer1.GetNativeHandle(),
+			m_MainFrameBuffer.frameBuffer.GetNativeHandle(),
+			m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(),
 			0u,
 			0u,
-			m_MainFrameBuffer.GetWidth(),
-			m_MainFrameBuffer.GetHeight(),
+			m_MainFrameBuffer.frameBuffer.GetWidth(),
+			m_MainFrameBuffer.frameBuffer.GetHeight(),
 			0u,
 			0u,
-			m_PostProcessingFrameBuffer1.GetWidth(),
-			m_PostProcessingFrameBuffer1.GetHeight(),
+			m_PostProcessingFrameBuffer1.frameBuffer.GetWidth(),
+			m_PostProcessingFrameBuffer1.frameBuffer.GetHeight(),
 			GL_COLOR_BUFFER_BIT,
 			GL_NEAREST);
 
-		auto* readFB = &m_PostProcessingFrameBuffer1;
-		auto* writeFB = &m_PostProcessingFrameBuffer2;
+		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
+		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
 		
 		if (scene.effects.hdr)
 		{
@@ -160,7 +166,7 @@ namespace Game {
 		
 			m_HDRMaterial.Use();
 			m_Sprite.Bind();
-			m_HDRMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			m_HDRMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
 			m_HDRMaterial.SetUniform("gamma", gamma);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
@@ -175,7 +181,7 @@ namespace Game {
 		
 			m_GreyScaleMaterial.Use();
 			m_Sprite.Bind();
-			m_GreyScaleMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			m_GreyScaleMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 		
@@ -189,7 +195,7 @@ namespace Game {
 		
 			m_BlurMaterial.Use();
 			m_Sprite.Bind();
-			m_BlurMaterial.BindTexture(0, &readFB->GetColorTexture(), scene.skyboxSampler);
+			m_BlurMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 		
