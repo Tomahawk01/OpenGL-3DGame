@@ -103,22 +103,20 @@ namespace Game {
 
 	void Material::BindCubeMap(const CubeMap* cubeMap, const Sampler* sampler) const
 	{
-		::glBindTextureUnit(0, cubeMap->GetNativeHandle());
-		::glBindSampler(0, sampler->GetNativeHandle());
-
 		const std::string uniformName = std::format("tex{}", 0);
-
 		SetUniform(uniformName, 0);
+
+		::glBindSampler(0, sampler->GetNativeHandle());
+		::glBindTextureUnit(0, cubeMap->GetNativeHandle());
 	}
 
 	void Material::BindTexture(uint32_t index, const Texture* texture, const Sampler* sampler) const
 	{
-		::glBindTextureUnit(index, texture->GetNativeHandle());
-		::glBindSampler(index, sampler->GetNativeHandle());
-
 		const std::string uniformName = std::format("tex{}", index);
-
 		SetUniform(uniformName, static_cast<int>(index));
+
+		::glBindSampler(index, sampler->GetNativeHandle());
+		::glBindTextureUnit(index, texture->GetNativeHandle());
 	}
 
 	void Material::BindTexture(uint32_t index, const Texture* texture) const
