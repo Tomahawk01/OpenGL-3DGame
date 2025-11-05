@@ -6,8 +6,8 @@ in vec2 tex_coord;
 in vec4 frag_position;
 in mat3 tbn;
 
-layout(location = 0) out vec4 frag_color;
-layout(location = 1) out vec4 norm_color;
+out vec4 frag_color;
+//layout(location = 1) out vec4 norm_color;
 
 uniform sampler2D tex0;
 uniform sampler2D tex1;
@@ -82,5 +82,5 @@ void main()
 	}
 
 	frag_color = vec4(color * albedo.rgb, 1.0);
-	norm_color = vec4(normal_view, 1.0);
+	//norm_color = vec4(normal_view, 1.0);
 }
