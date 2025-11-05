@@ -1,11 +1,15 @@
 #version 460 core
 
 in vec3 normal;
+in vec3 normal_view;
+in vec4 view_position;
 in vec2 tex_coord;
 in vec4 frag_position;
 in mat3 tbn;
 
-out vec4 frag_color;
+layout(location = 0) out vec4 frag_color;
+layout(location = 1) out vec4 norm_color;
+layout(location = 2) out vec4 position_color;
 
 uniform sampler2D tex0;
 uniform sampler2D tex1;
@@ -82,4 +86,6 @@ void main()
 	}
 
 	frag_color = vec4(mix(color * albedo.rgb, tint_color, tint_amount), 1.0);
+	norm_color = vec4(normal_view, 1.0);
+	position_color = view_position;
 }

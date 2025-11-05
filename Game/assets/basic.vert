@@ -7,6 +7,7 @@ layout(location = 3) in vec2 in_uv;
 
 out vec3 normal;
 out vec3 normal_view;
+out vec4 view_position;
 out vec2 tex_coord;
 out vec4 frag_position;
 out mat3 tbn;
@@ -33,4 +34,5 @@ void main()
     tbn = mat3(t, b, n);
 
     frag_position = model * vec4(in_position, 1);
+    view_position = view * vec4(in_position, 1);
 }

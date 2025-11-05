@@ -53,7 +53,7 @@ namespace Game {
 		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
 		, m_DebugLineMaterial(CreateMaterial(reader, "line.vert", "line.frag"))
 		, m_MainFrameBuffer(
-			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 8),
+			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 8),
 			{ TextureUsage::DEPTH, width, height, 8 })
 		, m_PostProcessingFrameBuffer1(
 			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
