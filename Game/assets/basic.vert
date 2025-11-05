@@ -34,5 +34,5 @@ void main()
     tbn = mat3(t, b, n);
 
     frag_position = model * vec4(in_position, 1);
-    view_position = view * vec4(in_position, 1);
+    view_position = view * frag_position;
 }
