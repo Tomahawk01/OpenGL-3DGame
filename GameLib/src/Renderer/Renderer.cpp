@@ -33,6 +33,15 @@ namespace {
 		return Game::Material{ vertexShader, fragmentShader };
 	}
 
+	std::vector<Game::Texture> GenerateTextures(size_t n, Game::TextureUsage usage, uint32_t width, uint32_t height, uint8_t sampleCount)
+	{
+		std::vector<Game::Texture> textures{};
+
+		std::ranges::generate_n(std::back_inserter(textures), n, [&]() { return Game::Texture{ usage, width, height, sampleCount }; });
+
+		return textures;
+	}
+
 }
 
 namespace Game {
@@ -44,14 +53,14 @@ namespace Game {
 		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
 		, m_DebugLineMaterial(CreateMaterial(reader, "line.vert", "line.frag"))
 		, m_MainFrameBuffer(
-			{ TextureUsage::FRAMEBUFFER, width, height, 8 },
+			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 8),
 			{ TextureUsage::DEPTH, width, height, 8 })
 		, m_PostProcessingFrameBuffer1(
-			{},
-			{ TextureUsage::DEPTH, width, height, 8 })
+			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_PostProcessingFrameBuffer2(
-			{},
-			{ TextureUsage::DEPTH, width, height, 8 })
+			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_Sprite(meshLoader.Sprite())
 		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
 		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
@@ -74,6 +83,7 @@ namespace Game {
 			writer.Write(camera.GetProjection());
 			writer.Write(camera.GetPosition());
 		}
+
 		::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
 
 		{
@@ -161,6 +171,7 @@ namespace Game {
 		
 		if (scene.effects.hdr)
 		{
+			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -176,6 +187,7 @@ namespace Game {
 		
 		if (scene.effects.grayScale)
 		{
+			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -190,6 +202,7 @@ namespace Game {
 		
 		if (scene.effects.blur)
 		{
+			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
