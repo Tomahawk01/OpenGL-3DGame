@@ -56,16 +56,17 @@ namespace Game {
 			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 8),
 			{ TextureUsage::DEPTH, width, height, 8 })
 		, m_PostProcessingFrameBuffer1(
-			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 1),
 			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_PostProcessingFrameBuffer2(
-			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 1),
 			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_Sprite(meshLoader.Sprite())
 		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
 		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
 		, m_BlurMaterial(CreateMaterial(reader, "blur.vert", "blur.frag"))
 		, m_LabelMaterial(CreateMaterial(reader, "label.vert", "label.frag"))
+		, m_SSAOMaterial(CreateMaterial(reader, "ssao.vert", "ssao.frag"))
 		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
 	{
 		m_OrthCamera.SetPosition({ width / 2.0f, height / -2.0f, 0.0f });
@@ -152,23 +153,44 @@ namespace Game {
 
 		m_MainFrameBuffer.frameBuffer.UnBind();
 
-		::glBlitNamedFramebuffer(
-			m_MainFrameBuffer.frameBuffer.GetNativeHandle(),
-			m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(),
-			0u,
-			0u,
-			m_MainFrameBuffer.frameBuffer.GetWidth(),
-			m_MainFrameBuffer.frameBuffer.GetHeight(),
-			0u,
-			0u,
-			m_PostProcessingFrameBuffer1.frameBuffer.GetWidth(),
-			m_PostProcessingFrameBuffer1.frameBuffer.GetHeight(),
-			GL_COLOR_BUFFER_BIT,
-			GL_NEAREST);
+		for (::GLenum i = 0; i < 3; ++i)
+		{
+			::glNamedFramebufferReadBuffer(m_MainFrameBuffer.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0 + i);
+			::glNamedFramebufferDrawBuffer(m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0 + i);
+			::glBlitNamedFramebuffer(
+				m_MainFrameBuffer.frameBuffer.GetNativeHandle(),
+				m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(),
+				0u,
+				0u,
+				m_MainFrameBuffer.frameBuffer.GetWidth(),
+				m_MainFrameBuffer.frameBuffer.GetHeight(),
+				0u,
+				0u,
+				m_PostProcessingFrameBuffer1.frameBuffer.GetWidth(),
+				m_PostProcessingFrameBuffer1.frameBuffer.GetHeight(),
+				GL_COLOR_BUFFER_BIT,
+				GL_NEAREST);
+		}
 
 		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
 		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
 		
+		if (scene.effects.ssao)
+		{
+			readFB->UnBind();
+			writeFB->Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_SSAOMaterial.Use();
+			m_Sprite.Bind();
+			m_SSAOMaterial.BindTexture(0, &m_PostProcessingFrameBuffer1.colorTextures[1], scene.skyboxSampler);
+			m_SSAOMaterial.BindTexture(1, &m_PostProcessingFrameBuffer1.colorTextures[2], scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+
+			std::ranges::swap(readFB, writeFB);
+		}
+
 		if (scene.effects.hdr)
 		{
 			readFB->UnBind();

@@ -57,6 +57,7 @@ namespace Game {
 		Material m_GreyScaleMaterial;
 		Material m_BlurMaterial;
 		Material m_LabelMaterial;
+		Material m_SSAOMaterial;
 		Camera m_OrthCamera;
 	};
 
