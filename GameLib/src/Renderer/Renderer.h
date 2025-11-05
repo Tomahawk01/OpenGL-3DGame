@@ -35,7 +35,7 @@ namespace Game {
 					std::views::transform([](const auto& e) -> const Texture* { return std::addressof(e); }) |
 					std::ranges::to<std::vector>() }
 				, depth{ std::move(depth) }
-				, frameBuffer{ colorTexturePointers, &depth }
+				, frameBuffer{ colorTexturePointers, &this->depth }
 			{}
 
 			std::vector<Texture> colorTextures;
