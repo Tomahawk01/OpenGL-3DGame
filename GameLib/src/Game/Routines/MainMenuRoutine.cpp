@@ -119,7 +119,8 @@ namespace Game {
 			.effects = {
 				.hdr = true,
 				.grayScale = false,
-				.blur = false
+				.blur = false,
+				.ssao = false
 			}
 		};
 
