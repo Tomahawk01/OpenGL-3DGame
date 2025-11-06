@@ -159,8 +159,6 @@ namespace Game {
 			dbl->UnBind();
 		}
 
-		m_MainFrameBuffer.frameBuffer.UnBind();
-
 		for (::GLenum i = 0; i < 3; ++i)
 		{
 			Blit(m_MainFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0 + i, m_PostProcessingFrameBuffer1.frameBuffer, GL_COLOR_ATTACHMENT0 + i);
@@ -173,7 +171,6 @@ namespace Game {
 		
 		if (scene.effects.ssao)
 		{
-			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -184,7 +181,6 @@ namespace Game {
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 
-			writeFB->UnBind();
 			m_SSAOApplyFrameBuffer.frameBuffer.Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -196,7 +192,6 @@ namespace Game {
 			m_Sprite.UnBind();
 
 			Blit(m_SSAOApplyFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0, *readFB, GL_COLOR_ATTACHMENT0);
-			m_SSAOApplyFrameBuffer.frameBuffer.UnBind();
 		}
 
 		if (scene.skybox)
@@ -216,7 +211,6 @@ namespace Game {
 
 		if (scene.effects.hdr)
 		{
-			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -232,7 +226,6 @@ namespace Game {
 		
 		if (scene.effects.grayScale)
 		{
-			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -247,7 +240,6 @@ namespace Game {
 		
 		if (scene.effects.blur)
 		{
-			readFB->UnBind();
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
