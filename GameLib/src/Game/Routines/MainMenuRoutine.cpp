@@ -15,7 +15,7 @@ using namespace std::literals;
 
 namespace {
 
-	static constexpr Game::vec3 barrelCenter{ 83.5f, 1.0f, -5.0f };
+	static constexpr Game::vec3 barrelCenter{ 83.5f, 3.0f, -5.0f };
 
 	Game::Camera CreateCamera(const Game::Window& window)
 	{
@@ -760,7 +760,7 @@ namespace Game {
 			const float x = std::sin(theta) * radius;
 			const float z = std::cos(theta) * radius;
 
-			m_Camera.SetPosition(center + vec3{ x, 0.0f, z });
+			m_Camera.SetPosition(center + vec3{ x, -5.0f, z });
 			m_Camera.SetYaw(-theta - (std::numbers::pi_v<float> / 2.0f));
 
 			theta += delta;
