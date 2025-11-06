@@ -176,6 +176,9 @@ namespace Game {
 				GL_NEAREST);
 		}
 
+		::glNamedFramebufferReadBuffer(m_MainFrameBuffer.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0);
+		::glNamedFramebufferDrawBuffer(m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0);
+
 		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
 		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
 		
@@ -203,8 +206,6 @@ namespace Game {
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 
-			std::ranges::swap(readFB, writeFB);
-
 			::glBlitNamedFramebuffer(
 				m_SSAOApplyFrameBuffer.frameBuffer.GetNativeHandle(),
 				readFB->GetNativeHandle(),
@@ -218,6 +219,7 @@ namespace Game {
 				readFB->GetHeight(),
 				GL_COLOR_BUFFER_BIT,
 				GL_NEAREST);
+			m_SSAOApplyFrameBuffer.frameBuffer.UnBind();
 		}
 
 		if (scene.effects.hdr)
