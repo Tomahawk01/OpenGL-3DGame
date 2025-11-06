@@ -116,21 +116,6 @@ namespace Game {
 		}
 		::glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightBuffer.GetNativeHandle());
 
-		if (scene.skybox)
-		{
-			::glDepthMask(GL_FALSE);
-
-			m_SkyboxMaterial.Use();
-			m_SkyboxCube.Bind();
-
-			m_SkyboxMaterial.BindCubeMap(scene.skybox, scene.skyboxSampler);
-			::glDrawElements(GL_TRIANGLES, m_SkyboxCube.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_SkyboxCube.IndexOffset()));
-
-			m_SkyboxCube.UnBind();
-
-			::glDepthMask(GL_TRUE);
-		}
-
 		for (const Entity* entity : scene.entities)
 		{
 			const Mesh* mesh = entity->GetMesh();
@@ -178,6 +163,19 @@ namespace Game {
 
 		::glNamedFramebufferReadBuffer(m_MainFrameBuffer.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0);
 		::glNamedFramebufferDrawBuffer(m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0);
+		::glBlitNamedFramebuffer(
+			m_MainFrameBuffer.frameBuffer.GetNativeHandle(),
+			m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(),
+			0u,
+			0u,
+			m_MainFrameBuffer.frameBuffer.GetWidth(),
+			m_MainFrameBuffer.frameBuffer.GetHeight(),
+			0u,
+			0u,
+			m_PostProcessingFrameBuffer1.frameBuffer.GetWidth(),
+			m_PostProcessingFrameBuffer1.frameBuffer.GetHeight(),
+			GL_DEPTH_BUFFER_BIT,
+			GL_NEAREST);
 
 		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
 		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
@@ -220,6 +218,21 @@ namespace Game {
 				GL_COLOR_BUFFER_BIT,
 				GL_NEAREST);
 			m_SSAOApplyFrameBuffer.frameBuffer.UnBind();
+		}
+
+		if (scene.skybox)
+		{
+			::glDepthFunc(GL_LEQUAL);
+			readFB->Bind();
+
+			m_SkyboxMaterial.Use();
+			m_SkyboxCube.Bind();
+
+			m_SkyboxMaterial.BindCubeMap(scene.skybox, scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_SkyboxCube.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_SkyboxCube.IndexOffset()));
+
+			m_SkyboxCube.UnBind();
+			::glDepthFunc(GL_LESS);
 		}
 
 		if (scene.effects.hdr)
