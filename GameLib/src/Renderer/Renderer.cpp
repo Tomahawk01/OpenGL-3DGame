@@ -61,6 +61,19 @@ namespace {
 			GL_NEAREST);
 	}
 
+	void ApplyPostProccesingEffect(Game::FrameBuffer const*& readFB, Game::FrameBuffer const*& writeFB, const Game::Material& material, const Game::Sampler* sampler, const Game::Mesh& sprite, float gamma)
+	{
+		writeFB->Bind();
+		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		material.Use();
+		material.BindTexture(0, readFB->GetColorTextures().front(), sampler);
+		material.SetUniform("gamma", gamma);
+		::glDrawElements(GL_TRIANGLES, sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(sprite.IndexOffset()));
+
+		std::ranges::swap(readFB, writeFB);
+	}
+
 }
 
 namespace Game {
@@ -213,39 +226,17 @@ namespace Game {
 
 		if (scene.effects.hdr)
 		{
-			writeFB->Bind();
-			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-			m_HDRMaterial.Use();
-			m_HDRMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
-			m_HDRMaterial.SetUniform("gamma", gamma);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		
-			std::ranges::swap(readFB, writeFB);
+			ApplyPostProccesingEffect(readFB, writeFB, m_HDRMaterial, scene.skyboxSampler, m_Sprite, gamma);
 		}
 		
 		if (scene.effects.grayScale)
 		{
-			writeFB->Bind();
-			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-			m_GreyScaleMaterial.Use();
-			m_GreyScaleMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		
-			std::ranges::swap(readFB, writeFB);
+			ApplyPostProccesingEffect(readFB, writeFB, m_GreyScaleMaterial, scene.skyboxSampler, m_Sprite, gamma);
 		}
 		
 		if (scene.effects.blur)
 		{
-			writeFB->Bind();
-			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-			m_BlurMaterial.Use();
-			m_BlurMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-		
-			std::ranges::swap(readFB, writeFB);
+			ApplyPostProccesingEffect(readFB, writeFB, m_BlurMaterial, scene.skyboxSampler, m_Sprite, gamma);
 		}
 		
 		// NOTE: Render UI
