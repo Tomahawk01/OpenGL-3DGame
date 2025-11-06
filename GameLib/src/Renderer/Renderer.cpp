@@ -8,6 +8,24 @@
 
 namespace {
 
+	template<class T>
+	class AutoBind
+	{
+	public:
+		AutoBind(T& obj)
+			: m_Obj{ obj }
+		{
+			m_Obj.Bind();
+		}
+		~AutoBind()
+		{
+			m_Obj.UnBind();
+		}
+
+	private:
+		T& m_Obj;
+	};
+
 	struct PointLightBuffer
 	{
 		alignas(16) Game::vec3 position;
@@ -63,7 +81,7 @@ namespace {
 
 	void ApplyPostProccesingEffect(Game::FrameBuffer const*& readFB, Game::FrameBuffer const*& writeFB, const Game::Material& material, const Game::Sampler* sampler, const Game::Mesh& sprite, float gamma)
 	{
-		writeFB->Bind();
+		const AutoBind bind{ *writeFB };
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		material.Use();
@@ -162,17 +180,15 @@ namespace Game {
 			material->InvokeUniformCallback(entity);
 			material->BindTextures(entity->GetTextures());
 
-			mesh->Bind();
+			const AutoBind bind{ *mesh };
 			::glDrawElements(GL_TRIANGLES, mesh->IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(mesh->IndexOffset()));
-			mesh->UnBind();
 		}
 
 		if (const auto& dbl = scene.debugLines; dbl)
 		{
 			m_DebugLineMaterial.Use();
-			dbl->Bind();
+			const AutoBind bind{ *dbl };
 			::glDrawArrays(GL_LINES, 0u, dbl->Count());
-			dbl->UnBind();
 		}
 
 		for (::GLenum i = 0; i < 3; ++i)
@@ -185,10 +201,10 @@ namespace Game {
 		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
 		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
 
-		m_Sprite.Bind();
-
 		if (scene.effects.ssao)
 		{
+			const AutoBind bind{ m_Sprite };
+
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -208,12 +224,10 @@ namespace Game {
 			Blit(m_SSAOApplyFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0, *readFB, GL_COLOR_ATTACHMENT0);
 		}
 
-		m_Sprite.UnBind();
-
 		if (scene.skybox)
 		{
 			::glDepthFunc(GL_LEQUAL);
-			readFB->Bind();
+			const AutoBind bind{ *readFB };
 
 			m_SkyboxMaterial.Use();
 			m_SkyboxCube.Bind();
@@ -225,40 +239,40 @@ namespace Game {
 			::glDepthFunc(GL_LESS);
 		}
 
-		m_Sprite.Bind();
-
-		if (scene.effects.hdr)
 		{
-			ApplyPostProccesingEffect(readFB, writeFB, m_HDRMaterial, scene.skyboxSampler, m_Sprite, gamma);
-		}
-		
-		if (scene.effects.grayScale)
-		{
-			ApplyPostProccesingEffect(readFB, writeFB, m_GreyScaleMaterial, scene.skyboxSampler, m_Sprite, gamma);
-		}
-		
-		if (scene.effects.blur)
-		{
-			ApplyPostProccesingEffect(readFB, writeFB, m_BlurMaterial, scene.skyboxSampler, m_Sprite, gamma);
-		}
-		
-		// NOTE: Render UI
-		m_LabelMaterial.Use();
+			const AutoBind bind{ m_Sprite };
 
-		WriteCameraDataToUBO(m_OrthCamera, m_CameraBuffer);
+			if (scene.effects.hdr)
+			{
+				ApplyPostProccesingEffect(readFB, writeFB, m_HDRMaterial, scene.skyboxSampler, m_Sprite, gamma);
+			}
 
-		for (const auto& [texture, x, y] : scene.labels)
-		{
-			const mat4 model{ 
-				vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
-				vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
-			};
-			m_LabelMaterial.SetUniform("model", model);
-			m_LabelMaterial.BindTexture(0, texture);
-			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			if (scene.effects.grayScale)
+			{
+				ApplyPostProccesingEffect(readFB, writeFB, m_GreyScaleMaterial, scene.skyboxSampler, m_Sprite, gamma);
+			}
+
+			if (scene.effects.blur)
+			{
+				ApplyPostProccesingEffect(readFB, writeFB, m_BlurMaterial, scene.skyboxSampler, m_Sprite, gamma);
+			}
+
+			// NOTE: Render UI
+			m_LabelMaterial.Use();
+			const AutoBind bind2{ *readFB };
+
+			for (const auto& [texture, x, y] : scene.labels)
+			{
+				WriteCameraDataToUBO(m_OrthCamera, m_CameraBuffer);
+				const mat4 model{
+					vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
+					vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
+				};
+				m_LabelMaterial.SetUniform("model", model);
+				m_LabelMaterial.BindTexture(0, texture);
+				::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			}
 		}
-
-		m_Sprite.UnBind();
 
 		::glBlitNamedFramebuffer(
 			readFB->GetNativeHandle(),
