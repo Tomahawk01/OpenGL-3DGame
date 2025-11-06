@@ -168,31 +168,31 @@ namespace Game {
 
 		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
 		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
-		
+
+		m_Sprite.Bind();
+
 		if (scene.effects.ssao)
 		{
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			m_SSAOMaterial.Use();
-			m_Sprite.Bind();
 			m_SSAOMaterial.BindTexture(0, &m_PostProcessingFrameBuffer1.colorTextures[1], scene.skyboxSampler);
 			m_SSAOMaterial.BindTexture(1, &m_PostProcessingFrameBuffer1.colorTextures[2], scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
 
 			m_SSAOApplyFrameBuffer.frameBuffer.Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			m_SSAOApplyMaterial.Use();
-			m_Sprite.Bind();
 			m_SSAOApplyMaterial.BindTexture(0, &m_PostProcessingFrameBuffer1.colorTextures[0], scene.skyboxSampler);
 			m_SSAOApplyMaterial.BindTexture(1, &m_PostProcessingFrameBuffer2.colorTextures[0], scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
 
 			Blit(m_SSAOApplyFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0, *readFB, GL_COLOR_ATTACHMENT0);
 		}
+
+		m_Sprite.UnBind();
 
 		if (scene.skybox)
 		{
@@ -209,17 +209,17 @@ namespace Game {
 			::glDepthFunc(GL_LESS);
 		}
 
+		m_Sprite.Bind();
+
 		if (scene.effects.hdr)
 		{
 			writeFB->Bind();
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 			m_HDRMaterial.Use();
-			m_Sprite.Bind();
 			m_HDRMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
 			m_HDRMaterial.SetUniform("gamma", gamma);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
 		
 			std::ranges::swap(readFB, writeFB);
 		}
@@ -230,10 +230,8 @@ namespace Game {
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 			m_GreyScaleMaterial.Use();
-			m_Sprite.Bind();
 			m_GreyScaleMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
 		
 			std::ranges::swap(readFB, writeFB);
 		}
@@ -244,17 +242,14 @@ namespace Game {
 			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 			m_BlurMaterial.Use();
-			m_Sprite.Bind();
 			m_BlurMaterial.BindTexture(0, readFB->GetColorTextures().front(), scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
-			m_Sprite.UnBind();
 		
 			std::ranges::swap(readFB, writeFB);
 		}
 		
 		// NOTE: Render UI
 		m_LabelMaterial.Use();
-		m_Sprite.Bind();
 		for (const auto& [texture, x, y] : scene.labels)
 		{
 			{
@@ -273,6 +268,7 @@ namespace Game {
 			m_LabelMaterial.BindTexture(0, texture);
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 		}
+
 		m_Sprite.UnBind();
 
 		::glBlitNamedFramebuffer(
