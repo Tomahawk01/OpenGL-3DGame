@@ -8,22 +8,29 @@
 
 namespace {
 
-	template<class T>
+	template<class... T>
 	class AutoBind
 	{
 	public:
-		AutoBind(T& obj)
-			: m_Obj{ obj }
+		AutoBind(T&... obj)
+			: m_Objs{ obj... }
 		{
-			m_Obj.Bind();
+			[this]<size_t... Ix>(std::index_sequence<Ix...>)
+			{
+				(std::get<Ix>(this->m_Objs).Bind(), ...);
+			}(std::make_index_sequence<sizeof...(T)>());
 		}
+
 		~AutoBind()
 		{
-			m_Obj.UnBind();
+			[this]<size_t... Ix>(std::index_sequence<Ix...>)
+			{
+				(std::get<Ix>(this->m_Objs).UnBind(), ...);
+			}(std::make_index_sequence<sizeof...(T)>());
 		}
 
 	private:
-		T& m_Obj;
+		std::tuple<T&...> m_Objs;
 	};
 
 	struct PointLightBuffer
@@ -81,7 +88,8 @@ namespace {
 
 	void ApplyPostProccesingEffect(Game::FrameBuffer const*& readFB, Game::FrameBuffer const*& writeFB, const Game::Material& material, const Game::Sampler* sampler, const Game::Mesh& sprite, float gamma)
 	{
-		const AutoBind bind{ *writeFB };
+		auto& fb = *writeFB;
+		AutoBind bind{ fb };
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		material.Use();
@@ -227,15 +235,12 @@ namespace Game {
 		if (scene.skybox)
 		{
 			::glDepthFunc(GL_LEQUAL);
-			const AutoBind bind{ *readFB };
+			const AutoBind bind{ *readFB, m_SkyboxCube };
 
 			m_SkyboxMaterial.Use();
-			m_SkyboxCube.Bind();
-
 			m_SkyboxMaterial.BindCubeMap(scene.skybox, scene.skyboxSampler);
 			::glDrawElements(GL_TRIANGLES, m_SkyboxCube.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_SkyboxCube.IndexOffset()));
 
-			m_SkyboxCube.UnBind();
 			::glDepthFunc(GL_LESS);
 		}
 
