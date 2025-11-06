@@ -52,12 +52,14 @@ namespace Game {
 		FrameBufferData m_MainFrameBuffer;
 		FrameBufferData m_PostProcessingFrameBuffer1;
 		FrameBufferData m_PostProcessingFrameBuffer2;
+		FrameBufferData m_SSAOApplyFrameBuffer;
 		Mesh m_Sprite;
 		Material m_HDRMaterial;
 		Material m_GreyScaleMaterial;
 		Material m_BlurMaterial;
 		Material m_LabelMaterial;
 		Material m_SSAOMaterial;
+		Material m_SSAOApplyMaterial;
 		Camera m_OrthCamera;
 	};
 

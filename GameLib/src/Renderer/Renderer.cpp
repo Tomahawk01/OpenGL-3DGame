@@ -61,12 +61,16 @@ namespace Game {
 		, m_PostProcessingFrameBuffer2(
 			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 1),
 			{ TextureUsage::DEPTH, width, height, 1 })
+		, m_SSAOApplyFrameBuffer(
+			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_Sprite(meshLoader.Sprite())
 		, m_HDRMaterial(CreateMaterial(reader, "hdr.vert", "hdr.frag"))
 		, m_GreyScaleMaterial(CreateMaterial(reader, "greyScale.vert", "greyScale.frag"))
 		, m_BlurMaterial(CreateMaterial(reader, "blur.vert", "blur.frag"))
 		, m_LabelMaterial(CreateMaterial(reader, "label.vert", "label.frag"))
 		, m_SSAOMaterial(CreateMaterial(reader, "ssao.vert", "ssao.frag"))
+		, m_SSAOApplyMaterial(CreateMaterial(reader, "ssao.vert", "ssao_apply.frag"))
 		, m_OrthCamera{ static_cast<float>(width), static_cast<float>(height), 1000u }
 	{
 		m_OrthCamera.SetPosition({ width / 2.0f, height / -2.0f, 0.0f });
@@ -143,13 +147,13 @@ namespace Game {
 			mesh->UnBind();
 		}
 
-		if (const auto& dbl = scene.debugLines; dbl)
-		{
-			m_DebugLineMaterial.Use();
-			dbl->Bind();
-			::glDrawArrays(GL_LINES, 0u, dbl->Count());
-			dbl->UnBind();
-		}
+		//if (const auto& dbl = scene.debugLines; dbl)
+		//{
+		//	m_DebugLineMaterial.Use();
+		//	dbl->Bind();
+		//	::glDrawArrays(GL_LINES, 0u, dbl->Count());
+		//	dbl->UnBind();
+		//}
 
 		m_MainFrameBuffer.frameBuffer.UnBind();
 
@@ -188,7 +192,32 @@ namespace Game {
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 
+			writeFB->UnBind();
+			m_SSAOApplyFrameBuffer.frameBuffer.Bind();
+			::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_SSAOApplyMaterial.Use();
+			m_Sprite.Bind();
+			m_SSAOApplyMaterial.BindTexture(0, &m_PostProcessingFrameBuffer1.colorTextures[0], scene.skyboxSampler);
+			m_SSAOApplyMaterial.BindTexture(1, &m_PostProcessingFrameBuffer2.colorTextures[0], scene.skyboxSampler);
+			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
+			m_Sprite.UnBind();
+
 			std::ranges::swap(readFB, writeFB);
+
+			::glBlitNamedFramebuffer(
+				m_SSAOApplyFrameBuffer.frameBuffer.GetNativeHandle(),
+				readFB->GetNativeHandle(),
+				0u,
+				0u,
+				m_SSAOApplyFrameBuffer.frameBuffer.GetWidth(),
+				m_SSAOApplyFrameBuffer.frameBuffer.GetHeight(),
+				0u,
+				0u,
+				readFB->GetWidth(),
+				readFB->GetHeight(),
+				GL_COLOR_BUFFER_BIT,
+				GL_NEAREST);
 		}
 
 		if (scene.effects.hdr)

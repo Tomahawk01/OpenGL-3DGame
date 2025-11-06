@@ -4,7 +4,8 @@ in vec3 normal;
 in vec2 tex_coord;
 in vec4 frag_position;
 in mat3 tbn;
-out vec4 frag_color;
+
+layout(location = 0) out vec4 frag_color;
 
 uniform sampler2D tex0; // normal
 uniform sampler2D tex1; // position
@@ -68,7 +69,7 @@ void main()
 	vec3 normal = normalize(texture(tex0, tex_coord).rgb);
 	vec3 frag_pos = texture(tex1, tex_coord).xyz;
 
-	const int sample_count = 32;
+	const int sample_count = 64;
 	const float radius = 0.5f;
 	const float bias = 0.025f;
 
@@ -89,9 +90,8 @@ void main()
 		sample_pos = frag_pos + sample_pos * radius;
 
 		vec4 offset = projection * vec4(sample_pos, 1.0f);
-		offset.xy /= offset.w;
-		offset.x = offset.x * 0.5f + 0.5f;
-		offset.y = -offset.y * 0.5f + 0.5f;
+		offset.xyz /= offset.w;
+		offset.xyz = offset.xyz * 0.5f + 0.5f;
 
 		const vec3 sample_normal = normalize(texture(tex0, offset.xy).rgb);
 		if (dot(normal, sample_normal) > 0.99f)
@@ -99,7 +99,7 @@ void main()
 			continue;
 		}
 
-		const float sample_depth = texture(tex1, vec2(offset.x, 1.0 - offset.y)).z;
+		const float sample_depth = texture(tex1, vec2(offset.x, offset.y)).z;
 		const float range_check = smoothstep(0.0, 1.0, radius / abs(frag_pos.z - sample_depth));
 		occlusion += (sample_depth >= sample_pos.z + bias ? 1.0 : 0.0) * range_check;
 	}
