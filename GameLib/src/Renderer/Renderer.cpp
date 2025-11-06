@@ -74,6 +74,16 @@ namespace {
 		std::ranges::swap(readFB, writeFB);
 	}
 
+	void WriteCameraDataToUBO(const Game::Camera& camera, const Game::Buffer& cameraBuffer)
+	{
+		Game::BufferWriter writer{ cameraBuffer };
+		writer.Write(camera.GetView());
+		writer.Write(camera.GetProjection());
+		writer.Write(camera.GetPosition());
+
+		::glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraBuffer.GetNativeHandle());
+	}
+
 }
 
 namespace Game {
@@ -114,14 +124,7 @@ namespace Game {
 
 		::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		{
-			BufferWriter writer{ m_CameraBuffer };
-			writer.Write(camera.GetView());
-			writer.Write(camera.GetProjection());
-			writer.Write(camera.GetPosition());
-		}
-
-		::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
+		WriteCameraDataToUBO(camera, m_CameraBuffer);
 
 		{
 			LightBuffer lightBuffer{
@@ -241,16 +244,11 @@ namespace Game {
 		
 		// NOTE: Render UI
 		m_LabelMaterial.Use();
+
+		WriteCameraDataToUBO(m_OrthCamera, m_CameraBuffer);
+
 		for (const auto& [texture, x, y] : scene.labels)
 		{
-			{
-				BufferWriter writer{ m_CameraBuffer };
-				writer.Write(m_OrthCamera.GetView());
-				writer.Write(m_OrthCamera.GetProjection());
-				writer.Write(m_OrthCamera.GetPosition());
-			}
-			::glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_CameraBuffer.GetNativeHandle());
-		
 			const mat4 model{ 
 				vec3{static_cast<float>(x) + (texture->GetWidth() / 2.0f), -static_cast<float>(y) - (texture->GetHeight() / 2.0f), 0.0f},
 				vec3{static_cast<float>(texture->GetWidth()) / 2.0f, static_cast<float>(texture->GetHeight()) / 2.0f, 1.0f}
