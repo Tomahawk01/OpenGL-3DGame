@@ -774,10 +774,7 @@ namespace Game {
 	{
 		const ScriptRunner runner{ m_Script };
 
-		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
-		{
-			runner.Execute("set_barrel_visibility", index + 1ll, entity.IsVisible());
-		}
+		UpdateBarrelVisibility();
 
 		auto origPositions = m_Entities |
 							 std::views::transform([](const auto& e) { return std::make_tuple(false, e.GetPosition()); }) |
@@ -948,6 +945,16 @@ namespace Game {
 	std::span<const Entity> LuaLevel::GetEntities() const
 	{
 		return m_Entities;
+	}
+
+	void LuaLevel::UpdateBarrelVisibility()
+	{
+		const ScriptRunner runner{ m_Script };
+
+		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
+		{
+			runner.Execute("set_barrel_visibility", index + 1ll, entity.IsVisible());
+		}
 	}
 
 }

@@ -48,6 +48,9 @@ namespace Game {
 		std::span<const Entity> GetEntities() const;
 
 	private:
+		void UpdateBarrelVisibility();
+
+	private:
 		PhysicsSystem &m_PS;
 		LuaScript m_Script;
 		std::vector<Entity> m_Entities;
