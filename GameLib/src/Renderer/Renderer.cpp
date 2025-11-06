@@ -132,13 +132,13 @@ namespace Game {
 			mesh->UnBind();
 		}
 
-		//if (const auto& dbl = scene.debugLines; dbl)
-		//{
-		//	m_DebugLineMaterial.Use();
-		//	dbl->Bind();
-		//	::glDrawArrays(GL_LINES, 0u, dbl->Count());
-		//	dbl->UnBind();
-		//}
+		if (const auto& dbl = scene.debugLines; dbl)
+		{
+			m_DebugLineMaterial.Use();
+			dbl->Bind();
+			::glDrawArrays(GL_LINES, 0u, dbl->Count());
+			dbl->UnBind();
+		}
 
 		m_MainFrameBuffer.frameBuffer.UnBind();
 

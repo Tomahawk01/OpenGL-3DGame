@@ -30,6 +30,7 @@ namespace Game {
 		, m_BarrelInfo{}
 		, m_Shapes{}
 		, m_AutoSub{ m_Bus, {MessageType::ENTITY_INTERSECT}, this }
+		, m_RenderDebugLines{ true }
 	{
 		Logger::Info("Loading level: {}", loader.GetName());
 
@@ -879,19 +880,26 @@ namespace Game {
 			m_Scene.pointLights[index].position = entity.GetPosition();
 		}
 
-		for (const auto& entity : m_Scene.entities)
+		if (m_RenderDebugLines)
 		{
-			if (const auto staticCollider = entity->GetStaticCollider(); staticCollider)
+			for (const auto& entity : m_Scene.entities)
 			{
-				staticCollider->Draw(m_PS.Debug_Renderer(), Colors::Azure);
+				if (const auto staticCollider = entity->GetStaticCollider(); staticCollider)
+				{
+					staticCollider->Draw(m_PS.Debug_Renderer(), Colors::Azure);
+				}
+				else
+				{
+					entity->GetBoundingBox().Draw(m_PS.Debug_Renderer(), Colors::White);
+				}
 			}
-			else
-			{
-				entity->GetBoundingBox().Draw(m_PS.Debug_Renderer(), Colors::White);
-			}
-		}
 
-		m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();
+			m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();
+		}
+		else
+		{
+			m_Scene.debugLines.reset();
+		}
 	}
 
 	void LuaLevel::Restart()
@@ -930,6 +938,11 @@ namespace Game {
 		const ScriptRunner runner{ m_Script };
 
 		runner.Execute("handle_entity_intersect", indexA + 1ll, indexB + 1ll);
+	}
+
+	void LuaLevel::ToggleRenderDebugLines()
+	{
+		m_RenderDebugLines = !m_RenderDebugLines;
 	}
 
 	std::span<const Entity> LuaLevel::GetEntities() const

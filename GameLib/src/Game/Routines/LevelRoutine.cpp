@@ -190,6 +190,11 @@ namespace Game {
 				m_Bus.PostStateChange(GameState::RUNNING);
 			}
 		}
+
+		if (event.GetKey() == Key::L && event.GetState() == KeyState::DOWN)
+		{
+			m_Level->ToggleRenderDebugLines();
+		}
 	}
 
 	void LevelRoutine::HandleMouseMove(const MouseEvent& event)

@@ -43,6 +43,7 @@ namespace Game {
 		void Update(Player& player) override;
 		void Restart() override;
 		void HandleEntityIntersect(const Entity* a, const Entity* b) override;
+		void ToggleRenderDebugLines();
 
 		std::span<const Entity> GetEntities() const;
 
@@ -58,6 +59,7 @@ namespace Game {
 		std::unordered_map<const Entity*, BarrelInfo> m_BarrelInfo;
 		std::vector<const Shape*> m_Shapes;
 		AutoSubscribe m_AutoSub;
+		bool m_RenderDebugLines;
 	};
 
 }
