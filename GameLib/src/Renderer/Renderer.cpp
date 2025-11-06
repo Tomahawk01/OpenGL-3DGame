@@ -42,6 +42,25 @@ namespace {
 		return textures;
 	}
 
+	void Blit(const Game::FrameBuffer& sourceFB, ::GLenum sourceAttachment, const Game::FrameBuffer& destFB, ::GLenum destAttachment, ::GLbitfield mask = GL_COLOR_BUFFER_BIT)
+	{
+		::glNamedFramebufferReadBuffer(sourceFB.GetNativeHandle(), sourceAttachment);
+		::glNamedFramebufferDrawBuffer(destFB.GetNativeHandle(), destAttachment);
+		::glBlitNamedFramebuffer(
+			sourceFB.GetNativeHandle(),
+			destFB.GetNativeHandle(),
+			0u,
+			0u,
+			sourceFB.GetWidth(),
+			sourceFB.GetHeight(),
+			0u,
+			0u,
+			destFB.GetWidth(),
+			destFB.GetHeight(),
+			mask,
+			GL_NEAREST);
+	}
+
 }
 
 namespace Game {
@@ -144,38 +163,10 @@ namespace Game {
 
 		for (::GLenum i = 0; i < 3; ++i)
 		{
-			::glNamedFramebufferReadBuffer(m_MainFrameBuffer.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0 + i);
-			::glNamedFramebufferDrawBuffer(m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0 + i);
-			::glBlitNamedFramebuffer(
-				m_MainFrameBuffer.frameBuffer.GetNativeHandle(),
-				m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(),
-				0u,
-				0u,
-				m_MainFrameBuffer.frameBuffer.GetWidth(),
-				m_MainFrameBuffer.frameBuffer.GetHeight(),
-				0u,
-				0u,
-				m_PostProcessingFrameBuffer1.frameBuffer.GetWidth(),
-				m_PostProcessingFrameBuffer1.frameBuffer.GetHeight(),
-				GL_COLOR_BUFFER_BIT,
-				GL_NEAREST);
+			Blit(m_MainFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0 + i, m_PostProcessingFrameBuffer1.frameBuffer, GL_COLOR_ATTACHMENT0 + i);
 		}
 
-		::glNamedFramebufferReadBuffer(m_MainFrameBuffer.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0);
-		::glNamedFramebufferDrawBuffer(m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(), GL_COLOR_ATTACHMENT0);
-		::glBlitNamedFramebuffer(
-			m_MainFrameBuffer.frameBuffer.GetNativeHandle(),
-			m_PostProcessingFrameBuffer1.frameBuffer.GetNativeHandle(),
-			0u,
-			0u,
-			m_MainFrameBuffer.frameBuffer.GetWidth(),
-			m_MainFrameBuffer.frameBuffer.GetHeight(),
-			0u,
-			0u,
-			m_PostProcessingFrameBuffer1.frameBuffer.GetWidth(),
-			m_PostProcessingFrameBuffer1.frameBuffer.GetHeight(),
-			GL_DEPTH_BUFFER_BIT,
-			GL_NEAREST);
+		Blit(m_MainFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0, m_PostProcessingFrameBuffer1.frameBuffer, GL_COLOR_ATTACHMENT0, GL_DEPTH_BUFFER_BIT);
 
 		auto* readFB = &m_PostProcessingFrameBuffer1.frameBuffer;
 		auto* writeFB = &m_PostProcessingFrameBuffer2.frameBuffer;
@@ -204,19 +195,7 @@ namespace Game {
 			::glDrawElements(GL_TRIANGLES, m_Sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(m_Sprite.IndexOffset()));
 			m_Sprite.UnBind();
 
-			::glBlitNamedFramebuffer(
-				m_SSAOApplyFrameBuffer.frameBuffer.GetNativeHandle(),
-				readFB->GetNativeHandle(),
-				0u,
-				0u,
-				m_SSAOApplyFrameBuffer.frameBuffer.GetWidth(),
-				m_SSAOApplyFrameBuffer.frameBuffer.GetHeight(),
-				0u,
-				0u,
-				readFB->GetWidth(),
-				readFB->GetHeight(),
-				GL_COLOR_BUFFER_BIT,
-				GL_NEAREST);
+			Blit(m_SSAOApplyFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0, *readFB, GL_COLOR_ATTACHMENT0);
 			m_SSAOApplyFrameBuffer.frameBuffer.UnBind();
 		}
 
