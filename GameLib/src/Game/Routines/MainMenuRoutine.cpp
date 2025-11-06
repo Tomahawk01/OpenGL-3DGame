@@ -15,7 +15,7 @@ using namespace std::literals;
 
 namespace {
 
-	static constexpr Game::vec3 barrelCenter{ 83.5f, 10.0f, -5.0f };
+	static constexpr Game::vec3 barrelCenter{ 83.5f, 1.0f, -5.0f };
 
 	Game::Camera CreateCamera(const Game::Window& window)
 	{
@@ -120,7 +120,7 @@ namespace Game {
 				.hdr = true,
 				.grayScale = false,
 				.blur = false,
-				.ssao = false
+				.ssao = true
 			}
 		};
 

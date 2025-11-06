@@ -102,7 +102,7 @@ namespace Game {
 				{&textTest, 0, 0}
 			},
 			.effects = {
-				.hdr = false,
+				.hdr = true,
 				.grayScale = false,
 				.blur = false,
 				.ssao = true
