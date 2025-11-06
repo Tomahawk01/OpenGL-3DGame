@@ -86,7 +86,7 @@ namespace {
 			GL_NEAREST);
 	}
 
-	void ApplyPostProccesingEffect(Game::FrameBuffer const*& readFB, Game::FrameBuffer const*& writeFB, const Game::Material& material, const Game::Sampler* sampler, const Game::Mesh& sprite, float gamma)
+	void ApplyPostProccesingEffect(Game::FrameBuffer const*& readFB, Game::FrameBuffer const*& writeFB, const Game::Material& material, const Game::Sampler* sampler, const Game::Mesh& sprite, float gamma = -1)
 	{
 		auto& fb = *writeFB;
 		AutoBind bind{ fb };
@@ -94,7 +94,10 @@ namespace {
 
 		material.Use();
 		material.BindTexture(0, readFB->GetColorTextures().front(), sampler);
-		material.SetUniform("gamma", gamma);
+		if (gamma != -1)
+		{
+			material.SetUniform("gamma", gamma);
+		}
 		::glDrawElements(GL_TRIANGLES, sprite.IndexCount(), GL_UNSIGNED_INT, reinterpret_cast<void*>(sprite.IndexOffset()));
 
 		std::ranges::swap(readFB, writeFB);
@@ -254,12 +257,12 @@ namespace Game {
 
 			if (scene.effects.grayScale)
 			{
-				ApplyPostProccesingEffect(readFB, writeFB, m_GreyScaleMaterial, scene.skyboxSampler, m_Sprite, gamma);
+				ApplyPostProccesingEffect(readFB, writeFB, m_GreyScaleMaterial, scene.skyboxSampler, m_Sprite);
 			}
 
 			if (scene.effects.blur)
 			{
-				ApplyPostProccesingEffect(readFB, writeFB, m_BlurMaterial, scene.skyboxSampler, m_Sprite, gamma);
+				ApplyPostProccesingEffect(readFB, writeFB, m_BlurMaterial, scene.skyboxSampler, m_Sprite);
 			}
 
 			// NOTE: Render UI
