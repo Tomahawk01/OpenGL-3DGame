@@ -50,6 +50,7 @@ namespace Game {
 	private:
 		void UpdateBarrelVisibility();
 		void UpdateLuaLevel(Player& player);
+		void UpdateBarrelCollisions();
 
 	private:
 		PhysicsSystem &m_PS;

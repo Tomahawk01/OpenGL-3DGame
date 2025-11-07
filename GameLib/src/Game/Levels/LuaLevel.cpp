@@ -776,52 +776,7 @@ namespace Game {
 
 		UpdateBarrelVisibility();
 		UpdateLuaLevel(player);
-
-		auto origPositions = m_Entities |
-							 std::views::transform([](const auto& e) { return std::make_tuple(false, e.GetPosition()); }) |
-							 std::ranges::to<std::vector>();
-
-
-		const auto max = std::ranges::size(m_Entities);
-
-		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
-		{
-			const auto& [position, color, tintAmount, collisionLayer, collisionMask] = runner.Execute<vec3, vec3, float, int64_t, int64_t>("barrel_info", index + 1ll);
-
-			entity.SetPosition(position);
-
-			m_BarrelInfo[std::addressof(entity)] = {
-				.tintColor = { color.x, color.y, color.z },
-				.tintAmount = tintAmount
-			};
-		}
-
-		auto combs = std::views::iota(0ull, max) |
-					 std::views::transform(
-					 [max](auto x)
-					 {
-							 return std::views::iota(x + 1ull, max) |
-								 std::views::transform([x](auto y) { return std::make_pair(x, y); });
-					 }) | std::views::join;
-
-		for (const auto [i, j] : combs)
-		{
-			const Entity& ent1 = m_Entities[i];
-			const Entity& ent2 = m_Entities[j];
-
-			if ((ent1.GetCollisionMask() & ent2.GetCollisionLayer()) && (ent2.GetCollisionMask() & ent1.GetCollisionLayer()))
-			{
-				const TransformedShape& transformShape1{ m_Shapes[i], {ent1.GetPosition(), {1.0f}, {}} };
-				const TransformedShape& transformShape2{ m_Shapes[j], {ent2.GetPosition(), {1.0f}, {}} };
-
-				if (transformShape1.Intersects(transformShape2))
-				{
-					std::get<0>(origPositions[i]) = true;
-					std::get<0>(origPositions[j]) = true;
-					m_Bus.PostEntityIntersect(std::addressof(ent1), std::addressof(ent2));
-				}
-			}
-		}
+		UpdateBarrelCollisions();		
 
 		TransformedShape playerTransformShape{ player.GetController().GetTransformedShape() };
 
@@ -849,17 +804,7 @@ namespace Game {
 				Restart();
 				m_Bus.PostRestartLevel();
 			} break;
-			default:
-			{
-				for (const auto& [index, orig] : std::views::enumerate(origPositions))
-				{
-					if (const auto& [revert, origPosition] = orig; revert)
-					{
-						m_Entities[index].SetPosition(origPosition);
-						runner.Execute("set_barrel_position", index + 1ll, origPosition);
-					}
-				}
-			} break;
+			default: break;
 		}
 
 		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.2f };
@@ -961,6 +906,69 @@ namespace Game {
 	{
 		const ScriptRunner runner{ m_Script };
 		runner.Execute("update_level", player.GetPosition());
+	}
+
+	void LuaLevel::UpdateBarrelCollisions()
+	{
+		const ScriptRunner runner{ m_Script };
+
+		auto origPositions = m_Entities |
+			std::views::transform([](const auto& e) { return std::make_tuple(false, e.GetPosition()); }) |
+			std::ranges::to<std::vector>();
+
+		const auto max = std::ranges::size(m_Entities);
+
+		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
+		{
+			const auto& [position, color, tintAmount, collisionLayer, collisionMask] = runner.Execute<vec3, vec3, float, int64_t, int64_t>("barrel_info", index + 1ll);
+
+			entity.SetPosition(position);
+
+			m_BarrelInfo[std::addressof(entity)] = {
+				.tintColor = { color.x, color.y, color.z },
+				.tintAmount = tintAmount
+			};
+		}
+
+		auto combs = std::views::iota(0ull, max) |
+			std::views::transform(
+				[max](auto x)
+				{
+					return std::views::iota(x + 1ull, max) |
+						std::views::transform([x](auto y) { return std::make_pair(x, y); });
+				}) | std::views::join;
+
+		for (const auto [i, j] : combs)
+		{
+			const Entity& ent1 = m_Entities[i];
+			const Entity& ent2 = m_Entities[j];
+
+			if ((ent1.GetCollisionMask() & ent2.GetCollisionLayer()) && (ent2.GetCollisionMask() & ent1.GetCollisionLayer()))
+			{
+				const TransformedShape& transformShape1{ m_Shapes[i], {ent1.GetPosition(), {1.0f}, {}} };
+				const TransformedShape& transformShape2{ m_Shapes[j], {ent2.GetPosition(), {1.0f}, {}} };
+
+				if (transformShape1.Intersects(transformShape2))
+				{
+					std::get<0>(origPositions[i]) = true;
+					std::get<0>(origPositions[j]) = true;
+					m_Bus.PostEntityIntersect(std::addressof(ent1), std::addressof(ent2));
+				}
+			}
+		}
+
+		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
+		if (levelState == LevelState::PLAYING)
+		{
+			for (const auto& [index, orig] : std::views::enumerate(origPositions))
+			{
+				if (const auto& [revert, origPosition] = orig; revert)
+				{
+					m_Entities[index].SetPosition(origPosition);
+					runner.Execute("set_barrel_position", index + 1ll, origPosition);
+				}
+			}
+		}
 	}
 
 }
