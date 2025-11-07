@@ -775,12 +775,12 @@ namespace Game {
 		const ScriptRunner runner{ m_Script };
 
 		UpdateBarrelVisibility();
+		UpdateLuaLevel(player);
 
 		auto origPositions = m_Entities |
 							 std::views::transform([](const auto& e) { return std::make_tuple(false, e.GetPosition()); }) |
 							 std::ranges::to<std::vector>();
 
-		runner.Execute("update_level", player.GetPosition());
 
 		const auto max = std::ranges::size(m_Entities);
 
@@ -955,6 +955,12 @@ namespace Game {
 		{
 			runner.Execute("set_barrel_visibility", index + 1ll, entity.IsVisible());
 		}
+	}
+
+	void LuaLevel::UpdateLuaLevel(Player& player)
+	{
+		const ScriptRunner runner{ m_Script };
+		runner.Execute("update_level", player.GetPosition());
 	}
 
 }
