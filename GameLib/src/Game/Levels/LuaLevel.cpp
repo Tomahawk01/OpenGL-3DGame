@@ -894,6 +894,20 @@ namespace Game {
 			}
 		}
 
+		for (const auto& [index, entity] : m_Scene.entities | std::views::filter([](const auto* e) { return !e->HasStaticCollider(); }) | std::views::enumerate)
+		{
+			const auto& transformShape = entity->GetBoundingBox();
+
+			for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
+			{
+				auto collision = staticEntity->GetStaticCollider()->Intersects(transformShape);
+				if (collision)
+				{
+					std::get<0>(origPositions[index]) = true;
+				}
+			}
+		}
+
 		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
 		if (levelState == LevelState::PLAYING)
 		{
