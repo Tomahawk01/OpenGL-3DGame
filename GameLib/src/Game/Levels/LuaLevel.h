@@ -54,6 +54,7 @@ namespace Game {
 		void UpdatePlayerCollisions(Player& player);
 		void UpdateLevelState();
 		void UpdateScene();
+		void UpdateDebugLines();
 
 	private:
 		PhysicsSystem &m_PS;

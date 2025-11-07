@@ -772,35 +772,13 @@ namespace Game {
 
 	void LuaLevel::Update(Player& player)
 	{
-		const ScriptRunner runner{ m_Script };
-
 		UpdateBarrelVisibility();
 		UpdateLuaLevel(player);
 		UpdateBarrelCollisions();
 		UpdatePlayerCollisions(player);
 		UpdateLevelState();
 		UpdateScene();
-		
-		if (m_RenderDebugLines)
-		{
-			for (const auto& entity : m_Scene.entities)
-			{
-				if (const auto staticCollider = entity->GetStaticCollider(); staticCollider)
-				{
-					staticCollider->Draw(m_PS.Debug_Renderer(), Colors::Azure);
-				}
-				else
-				{
-					entity->GetBoundingBox().Draw(m_PS.Debug_Renderer(), Colors::White);
-				}
-			}
-
-			m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();
-		}
-		else
-		{
-			m_Scene.debugLines.reset();
-		}
+		UpdateDebugLines();
 	}
 
 	void LuaLevel::Restart()
@@ -984,6 +962,30 @@ namespace Game {
 		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
 		{
 			m_Scene.pointLights[index].position = entity.GetPosition();
+		}
+	}
+
+	void LuaLevel::UpdateDebugLines()
+	{
+		if (m_RenderDebugLines)
+		{
+			for (const auto& entity : m_Scene.entities)
+			{
+				if (const auto staticCollider = entity->GetStaticCollider(); staticCollider)
+				{
+					staticCollider->Draw(m_PS.Debug_Renderer(), Colors::Azure);
+				}
+				else
+				{
+					entity->GetBoundingBox().Draw(m_PS.Debug_Renderer(), Colors::White);
+				}
+			}
+
+			m_Scene.debugLines = m_PS.Debug_Renderer().GetLines();
+		}
+		else
+		{
+			m_Scene.debugLines.reset();
 		}
 	}
 
