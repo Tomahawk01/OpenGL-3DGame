@@ -44,8 +44,8 @@ namespace {
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
-			static_cast<float>(window.GetWidth()),
-			static_cast<float>(window.GetHeight()),
+			static_cast<float>(window.GetRenderWidth()),
+			static_cast<float>(window.GetRenderHeight()),
 			0.1f, 1000.0f
 		};
 	}

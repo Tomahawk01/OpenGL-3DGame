@@ -2,7 +2,6 @@
 
 #include "Core/Entity.h"
 #include "BufferWriter.h"
-#include "Texture.h"
 #include "Sampler.h"
 #include "OpenGL.h"
 
@@ -149,7 +148,7 @@ namespace Game {
 		m_OrthCamera.SetPosition({ width / 2.0f, height / -2.0f, 0.0f });
 	}
 
-	void Renderer::Render(const Camera& camera, const Scene& scene, float gamma) const
+	void Renderer::Render(const Window& window, const Camera& camera, const Scene& scene, float gamma) const
 	{
 		m_MainFrameBuffer.frameBuffer.Bind();
 
@@ -293,8 +292,8 @@ namespace Game {
 			readFB->GetHeight(),
 			0u,
 			0u,
-			readFB->GetWidth(),
-			readFB->GetHeight(),
+			window.GetWindowWidth(),
+			window.GetWindowHeight(),
 			GL_COLOR_BUFFER_BIT,
 			GL_NEAREST);
 	}

@@ -9,7 +9,7 @@ namespace Game {
 		: Routine(bus, {MessageType::STATE_CHANGE, MessageType::NEW_CAMERA, MessageType::NEW_SCENE})
 		, m_Window(window)
 		, m_Scheduler(scheduler)
-		, m_Renderer{ reader, meshLoader, m_Window.GetWidth(), m_Window.GetHeight() }
+		, m_Renderer{ reader, meshLoader, m_Window.GetRenderWidth(), m_Window.GetRenderHeight() }
 		, m_WireframeRenderer{}
 		, m_Scene{}
 		, m_Camera{}
@@ -25,7 +25,7 @@ namespace Game {
 			Expect(m_Camera, "Camera cannot be null");
 
 			m_WireframeRenderer.Draw(*m_Camera);
-			m_Renderer.Render(*m_Camera, *m_Scene, gamma);
+			m_Renderer.Render(m_Window, *m_Camera, *m_Scene, gamma);
 
 			m_Window.Swap();
 

@@ -24,8 +24,8 @@ namespace {
 			barrelCenter,
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
-			static_cast<float>(window.GetWidth()),
-			static_cast<float>(window.GetHeight()),
+			static_cast<float>(window.GetRenderWidth()),
+			static_cast<float>(window.GetRenderHeight()),
 			0.1f, 1000.0f
 		};
 	}
@@ -112,9 +112,9 @@ namespace Game {
 			.skybox = nullptr,
 			.skyboxSampler = resourceCache.Get<Sampler>("sky_box"),
 			.labels = {
-				{&m_Labels[0], static_cast<uint32_t>((m_Window.GetWidth() / 2.0f) - (m_Labels[0].GetWidth() / 2.0f)), static_cast<uint32_t>(m_Window.GetHeight() * 0.75f)},
-				{&m_Labels[1], 5u, static_cast<uint32_t>(m_Window.GetHeight() - m_Labels[1].GetHeight() - 5.0f)},
-				{&m_Labels[2], static_cast<uint32_t>((m_Window.GetWidth() / 2.0f) - (m_Labels[2].GetWidth() / 2.0f)), static_cast<uint32_t>((m_Window.GetHeight() * 0.75f) + 40.0f)},
+				{&m_Labels[0], static_cast<uint32_t>((m_Window.GetRenderWidth() / 2.0f) - (m_Labels[0].GetWidth() / 2.0f)), static_cast<uint32_t>(m_Window.GetRenderHeight() * 0.75f)},
+				{&m_Labels[1], 5u, static_cast<uint32_t>(m_Window.GetRenderHeight() - m_Labels[1].GetHeight() - 5.0f)},
+				{&m_Labels[2], static_cast<uint32_t>((m_Window.GetRenderWidth() / 2.0f) - (m_Labels[2].GetWidth() / 2.0f)), static_cast<uint32_t>((m_Window.GetRenderHeight() * 0.75f) + 40.0f)},
 			},
 			.effects = {
 				.hdr = true,

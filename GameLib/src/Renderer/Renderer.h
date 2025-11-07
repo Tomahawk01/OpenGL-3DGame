@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TLV/Utilities.h"
+#include "Core/Window.h"
 #include "Core/Scene.h"
 #include "Buffer.h"
 #include "FrameBuffer.h"
@@ -23,7 +24,7 @@ namespace Game {
 	public:
 		Renderer(const TLVReader& reader, MeshLoader& meshLoader, uint32_t width, uint32_t height);
 
-		void Render(const Camera& camera, const Scene& scene, float gamma) const;
+		void Render(const Window& window, const Camera& camera, const Scene& scene, float gamma) const;
 
 	private:
 
