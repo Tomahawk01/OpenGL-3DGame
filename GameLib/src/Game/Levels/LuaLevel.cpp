@@ -778,21 +778,7 @@ namespace Game {
 		UpdateLuaLevel(player);
 		UpdateBarrelCollisions();
 		UpdatePlayerCollisions(player);
-
-		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
-		switch (levelState)
-		{
-			case LevelState::COMPLETE:
-			{
-				m_Bus.PostLevelComplete("lua_level");
-			} break;
-			case LevelState::LOST:
-			{
-				Restart();
-				m_Bus.PostRestartLevel();
-			} break;
-			default: break;
-		}
+		UpdateLevelState();
 
 		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.2f };
 		const auto [directionalLightDir, directionalLightColor] = m_Script.HasFunction("get_directional_light")
@@ -972,6 +958,26 @@ namespace Game {
 				collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
 				break;
 			}
+		}
+	}
+
+	void LuaLevel::UpdateLevelState()
+	{
+		const ScriptRunner runner{ m_Script };
+
+		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
+		switch (levelState)
+		{
+			case LevelState::COMPLETE:
+			{
+				m_Bus.PostLevelComplete("lua_level");
+			} break;
+			case LevelState::LOST:
+			{
+				Restart();
+				m_Bus.PostRestartLevel();
+			} break;
+			default: break;
 		}
 	}
 
