@@ -779,22 +779,8 @@ namespace Game {
 		UpdateBarrelCollisions();
 		UpdatePlayerCollisions(player);
 		UpdateLevelState();
-
-		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.2f };
-		const auto [directionalLightDir, directionalLightColor] = m_Script.HasFunction("get_directional_light")
-			? runner.Execute<vec3, vec3>("get_directional_light")
-			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.1f });
-		m_Scene.ambient = { ambientVec.x, ambientVec.y, ambientVec.z };
-		m_Scene.directionalLight = {
-			.direction = directionalLightDir,
-			.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
-		};
-
-		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
-		{
-			m_Scene.pointLights[index].position = entity.GetPosition();
-		}
-
+		UpdateScene();
+		
 		if (m_RenderDebugLines)
 		{
 			for (const auto& entity : m_Scene.entities)
@@ -978,6 +964,26 @@ namespace Game {
 				m_Bus.PostRestartLevel();
 			} break;
 			default: break;
+		}
+	}
+
+	void LuaLevel::UpdateScene()
+	{
+		const ScriptRunner runner{ m_Script };
+
+		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.2f };
+		const auto [directionalLightDir, directionalLightColor] = m_Script.HasFunction("get_directional_light")
+			? runner.Execute<vec3, vec3>("get_directional_light")
+			: std::make_tuple(vec3{ -1.0f, -1.0f, 0.0f }, vec3{ 0.1f });
+		m_Scene.ambient = { ambientVec.x, ambientVec.y, ambientVec.z };
+		m_Scene.directionalLight = {
+			.direction = directionalLightDir,
+			.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
+		};
+
+		for (const auto& [index, entity] : std::views::enumerate(m_Entities))
+		{
+			m_Scene.pointLights[index].position = entity.GetPosition();
 		}
 	}
 

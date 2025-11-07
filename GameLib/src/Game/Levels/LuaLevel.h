@@ -53,6 +53,7 @@ namespace Game {
 		void UpdateBarrelCollisions();
 		void UpdatePlayerCollisions(Player& player);
 		void UpdateLevelState();
+		void UpdateScene();
 
 	private:
 		PhysicsSystem &m_PS;
