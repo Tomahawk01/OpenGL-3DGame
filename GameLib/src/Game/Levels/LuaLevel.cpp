@@ -776,21 +776,8 @@ namespace Game {
 
 		UpdateBarrelVisibility();
 		UpdateLuaLevel(player);
-		UpdateBarrelCollisions();		
-
-		TransformedShape playerTransformShape{ player.GetController().GetTransformedShape() };
-
-		for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
-		{
-			auto collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
-			while (collision)
-			{
-				player.GetController().Move(collision->penetrationAxis * collision->penetrationDepth * 0.5f);
-				playerTransformShape = player.GetController().GetTransformedShape();
-				collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
-				break;
-			}
-		}
+		UpdateBarrelCollisions();
+		UpdatePlayerCollisions(player);
 
 		const auto levelState = static_cast<LevelState>(runner.Execute<int64_t>("level_state"));
 		switch (levelState)
@@ -967,6 +954,23 @@ namespace Game {
 					m_Entities[index].SetPosition(origPosition);
 					runner.Execute("set_barrel_position", index + 1ll, origPosition);
 				}
+			}
+		}
+	}
+
+	void LuaLevel::UpdatePlayerCollisions(Player& player)
+	{
+		TransformedShape playerTransformShape{ player.GetController().GetTransformedShape() };
+
+		for (const auto& staticEntity : m_Scene.entities | std::views::filter([](const auto* e) { return e->HasStaticCollider(); }))
+		{
+			auto collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
+			while (collision)
+			{
+				player.GetController().Move(collision->penetrationAxis * collision->penetrationDepth * 0.5f);
+				playerTransformShape = player.GetController().GetTransformedShape();
+				collision = staticEntity->GetStaticCollider()->Intersects(playerTransformShape);
+				break;
 			}
 		}
 	}
