@@ -124,13 +124,13 @@ namespace Game {
 		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
 		, m_DebugLineMaterial(CreateMaterial(reader, "line.vert", "line.frag"))
 		, m_MainFrameBuffer(
-			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 8),
+			GenerateTextures(4u, TextureUsage::FRAMEBUFFER, width, height, 8),
 			{ TextureUsage::DEPTH, width, height, 8 })
 		, m_PostProcessingFrameBuffer1(
-			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			GenerateTextures(4u, TextureUsage::FRAMEBUFFER, width, height, 1),
 			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_PostProcessingFrameBuffer2(
-			GenerateTextures(3u, TextureUsage::FRAMEBUFFER, width, height, 1),
+			GenerateTextures(4u, TextureUsage::FRAMEBUFFER, width, height, 1),
 			{ TextureUsage::DEPTH, width, height, 1 })
 		, m_SSAOApplyFrameBuffer(
 			GenerateTextures(1u, TextureUsage::FRAMEBUFFER, width, height, 1),
@@ -202,7 +202,7 @@ namespace Game {
 			::glDrawArrays(GL_LINES, 0u, dbl->Count());
 		}
 
-		for (::GLenum i = 0; i < 3; ++i)
+		for (::GLenum i = 0; i < 4; ++i)
 		{
 			Blit(m_MainFrameBuffer.frameBuffer, GL_COLOR_ATTACHMENT0 + i, m_PostProcessingFrameBuffer1.frameBuffer, GL_COLOR_ATTACHMENT0 + i);
 		}

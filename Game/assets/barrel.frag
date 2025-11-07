@@ -10,6 +10,7 @@ in mat3 tbn;
 layout(location = 0) out vec4 frag_color;
 layout(location = 1) out vec4 norm_color;
 layout(location = 2) out vec4 position_color;
+layout(location = 3) out vec4 bloom_color;
 
 uniform sampler2D tex0;
 uniform sampler2D tex1;
@@ -88,4 +89,5 @@ void main()
 	frag_color = vec4(mix(color * albedo.rgb, tint_color, tint_amount), 1.0);
 	norm_color = vec4(normal_view, 1.0);
 	position_color = view_position;
+	bloom_color = length(frag_color) > 2.0 ? frag_color : vec4(0.0f);
 }

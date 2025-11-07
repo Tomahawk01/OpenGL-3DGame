@@ -32,7 +32,7 @@ function restart_level()
 		position = vec3(0.0, 0.0, 0.0),
 		visibility = true,
 		color = vec3(1.0, 0.0, 0.0),
-		tint = 1.0,
+		tint = 5.0,
 		collision_layer = 1,
 		collision_mask = 0,
 	}
