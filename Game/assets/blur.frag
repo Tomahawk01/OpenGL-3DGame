@@ -5,6 +5,15 @@ out vec4 frag_color;
 
 uniform sampler2D tex0;
 
+layout(std140, binding = 0) uniform camera
+{
+    mat4 view;
+    mat4 projection;
+	vec3 eye;
+	float window_width;
+	float window_height;
+};
+
 void main()
 {
 	const int KERNEL_SIZE = 13;
@@ -24,7 +33,7 @@ void main()
     );
 
     vec3 color = vec3(0.0);
-    vec2 scale = vec2(4.0) / vec2(textureSize(tex0, 0));
+    vec2 scale = vec2(4.0) * vec2(1.0 / window_width, 1.0 / window_height);
 
     for (int i = 0; i < KERNEL_SIZE; ++i)
     {

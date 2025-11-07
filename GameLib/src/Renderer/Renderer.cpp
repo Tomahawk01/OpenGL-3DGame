@@ -109,6 +109,8 @@ namespace {
 		writer.Write(camera.GetView());
 		writer.Write(camera.GetProjection());
 		writer.Write(camera.GetPosition());
+		writer.Write(camera.GetWidth());
+		writer.Write(camera.GetHeight());
 
 		::glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraBuffer.GetNativeHandle());
 	}
@@ -118,7 +120,7 @@ namespace {
 namespace Game {
 
 	Renderer::Renderer(const TLVReader& reader, MeshLoader& meshLoader, uint32_t width, uint32_t height)
-		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3))
+		: m_CameraBuffer(sizeof(mat4) * 2u + sizeof(vec3) + sizeof(float) * 2u)
 		, m_LightBuffer(10240u)
 		, m_SkyboxCube(meshLoader.Cube())
 		, m_SkyboxMaterial(CreateMaterial(reader, "cubeMap.vert", "cubeMap.frag"))
