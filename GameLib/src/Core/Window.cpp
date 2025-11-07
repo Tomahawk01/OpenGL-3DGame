@@ -166,7 +166,7 @@ namespace {
 			WGL_DEPTH_BITS_ARB, 24,
 			WGL_STENCIL_BITS_ARB, 8,
 			WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
-			WGL_SAMPLES_ARB, 8,
+			WGL_SAMPLES_ARB, 0,
 			0
 		};
 
@@ -207,16 +207,25 @@ namespace {
 		::glDebugMessageCallback(OpenGLDebugCallback, nullptr);
 	}
 
+	::MONITORINFO MonitorInfo(::HWND window)
+	{
+		::MONITORINFO mi{ sizeof(::MONITORINFO) };
+		Game::Ensure(::GetMonitorInfo(::MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi) != 0, "Could not get monitor info: {}", ::GetLastError());
+
+		return mi;
+	}
+
 }
 
 namespace Game {
 
-	Window::Window(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
+	Window::Window(WindowMode mode, uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 		: m_Window({})
 		, m_DeviceCtx({})
 		, m_WndClass({})
 		, m_Width(width)
 		, m_Height(height)
+		, m_Mode(mode)
 	{
 		m_WndClass = {
 			.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC,
@@ -279,7 +288,9 @@ namespace Game {
 		::glEnable(GL_MULTISAMPLE);
 		::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		Logger::Info("Created new window (dpi: {})", ::GetDpiForWindow(m_Window));
+		SetMode(mode);
+
+		Logger::Info("Created new window (dpi: {}) {} {} {}", ::GetDpiForWindow(m_Window), m_Width, m_Height, m_Mode);
 	}
 
 	std::optional<Event> Window::PollEvent() const
@@ -315,19 +326,56 @@ namespace Game {
 		::SetWindowTextA(m_Window, title.c_str());
 	}
 
+	void Window::SetMode(WindowMode mode)
+	{
+		static ::WINDOWPLACEMENT wpPrev{ sizeof(::WINDOWPLACEMENT) };
+		m_Mode = mode;
+
+		const auto currentStyle = ::GetWindowLong(m_Window, GWL_STYLE);
+		Ensure(currentStyle != 0, "Could not get window style");
+
+		const ::MONITORINFO mi = MonitorInfo(m_Window);
+		Ensure(::GetWindowPlacement(m_Window, &wpPrev) != 0, "Could not get window placement");
+		Ensure(::SetWindowLong(m_Window, GWL_STYLE, currentStyle & ~WS_OVERLAPPEDWINDOW) != 0, "Could not set window style");
+		Ensure(::SetWindowPos(m_Window,
+							  HWND_TOP,
+							  mi.rcMonitor.left,
+							  mi.rcMonitor.top,
+							  mi.rcMonitor.right - mi.rcMonitor.left,
+							  mi.rcMonitor.bottom - mi.rcMonitor.top,
+							  SWP_NOOWNERZORDER | SWP_FRAMECHANGED) != 0, "Failed to set window pos");
+	}
+
 	HWND Window::GetNativeHandle() const
 	{
 		return m_Window;
 	}
 
-	uint32_t Window::GetWidth() const
+	uint32_t Window::GetRenderWidth() const
 	{
 		return m_Width;
 	}
 
-	uint32_t Window::GetHeight() const
+	uint32_t Window::GetRenderHeight() const
 	{
 		return m_Height;
+	}
+
+	uint32_t Window::GetWindowWidth() const
+	{
+		const ::MONITORINFO mi = MonitorInfo(m_Window);
+		return mi.rcMonitor.right - mi.rcMonitor.left;
+	}
+
+	uint32_t Window::GetWindowHeight() const
+	{
+		const ::MONITORINFO mi = MonitorInfo(m_Window);
+		return mi.rcMonitor.bottom - mi.rcMonitor.top;
+	}
+
+	WindowMode Window::GetMode() const
+	{
+		return m_Mode;
 	}
 
 }
