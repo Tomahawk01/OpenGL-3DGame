@@ -57,5 +57,6 @@ project "Game"
     filter "configurations:Release"
         defines { "RELEASE" }
         debugargs { "assets -x 640 -y 360" }
+        ignoredefaultlibraries { "LIBCMT" }
         runtime "Release"
         optimize "On"
