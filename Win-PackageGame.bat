@@ -51,6 +51,10 @@ echo Copying resources file
 copy "%RESOURCES_PATH%" "%TEMP_DIR%\resources" >nul
 set RESOURCES_RESULT=%errorlevel%
 
+echo Copying config file
+copy "Game\.config" "%TEMP_DIR%\.config" >nul
+set CONFIG_COPY_RESULT=%errorlevel%
+
 echo Copying levels
 robocopy "%LEVELS_PATH%" "%TEMP_DIR%\levels" /e /np /nfl /ndl /njh /njs
 set LEVELS_RESULT=%errorlevel%
