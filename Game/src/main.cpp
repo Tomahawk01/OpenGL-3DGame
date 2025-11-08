@@ -2,6 +2,7 @@
 #include <Utilities/Logger.h>
 #include <Game/Game.h>
 #include <Game/config.h>
+#include <Utilities/SystemInfo.h>
 
 #include <iostream>
 #include <print>
@@ -14,8 +15,10 @@ int main(int argc, char** argv)
 
 	try
 	{
-		const auto root = !args.empty() ? args.front() : ".";
+		Game::Ensure(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED) == S_OK, "Failed to initialize com");
+		Game::Logger::Info("{}", Game::GetSystemInfo());
 
+		const auto root = !args.empty() ? args.front() : ".";
 		Game::Game app{ args };
 		app.Run(root);
 	}

@@ -39,7 +39,6 @@ namespace Game {
 		, m_Bus{}
 		, m_Window{ WindowMode::WINDOWED, 1920u, 1080u, GetArg("-x", args), GetArg("-y", args) }
 	{
-		Ensure(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED) == S_OK, "Failed to initialize com");
 		Ensure(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE) == S_OK, "Failed to set dpi aware");
 	}
 
