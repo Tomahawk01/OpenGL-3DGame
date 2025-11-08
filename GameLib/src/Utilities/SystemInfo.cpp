@@ -1,98 +1,80 @@
 #include "SystemInfo.h"
 
 #include "Renderer/OpenGL.h"
-#include "TextWiden.h"
 #include "Exception.h"
+#include "Logger.h"
+#include "WMI.h"
 
+#include <ranges>
 #include <format>
-
-#include <Windows.h>
-#include <WbemIdl.h>
-#include <comdef.h>
 
 namespace {
 
-	std::string GetOSVersion()
+	std::string GetOSVersion(const Game::WMI& wmi)
 	{
-		::OSVERSIONINFOEXA versionInfo{};
-		versionInfo.dwOSVersionInfoSize = sizeof(::OSVERSIONINFOEXA);
-
-#pragma warning(disable: 4996)
-		if (::GetVersionExA(reinterpret_cast<::OSVERSIONINFOA*>(&versionInfo)) != 0)
+		try
 		{
-			return std::format("Major: {} Minor: {} Build: {} Platform ID: {} Service pack major: {}, Service pack minor: {} Product type: {}",
-							   versionInfo.dwMajorVersion,
-							   versionInfo.dwMinorVersion,
-							   versionInfo.dwBuildNumber,
-							   versionInfo.dwPlatformId,
-							   versionInfo.wServicePackMajor,
-							   versionInfo.wServicePackMinor,
-							   versionInfo.wProductType);
+			const auto caption = wmi.Query("SELECT * FROM Win32_OperatingSystem", "Caption") | std::views::join_with(' ') | std::ranges::to<std::string>();
+			const auto version = wmi.Query("SELECT * FROM Win32_OperatingSystem", "Version") | std::views::join_with(' ') | std::ranges::to<std::string>();
+
+			return std::format("{} ({})", caption, version);
 		}
-#pragma warning(default: 4996)
+		catch (Game::Exception& e)
+		{
+			Game::Logger::Error("Failed to get OS version: {}", e);
+		}
+		catch (...)
+		{
+			Game::Logger::Error("Failed to get OS version");
+		}
 
 		return {};
 	}
 
-	std::string GetGPUID()
+	std::string GetGPUID(const Game::WMI& wmi)
 	{
-		do
+		try
 		{
-			::IWbemLocator* locator{};
-			if (::CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC, IID_IWbemLocator, reinterpret_cast<void**>(&locator)) != S_OK)
-			{
-				break;
-			}
-
-			::IWbemServices* services{};
-			if (locator->ConnectServer(_bstr_t(L"root\\CIMV2"), nullptr, nullptr, 0, NULL, 0, 0, &services) != S_OK)
-			{
-				break;
-			}
-
-			if (::CoSetProxyBlanket(services, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE) != S_OK)
-			{
-				break;
-			}
-
-			::IEnumWbemClassObject* enumerator{};
-			if (services->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_VideoController"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &enumerator) != S_OK)
-			{
-				break;
-			}
-
-			::IWbemClassObject* obj{};
-			::ULONG ret{};
-			std::string id{};
-			while (enumerator)
-			{
-				if (enumerator->Next(WBEM_INFINITE, 1, &obj, &ret) != S_OK)
-				{
-					break;
-				}
-
-				::VARIANT prop{};
-				if (obj->Get(L"Caption", 0, &prop, 0, 0) == S_OK)
-				{
-					const std::wstring wstr(prop.bstrVal, ::SysStringLen(prop.bstrVal));
-					try
-					{
-						id += Game::TextNarrow(wstr) + " ";
-					}
-					catch (Game::Exception&)
-					{
-						return {};
-					}
-				}
-
-				::VariantClear(&prop);
-			}
-
-			return id;
-
-		} while (false);
+			const auto props = wmi.Query("SELECT * FROM Win32_VideoController", "Caption");
+			return props | std::views::join_with(' ') | std::ranges::to<std::string>();
+		}
+		catch (Game::Exception& e)
+		{
+			Game::Logger::Error("Failed to get GPU id: {}", e);
+		}
+		catch (...)
+		{
+			Game::Logger::Error("Failed to get GPU id");
+		}
 
 		return {};
+	}
+
+	std::string GetGPUDriver(const Game::WMI& wmi)
+	{
+		try
+		{
+			const auto props = wmi.Query("SELECT * FROM Win32_VideoController", "DriverVersion");
+			return props | std::views::join_with(' ') | std::ranges::to<std::string>();
+		}
+		catch (Game::Exception& e)
+		{
+			Game::Logger::Error("Failed to get GPU driver version: {}", e);
+		}
+		catch (...)
+		{
+			Game::Logger::Error("Failed to get GPU driver version");
+		}
+
+		return {};
+	}
+
+	std::string GetSystemMemory()
+	{
+		::ULONGLONG mem{};
+		::GetPhysicallyInstalledSystemMemory(&mem);
+
+		return mem == 0 ? "" : std::format("{} MB", mem / 1024ull);
 	}
 
 }
@@ -101,12 +83,12 @@ namespace Game {
 
 	SystemInfo GetSystemInfo()
 	{
+		WMI wmi{};
 		return {
-			.osVersion = GetOSVersion(),
-			.gpuID = GetGPUID(),
-			.gpuDriver = {},
-			.systemMemory = {},
-			.openglInfo = {}
+			.osVersion = GetOSVersion(wmi),
+			.gpuID = GetGPUID(wmi),
+			.gpuDriver = GetGPUDriver(wmi),
+			.systemMemory = GetSystemMemory()
 		};
 	}
 
@@ -118,12 +100,11 @@ namespace Game {
 				return s.empty() ? "unknown" : s;
 			};
 
-		return std::format("\nOS version: {}\nGPU id: {}\nGPU driver: {}\nSystem memory: {}\nOpenGL info: {}",
+		return std::format("\nOS version: {}\nGPU id: {}\nGPU driver: {}\nSystem memory: {}",
 						   getOrEmpty(info.osVersion),
 						   getOrEmpty(info.gpuID),
 						   getOrEmpty(info.gpuDriver),
-						   getOrEmpty(info.systemMemory),
-						   getOrEmpty(info.openglInfo));
+						   getOrEmpty(info.systemMemory));
 	}
 
 }

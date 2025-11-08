@@ -10,7 +10,6 @@ namespace Game {
 		std::string gpuID;
 		std::string gpuDriver;
 		std::string systemMemory;
-		std::string openglInfo;
 	};
 
 	SystemInfo GetSystemInfo();
