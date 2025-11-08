@@ -16,4 +16,6 @@ namespace Game::Config {
     static constexpr bool logToFile = false;
 #endif
 
+    bool LoggingEnabled();
+
 }
