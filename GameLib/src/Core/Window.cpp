@@ -290,7 +290,18 @@ namespace Game {
 
 		SetMode(mode);
 
-		Logger::Info("Created new window (dpi: {}) {} {} {}", ::GetDpiForWindow(m_Window), m_Width, m_Height, m_Mode);
+		const auto* vendor = ::glGetString(GL_VENDOR);
+		const auto* renderer = ::glGetString(GL_RENDERER);
+		const auto* version = ::glGetString(GL_VERSION);
+
+		Logger::Info("Created new window (dpi: {}) {}x{} {} {} {} {}",
+					 ::GetDpiForWindow(m_Window),
+					 m_Width,
+					 m_Height,
+					 m_Mode,
+					 reinterpret_cast<const char*>(vendor),
+					 reinterpret_cast<const char*>(renderer),
+					 reinterpret_cast<const char*>(version));
 	}
 
 	std::optional<Event> Window::PollEvent() const
