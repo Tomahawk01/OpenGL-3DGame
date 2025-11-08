@@ -17,6 +17,7 @@ int main(int argc, char** argv)
 	{
 		Game::Ensure(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED) == S_OK, "Failed to initialize com");
 		Game::Logger::Info("{}", Game::GetSystemInfo());
+		Game::Logger::Info("Logging enabled: {}", Game::Config::LoggingEnabled());
 
 		const auto root = !args.empty() ? args.front() : ".";
 		Game::Game app{ args };
