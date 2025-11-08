@@ -3,6 +3,7 @@
 #include "Utilities/Logger.h"
 #include "Utilities/Error.h"
 #include "Utilities/TextWiden.h"
+#include "Utilities/ComRelease.h"
 #include "Texture.h"
 #include "Sampler.h"
 
@@ -88,15 +89,14 @@ namespace Game {
 				D2D1_FACTORY_TYPE_SINGLE_THREADED,
 				&direct2dFactory) == S_OK, "Failed to create d2d factory");
 
-		const auto release = [](auto* obj) { obj->Release(); };
-		auto renderTarget = std::unique_ptr<ID2D1RenderTarget, decltype(release)>{};
+		auto renderTarget = std::unique_ptr<ID2D1RenderTarget, ComRelease>{};
 
 		const auto res = direct2dFactory->CreateWicBitmapRenderTarget(bitmap, &properties, std::out_ptr(renderTarget));
 		Ensure(res == S_OK, "Failed to create render target: {}", res);
 
 		const D2D1::ColorF d2d1Color{ color.r, color.g, color.b, 1.0f };
 
-		auto brush = std::unique_ptr<ID2D1SolidColorBrush, decltype(release)>{};
+		auto brush = std::unique_ptr<ID2D1SolidColorBrush, ComRelease>{};
 		Ensure(
 			renderTarget->CreateSolidColorBrush(
 				d2d1Color,
@@ -120,7 +120,7 @@ namespace Game {
 			.Height = static_cast<INT>(bitmapHeight)
 		};
 
-		auto lock = std::unique_ptr<IWICBitmapLock, decltype(release)>{};
+		auto lock = std::unique_ptr<IWICBitmapLock, ComRelease>{};
 		Ensure(bitmap->Lock(&rect, WICBitmapLockRead, std::out_ptr(lock)) == S_OK, "Failed to lock bitmap");
 
 		UINT bufferSize{};
