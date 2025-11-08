@@ -93,7 +93,7 @@ namespace {
 
 namespace Game {
 
-	LevelRoutine::LevelRoutine(PhysicsSystem& ps, const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader)
+	LevelRoutine::LevelRoutine(PhysicsSystem& ps, Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader)
 		: Routine(bus, {MessageType::KEY_PRESS, MessageType::MOUSE_MOVE, MessageType::LEVEL_COMPLETE, MessageType::QUIT})
 		, m_PS{ ps }
 		, m_Window{ window }
@@ -172,6 +172,11 @@ namespace Game {
 			if (event.GetKey() == Key::Q)
 			{
 				m_Bus.PostStateChange(GameState::EXITING);
+			}
+			else if (event.GetKey() == Key::F1 && event.GetState() == KeyState::DOWN)
+			{
+				const auto nextMode = m_Window.GetMode() == WindowMode::FULLSCREEN ? WindowMode::WINDOWED : WindowMode::FULLSCREEN;
+				m_Window.SetMode(nextMode);
 			}
 		}
 

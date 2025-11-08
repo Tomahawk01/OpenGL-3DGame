@@ -165,7 +165,7 @@ namespace {
 			WGL_COLOR_BITS_ARB, 32,
 			WGL_DEPTH_BITS_ARB, 24,
 			WGL_STENCIL_BITS_ARB, 8,
-			WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+			WGL_SAMPLE_BUFFERS_ARB, GL_FALSE,
 			WGL_SAMPLES_ARB, 0,
 			0
 		};
@@ -334,16 +334,38 @@ namespace Game {
 		const auto currentStyle = ::GetWindowLong(m_Window, GWL_STYLE);
 		Ensure(currentStyle != 0, "Could not get window style");
 
-		const ::MONITORINFO mi = MonitorInfo(m_Window);
-		Ensure(::GetWindowPlacement(m_Window, &wpPrev) != 0, "Could not get window placement");
-		Ensure(::SetWindowLong(m_Window, GWL_STYLE, currentStyle & ~WS_OVERLAPPEDWINDOW) != 0, "Could not set window style");
-		Ensure(::SetWindowPos(m_Window,
-							  HWND_TOP,
-							  mi.rcMonitor.left,
-							  mi.rcMonitor.top,
-							  mi.rcMonitor.right - mi.rcMonitor.left,
-							  mi.rcMonitor.bottom - mi.rcMonitor.top,
-							  SWP_NOOWNERZORDER | SWP_FRAMECHANGED) != 0, "Failed to set window pos");
+		if (currentStyle & WS_OVERLAPPEDWINDOW)
+		{
+			if (mode == WindowMode::WINDOWED)
+			{
+				return;
+			}
+
+			const ::MONITORINFO mi = MonitorInfo(m_Window);
+			Ensure(::GetWindowPlacement(m_Window, &wpPrev) != 0, "Could not get window placement");
+			Ensure(::SetWindowLong(m_Window, GWL_STYLE, currentStyle & ~WS_OVERLAPPEDWINDOW) != 0, "Could not set window style");
+			Ensure(::SetWindowPos(m_Window,
+								  HWND_TOP,
+								  mi.rcMonitor.left,
+								  mi.rcMonitor.top,
+								  mi.rcMonitor.right - mi.rcMonitor.left,
+								  mi.rcMonitor.bottom - mi.rcMonitor.top,
+								  SWP_NOOWNERZORDER | SWP_FRAMECHANGED) != 0, "Failed to set window pos");
+		}
+		else
+		{
+			if (mode == WindowMode::FULLSCREEN)
+			{
+				return;
+			}
+
+			Ensure(::SetWindowLong(m_Window, GWL_STYLE, currentStyle | WS_OVERLAPPEDWINDOW) != 0, "Failed to set window style");
+			Ensure(::SetWindowPlacement(m_Window, &wpPrev) != 0, "Failed to set window placement");
+			Ensure(::SetWindowPos(m_Window,
+								  nullptr,
+								  0, 0, 0, 0,
+								  SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED) != 0, "Failed to set window pos");
+		}
 	}
 
 	HWND Window::GetNativeHandle() const
@@ -363,12 +385,22 @@ namespace Game {
 
 	uint32_t Window::GetWindowWidth() const
 	{
+		if (m_Mode == WindowMode::WINDOWED)
+		{
+			return GetRenderWidth();
+		}
+
 		const ::MONITORINFO mi = MonitorInfo(m_Window);
 		return mi.rcMonitor.right - mi.rcMonitor.left;
 	}
 
 	uint32_t Window::GetWindowHeight() const
 	{
+		if (m_Mode == WindowMode::WINDOWED)
+		{
+			return GetRenderHeight();
+		}
+
 		const ::MONITORINFO mi = MonitorInfo(m_Window);
 		return mi.rcMonitor.bottom - mi.rcMonitor.top;
 	}

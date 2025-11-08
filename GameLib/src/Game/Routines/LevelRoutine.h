@@ -18,7 +18,7 @@ namespace Game {
 	class LevelRoutine : public Routine
 	{
 	public:
-		LevelRoutine(PhysicsSystem& ps, const Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader);
+		LevelRoutine(PhysicsSystem& ps, Window& window, MessageBus& bus, Scheduler& scheduler, DefaultCache& resourceCache, const TLVReader& reader);
 
 		LevelRoutine(const LevelRoutine&) = delete;
 		LevelRoutine& operator=(const LevelRoutine&) = delete;
@@ -34,7 +34,7 @@ namespace Game {
 
 	private:
 		PhysicsSystem& m_PS;
-		const Window& m_Window;
+		Window& m_Window;
 		Scheduler& m_Scheduler;
 		Player m_Player;
 		DefaultCache& m_ResourceCache;
