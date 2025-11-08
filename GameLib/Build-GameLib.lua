@@ -58,7 +58,8 @@ project "GameLib"
             "dwrite",
             "d2d1",
             "shcore",
-            "xaudio2"
+            "xaudio2",
+            "wbemuuid"
         }
 
     filter "configurations:Debug"
