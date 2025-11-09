@@ -36,12 +36,14 @@ namespace Game::Logger {
 		ERR	// NOTE: ERROR defined in wingdi.h :(
 	};
 
+	inline bool gForceLog = false;
+
 	template<Level L, class... Args>
 	struct Print
 	{
 		Print(std::format_string<Args...> msg, Args&&... args, std::source_location loc = std::source_location::current())
 		{
-			if (!Config::LoggingEnabled())
+			if (!(gForceLog || Config::LoggingEnabled()))
 			{
 				return;
 			}

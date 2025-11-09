@@ -64,6 +64,8 @@ namespace {
 
 int main(int argc, char** argv)
 {
+	Game::Logger::gForceLog = true;
+
 	try
 	{
 		Game::Logger::Info("Resource packer");
@@ -75,6 +77,7 @@ int main(int argc, char** argv)
 
 		Game::TLVWriter writer{};
 
+		Game::Logger::Info("Asset dir: {}", argv[1]);
 		auto files = std::filesystem::directory_iterator{ argv[1] } | std::ranges::to<std::vector>();
 		std::ranges::sort(files, [](const auto& a, const auto& b) { return a.path() < b.path(); });
 
