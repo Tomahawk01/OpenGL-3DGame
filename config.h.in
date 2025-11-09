@@ -17,5 +17,6 @@ namespace Game::Config {
 #endif
 
     bool LoggingEnabled();
+    bool OpenGLDebugEnabled();
 
 }

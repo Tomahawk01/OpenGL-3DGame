@@ -3,6 +3,7 @@
 #include "Renderer/OpenGL.h"
 #include "Utilities/Error.h"
 #include "Events/Event.h"
+#include "Game/config.h"
 
 #include <windowsx.h>
 #include <hidusage.h>
@@ -281,7 +282,11 @@ namespace Game {
 		ResolveWGLFunctions(m_WndClass.hInstance);
 		InitOpenGL(m_DeviceCtx);
 		ResolveGlobalGLFunctions();
-		SetupDebug();
+
+		if (Config::OpenGLDebugEnabled())
+		{
+			SetupDebug();
+		}
 
 		::glEnable(GL_DEPTH_TEST);
 		::glEnable(GL_BLEND);
