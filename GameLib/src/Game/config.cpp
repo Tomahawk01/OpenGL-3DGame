@@ -15,7 +15,7 @@ namespace {
         const auto file = Game::File{ ".config" };
         const auto config = file.AsString();
 
-        auto lines = config | std::views::split("\n"sv);
+        auto lines = config | std::views::split("\r\n"sv);
 
         for (const auto& line : lines)
         {
