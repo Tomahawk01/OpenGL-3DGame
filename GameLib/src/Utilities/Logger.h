@@ -41,6 +41,11 @@ namespace Game::Logger {
 	{
 		Print(std::format_string<Args...> msg, Args&&... args, std::source_location loc = std::source_location::current())
 		{
+			if (!Config::LoggingEnabled())
+			{
+				return;
+			}
+
 			char c = '?';
 			if constexpr (L == Level::TRACE)
 				c = 'T';
