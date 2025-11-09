@@ -49,4 +49,9 @@ namespace Game::Config {
         return FindValue("OpenGLDebugEnabled"sv) == "true"sv;
     }
 
+    bool IsFullscreen()
+    {
+        return FindValue("IsFullscreen"sv) == "true"sv;
+    }
+
 }

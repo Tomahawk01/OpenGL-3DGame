@@ -18,5 +18,6 @@ namespace Game::Config {
 
     bool LoggingEnabled();
     bool OpenGLDebugEnabled();
+    bool IsFullscreen();
 
 }

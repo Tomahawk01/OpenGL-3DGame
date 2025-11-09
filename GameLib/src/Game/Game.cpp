@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #include "Utilities/Decompress.h"
+#include "Core/Window.h"
 
 #include "Game/Routines/InputRoutine.h"
 #include "Game/Routines/LevelRoutine.h"
@@ -8,6 +9,7 @@
 #include "Game/Routines/MainMenuRoutine.h"
 #include "Game/Routines/SoundRoutine.h"
 #include "Game/Routines/PhysicsRoutine.h"
+#include "config.h"
 
 #include <ShellScalingApi.h>
 
@@ -30,6 +32,11 @@ namespace {
 		return std::stol(std::string{ args[index + 1u] });
 	}
 
+	Game::WindowMode _WindowMode()
+	{
+		return Game::Config::IsFullscreen() ? Game::WindowMode::FULLSCREEN : Game::WindowMode::WINDOWED;
+	}
+
 }
 
 namespace Game {
@@ -37,7 +44,7 @@ namespace Game {
 	Game::Game(const std::vector<std::string_view>& args)
 		: m_Running{ true }
 		, m_Bus{}
-		, m_Window{ WindowMode::WINDOWED, 1920u, 1080u, GetArg("-x", args), GetArg("-y", args) }
+		, m_Window{ _WindowMode(), 1920u, 1080u, GetArg("-x", args), GetArg("-y", args) }
 	{
 		Ensure(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE) == S_OK, "Failed to set dpi aware");
 	}
