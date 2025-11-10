@@ -37,7 +37,7 @@ function restart_level()
 		collision_mask = 0,
 	}
 	barrels[2] = {
-		position = vec3(5.0, 0.0, 0.0),
+		position = vec3(-20.5, 0.0, 13.0),
 		visibility = true,
 		color = vec3(0.0, 0.0, 1.0),
 		tint = 0.5,

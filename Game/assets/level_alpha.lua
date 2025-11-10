@@ -18,7 +18,9 @@ function update_level(player_position)
 	end
 
 	if barrels[2].visibility then
-		barrels[2].position = barrels[2].position + (player_position - last_player_position)
+		delta_x = player_position.x - last_player_position.x
+		delta_z = player_position.z - last_player_position.z
+		barrels[2].position = barrels[2].position + vec3(delta_x, 0.0, delta_z)
 	end
 	last_player_position = player_position
 
@@ -37,7 +39,7 @@ function restart_level()
 		collision_mask = 0,
 	}
 	barrels[2] = {
-		position = vec3(5.0, 0.0, 0.0),
+		position = vec3(-20.5, 0.0, 13.0),
 		visibility = true,
 		color = vec3(1.0, 0.0, 0.0),
 		tint = 0.5,
