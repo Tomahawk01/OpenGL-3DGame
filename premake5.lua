@@ -1,9 +1,9 @@
 dofile("utils.lua")
 
 configure_file("config.h.in", "GameLib/src/Game/config.h", {
-    OpenGL_Game_VERSION_MAJOR = "0",
+    OpenGL_Game_VERSION_MAJOR = "1",
     OpenGL_Game_VERSION_MINOR = "0",
-    OpenGL_Game_VERSION_PATCH = "19"
+    OpenGL_Game_VERSION_PATCH = "0"
 })
 
 workspace "OpenGL_Game"
