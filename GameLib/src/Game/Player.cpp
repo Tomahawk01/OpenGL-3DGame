@@ -11,7 +11,9 @@ namespace Game {
 		, m_KeyState{}
 		, m_StartPosition{ m_Camera.GetPosition() }
 		, m_Controller{ controller }
-	{}
+	{
+		m_Camera.SetYaw(0.0f);
+	}
 
 	void Player::Update()
 	{
@@ -44,7 +46,7 @@ namespace Game {
 
 	void Player::Restart()
 	{
-		m_Camera.SetYaw(-std::numbers::pi_v<float> / 2.0f);
+		m_Camera.SetYaw(0.0f);
 		m_Camera.SetPitch(0.0f);
 		m_Camera.SetPosition(m_StartPosition);
 	}
