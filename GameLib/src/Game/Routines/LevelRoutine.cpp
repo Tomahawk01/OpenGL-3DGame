@@ -40,7 +40,7 @@ namespace {
 	Game::Camera CreateCamera(const Game::Window& window)
 	{
 		return {
-			{0.0f, 5.0f, 20.0f},
+			{-45.0f, 5.0f, -2.8f},
 			{0.0f, 0.0f, 0.0f},
 			{0.0f, 1.0f, 0.0f},
 			std::numbers::pi_v<float> / 4.0f,
@@ -158,7 +158,11 @@ namespace Game {
 	void LevelRoutine::HandleLevelComplete(std::string_view levelName)
 	{
 		Logger::Info("Level complete: {}", levelName);
-		m_LevelNum = (m_LevelNum + 1) % m_LevelLoaders.size();
+		++m_LevelNum;
+		if (m_LevelNum == m_LevelLoaders.size())
+		{
+			m_Bus.PostStateChange(GameState::EXITING);
+		}
 	}
 
 	void LevelRoutine::HandleKeyPress(const KeyEvent& event)
@@ -194,6 +198,11 @@ namespace Game {
 				m_Level->GetScene().effects.blur = false;
 				m_Bus.PostStateChange(GameState::RUNNING);
 			}
+		}
+
+		if (event.GetKey() == Key::P)
+		{
+			Logger::Trace("Player pos: {}", m_Player.GetPosition());
 		}
 
 		if (event.GetKey() == Key::L && event.GetState() == KeyState::DOWN)
