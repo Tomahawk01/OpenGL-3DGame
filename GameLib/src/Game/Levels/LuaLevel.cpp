@@ -30,7 +30,7 @@ namespace Game {
 		, m_BarrelInfo{}
 		, m_Shapes{}
 		, m_AutoSub{ m_Bus, {MessageType::ENTITY_INTERSECT}, this }
-		, m_RenderDebugLines{ true }
+		, m_RenderDebugLines{ false }
 	{
 		Logger::Info("Loading level: {}", loader.GetName());
 
@@ -42,6 +42,8 @@ namespace Game {
 
 		const ScriptRunner runner{ m_Script };
 		runner.Execute("init_level", player.GetPosition());
+
+		std::vector<PointLight> lights{};
 
 		const auto barrelCount = runner.Execute<int64_t>("barrel_count");
 		for (int64_t i = 0; i < barrelCount; i++)
@@ -60,6 +62,13 @@ namespace Game {
 				static_cast<uint32_t>(std::get<3>(info)),
 				static_cast<uint32_t>(std::get<4>(info))
 			);
+
+			lights.push_back({
+				.position = {5.0f, 5.0f, 0.0f},
+				.color = {1.0f, 0.0f, 0.0f},
+				.constAttenuation = 1.0f,
+				.linearAttenuation = 0.07f,
+				.quadAttenuation = 0.007f });
 		}
 
 		const auto ambientVec = m_Script.HasFunction("get_ambient") ? runner.Execute<vec3>("get_ambient") : vec3{ 0.4f };
@@ -77,25 +86,7 @@ namespace Game {
 				.direction = directionalLightDir,
 				.color = {directionalLightColor.x, directionalLightColor.y, directionalLightColor.z}
 			},
-			.pointLights = {
-				{.position = {5.0f, 5.0f, 0.0f},
-				.color = {1.0f, 0.0f, 0.0f},
-				.constAttenuation = 1.0f,
-				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.007f },
-
-				{.position = {-5.0f, 5.0f, 0.0f},
-				.color = {0.0f, 1.0f, 0.0f},
-				.constAttenuation = 1.0f,
-				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.007f },
-
-				{.position = {-5.0f, 5.0f, 0.0f},
-				.color = {0.0f, 0.0f, 1.0f},
-				.constAttenuation = 1.0f,
-				.linearAttenuation = 0.07f,
-				.quadAttenuation = 0.007f }
-			},
+			.pointLights = { std::move(lights) },
 			.debugLines = {},
 			.skybox = &m_Skybox,
 			.skyboxSampler = resourceCache.Get<Sampler>("sky_box"),
@@ -109,6 +100,8 @@ namespace Game {
 				.ssao = true
 			}
 		};
+
+		m_Bus.PostNewScene(&m_Scene);
 
 		const std::vector levelEntityNames = {
 			"sponza_bricks_05"sv,
