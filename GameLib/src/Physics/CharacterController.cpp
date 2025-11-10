@@ -14,7 +14,7 @@ namespace {
 namespace Game {
 
 	CharacterController::CharacterController(PhysicsSystem& ps, PassKey<PhysicsSystem>)
-		: m_TransformedShape{ ps.CreateShape<CapsuleShape>(0.5f * standingHeight, standingRadius), {{}, {1.0f}, {}} }
+		: m_TransformedShape{ ps.CreateShape<CapsuleShape>(0.5f * standingHeight, standingRadius), {{-45.0f, 0.0f, -2.8f}, {1.0f}, {}} }
 		, m_LinearVelocity{}
 	{}
 
